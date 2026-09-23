@@ -70,12 +70,14 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.5); border-radius: 8px; }
 
         .draggable-element {
-            cursor: grab;
             touch-action: none;
             user-select: none;
+        }
+        .is-editable {
+            cursor: grab;
             transition: outline 0.2s;
         }
-        .draggable-element:active {
+        .is-editable:active {
             cursor: grabbing;
             outline: 2px dashed rgba(244, 63, 94, 0.6);
         }
@@ -85,7 +87,7 @@
 
     <audio id="bgm" loop preload="auto"></audio>
 
-    <!-- ERROR SCREEN AMAN (CADANGAN) -->
+    <!-- ERROR SCREEN AMAN -->
     <div id="error-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
             <div class="text-5xl mb-4">⚠️</div>
@@ -125,7 +127,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.28</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.31</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -165,7 +167,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.28</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.31</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -472,8 +474,8 @@
         ];
 
         let activeDragItem = null;
+        let isReceiverView = false;
 
-        // Kompresi Super Ketat untuk 1 Foto Utama agar Link Sangat Ringkas & Aman
         function compressAndConvertImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -482,7 +484,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxWidth = 180; // Dioptimalkan sekecil mungkin agar string Base64 sangat pendek dan anti-error di WhatsApp
+                    const maxWidth = 180;
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
                         width = maxWidth;
@@ -491,7 +493,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3); // Kualitas 30% yang ringan & tajam
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3);
                     callback(compressedDataUrl);
                 };
                 img.src = e.target.result;
@@ -623,8 +625,6 @@
                         setupReceiverMode();
                         return;
                     } catch (e) {
-                        // Safe Fallback: Jika link terpotong WhatsApp, tetap muat kartu dengan aman tanpa layar error
-                        console.warn("Link terpotong atau rusak, menggunakan mode pemulihan aman...");
                         setupReceiverMode();
                         return;
                     }
@@ -669,6 +669,7 @@
         };
 
         function setupReceiverMode() {
+            isReceiverView = true;
             document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
             document.getElementById('receiver-opening-title').innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
             
@@ -699,6 +700,7 @@
         }
 
         function openDashboardMenu() {
+            isReceiverView = false;
             const email = localStorage.getItem('auth_email') || 'User';
             document.getElementById('dashboard-user-email').innerText = 'Akun: ' + email;
             document.getElementById('main-container').classList.add('hidden');
@@ -731,6 +733,7 @@
         }
 
         function editCard(cardId) {
+            isReceiverView = false;
             const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
             const found = allCards.find(c => c.id === cardId);
             if (found) {
@@ -752,6 +755,7 @@
         }
 
         function createNewCard() {
+            isReceiverView = false;
             cardState = {
                 id: 'card_' + Date.now(),
                 nama: "Audylia Salsabilla",
@@ -964,6 +968,7 @@
         }
 
         function saveCardData() {
+            updateLivePreview(); // Force sync data input terbaru
             if (!cardState.id) cardState.id = 'card_' + Date.now();
             cardState.decorations = dynamicDecorations;
             let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
@@ -974,13 +979,14 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.28)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.31)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
             alert('Perubahan kartu berhasil disimpan! 💾');
         }
 
         function getShareableLink() {
+            updateLivePreview(); // Force sync data input terbaru sebelum link dibuat
             if (!cardState.id) cardState.id = 'card_' + Date.now();
             cardState.decorations = dynamicDecorations;
             const shortCode = encodeCardToShortLink(cardState);
@@ -1010,9 +1016,12 @@
             if (!el) return;
             if (styleType === 'none') {
                 el.className = "draggable-element absolute transition-all duration-300 bg-transparent border-none shadow-none p-0";
+                if (!isReceiverView) el.className += " is-editable";
                 return;
             }
             el.className = "draggable-element absolute p-5 rounded-3xl shadow-2xl transition-all duration-300 max-w-sm w-[90%] ";
+            if (!isReceiverView) el.className += " is-editable ";
+
             if (styleType === 'glass-blur') el.className += "bg-black/25 backdrop-blur-md border border-white/20 text-slate-100";
             else if (styleType === 'solid-dark') el.className += "bg-slate-950/90 border border-slate-800 text-slate-100";
             else if (styleType === 'neon-glow') el.className += "bg-slate-950/80 border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.4)] text-slate-100";
@@ -1072,6 +1081,8 @@
         }
 
         function attachDragEvent(el, posObj) {
+            if (isReceiverView) return;
+            
             el.addEventListener('pointerdown', (e) => {
                 activeDragItem = posObj;
                 el.setPointerCapture(e.pointerId);
@@ -1131,10 +1142,14 @@
             if (cardState.bgStyle === 'custom-image') {
                 customBgBox.classList.remove('hidden');
                 bgWrapper.style.backgroundImage = cardState.bgImgUrl ? `url('${cardState.bgImgUrl}')` : 'none';
-                bgWrapper.className = "w-full h-full relative bg-cover bg-center p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
+                bgWrapper.style.backgroundSize = 'cover';
+                bgWrapper.style.backgroundPosition = 'center';
+                bgWrapper.className = "w-full h-full relative p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
             } else {
                 customBgBox.classList.add('hidden');
-                bgWrapper.style.backgroundImage = 'none';
+                bgWrapper.style.backgroundImage = '';
+                bgWrapper.style.backgroundSize = '';
+                bgWrapper.style.backgroundPosition = '';
                 if (cardState.bgStyle === 'gradient-rose') {
                     bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
                 } else if (cardState.bgStyle === 'gradient-dark') {
@@ -1173,7 +1188,7 @@
             // 1. GIF
             if (cardState.gifUrl && !cardState.hideGif) {
                 let div = document.createElement('div');
-                div.className = 'draggable-element absolute flex justify-center';
+                div.className = 'draggable-element absolute flex justify-center' + (!isReceiverView ? ' is-editable' : '');
                 div.style.left = cardState.posGif.x + '%';
                 div.style.top = cardState.posGif.y + '%';
                 div.style.transform = 'translate(-50%, -50%)';
@@ -1186,7 +1201,7 @@
             if (!cardState.hideJudul) {
                 let h2 = document.createElement('h2');
                 h2.id = 'display-judul';
-                h2.className = `draggable-element absolute font-bold text-center whitespace-nowrap ${judulSize} typewriter-cursor`;
+                h2.className = `draggable-element absolute font-bold text-center whitespace-nowrap ${judulSize} typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
                 h2.style.left = cardState.posJudul.x + '%';
                 h2.style.top = cardState.posJudul.y + '%';
                 h2.style.transform = 'translate(-50%, -50%)';
@@ -1201,7 +1216,7 @@
             // 3. Foto & Bingkai
             if (cardState.frameStyle !== 'none' && !cardState.hideFoto && cardState.fotoUrl) {
                 let wrap = document.createElement('div');
-                wrap.className = 'draggable-element absolute flex justify-center';
+                wrap.className = 'draggable-element absolute flex justify-center' + (!isReceiverView ? ' is-editable' : '');
                 wrap.style.left = cardState.posFoto.x + '%';
                 wrap.style.top = cardState.posFoto.y + '%';
                 wrap.style.transform = 'translate(-50%, -50%)';
@@ -1214,7 +1229,7 @@
             if (!cardState.hideNama) {
                 let p = document.createElement('p');
                 p.id = 'display-nama';
-                p.className = `draggable-element absolute font-semibold text-center whitespace-nowrap ${namaSize} drop-shadow typewriter-cursor`;
+                p.className = `draggable-element absolute font-semibold text-center whitespace-nowrap ${namaSize} drop-shadow typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
                 p.style.left = cardState.posNama.x + '%';
                 p.style.top = cardState.posNama.y + '%';
                 p.style.transform = 'translate(-50%, -50%)';
@@ -1234,6 +1249,7 @@
                 box.style.top = cardState.posUcapan.y + '%';
                 box.style.transform = 'translate(-50%, -50%)';
                 applyGreetingBoxStyle('greeting-box-container', cardState.greetingFrameStyle);
+                if (!isReceiverView) box.classList.add('is-editable');
                 
                 let ucapanP = document.createElement('p');
                 ucapanP.id = 'display-ucapan';
@@ -1250,7 +1266,7 @@
             // 6. Running Text
             if (!cardState.hideRunningText) {
                 let marqueeWrap = document.createElement('div');
-                marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]';
+                marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]' + (!isReceiverView ? ' is-editable' : '');
                 marqueeWrap.style.left = cardState.posRunningText.x + '%';
                 marqueeWrap.style.top = cardState.posRunningText.y + '%';
                 marqueeWrap.style.transform = 'translate(-50%, -50%)';
@@ -1268,7 +1284,7 @@
             // 7. Stiker Dekorasi
             dynamicDecorations.forEach(item => {
                 let el = document.createElement('div');
-                el.className = `draggable-element absolute font-bold ${item.size} p-2`;
+                el.className = `draggable-element absolute font-bold ${item.size} p-2` + (!isReceiverView ? ' is-editable' : '');
                 el.style.left = item.x + '%';
                 el.style.top = item.y + '%';
                 el.style.transform = 'translate(-50%, -50%)';
