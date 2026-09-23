@@ -30,6 +30,25 @@
         button, a, select, input, textarea { -webkit-tap-highlight-color: transparent; }
         .interactive-scale:active { transform: scale(0.97); transition: transform 0.1s ease; }
 
+        /* Animasi Background */
+        @keyframes bgSlomo {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes bgPanRight {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        @keyframes bgPanUp {
+            0% { background-position: 50% 100%; }
+            100% { background-position: 50% 0%; }
+        }
+
+        .bg-anim-slomo { animation: bgSlomo 12s ease infinite; background-size: 200% 200%; }
+        .bg-anim-right { animation: bgPanRight 15s linear infinite; background-size: 200% 200%; }
+        .bg-anim-up { animation: bgPanUp 15s linear infinite; background-size: 200% 200%; }
+
         .typewriter-cursor::after {
             content: '|';
             animation: blink 0.8s infinite;
@@ -87,7 +106,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.19</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.21</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -127,7 +146,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-20 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.19</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.21</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -135,8 +154,8 @@
 
             <!-- Box Konten Kartu Utama -->
             <div id="card-preview-box" class="text-center py-8 my-auto animate-float z-10 max-w-xl mx-auto w-full relative">
-                <!-- Stiker Gen Z Layer -->
-                <div id="preview-stickers-layer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden"></div>
+                <!-- Stiker / Teks Drag & Drop Layer -->
+                <div id="preview-stickers-layer" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
 
                 <div id="gif-container" class="my-3 flex justify-center hidden">
                     <img id="display-gif" class="w-24 h-24 object-contain rounded-xl shadow-md" alt="GIF">
@@ -224,6 +243,15 @@
                         <option value="custom-image">Gunakan Gambar Latar Kustom (URL)</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🎬 Efek Animasi Background</label>
+                    <select id="input-bgeffect" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                        <option value="none">🚫 Diam (Static)</option>
+                        <option value="slomo">🌊 Slomo (Smooth Pulse Lambat)</option>
+                        <option value="right">➡️ Berjalan ke Kanan (Pan Right)</option>
+                        <option value="up">⬆️ Gerak ke Atas (Pan Up)</option>
+                    </select>
+                </div>
                 <div id="custom-bg-url-box" class="hidden">
                     <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Gambar Background</label>
                     <input type="text" id="input-bgimgurl" placeholder="https://..." oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
@@ -257,4 +285,880 @@
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">🎨 Warna Teks</label>
                         <input type="color" id="input-textcolor" value="#f8fafc" oninput="updateLivePreview()" class="w-full h-9 bg-slate-950 border border-slate-800 rounded-xl px-1 cursor-pointer">
-   
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">🔤 Model Huruf</label>
+                        <select id="input-fontfamily" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-200 text-xs focus:outline-none">
+                            <option value="'Poppins', sans-serif">Poppins</option>
+                            <option value="'Playfair Display', serif">Playfair Display</option>
+                            <option value="'Great Vibes', cursive">Great Vibes</option>
+                            <option value="'Dancing Script', cursive">Dancing Script</option>
+                            <option value="'Montserrat', sans-serif">Montserrat</option>
+                            <option value="'Merriweather', serif">Merriweather</option>
+                            <option value="'Sacramento', cursive">Sacramento</option>
+                            <option value="'Cinzel', serif">Cinzel</option>
+                            <option value="'Alex Brush', cursive">Alex Brush</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">📏 Ukuran Teks</label>
+                        <select id="input-fontsize" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-200 text-xs focus:outline-none">
+                            <option value="normal">Normal</option>
+                            <option value="large">Besar</option>
+                            <option value="xlarge">Sangat Besar</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">✨ Efek Dekorasi Teks</label>
+                    <select id="input-textdecoration" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs focus:outline-none">
+                        <option value="shadow">Soft Shadow (Bayangan Halus)</option>
+                        <option value="glow">Text Glow (Garis Bercahaya)</option>
+                        <option value="bold-outline">Bold Outline (Kontras Tebal)</option>
+                        <option value="flat">Flat Minimalis</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TAB 3: GEN Z DECORATIONS & DRAG DROP -->
+            <div id="tab-content-decor" class="space-y-4 editor-tab-pane hidden">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="applyGenZPreset('genz-birthday')" class="bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">🎂 Gen Z Birthday</button>
+                        <button onclick="applyGenZPreset('cute-genz')" class="bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">🧸 Cute Gen Z</button>
+                        <button onclick="applyGenZPreset('neon-party')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">🔥 Neon Party</button>
+                        <button onclick="applyGenZPreset('pastel-love')" class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">💖 Pastel Love</button>
+                    </div>
+                </div>
+                <div class="space-y-3 pt-2 border-t border-slate-800/80">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <label class="text-xs font-medium text-slate-300">✋ Teks Bebas (Drag & Drop)</label>
+                            <p class="text-[10px] text-slate-500">Anda bisa geser teks langsung di layar pratinjau!</p>
+                        </div>
+                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-semibold interactive-scale">+ Tambah Teks</button>
+                    </div>
+                    <div id="dynamic-decor-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar"></div>
+                </div>
+            </div>
+
+            <!-- TAB 4: MEDIA -->
+            <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload Foto Utama (Dari HP)</label>
+                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
+                    <p class="text-[10px] text-slate-500 mt-1">💡 Otomatis dikompres agar link tetap ringkas.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Atau Link URL Foto</label>
+                    <input type="text" id="input-fotourl" placeholder="https://..." oninput="updateMediaFromInput('foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                </div>
+                <div class="pt-2 border-t border-slate-800">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">✨ Upload GIF / Stiker Bergerak (Dari HP)</label>
+                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'gif')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Musik MP3 (URL)</label>
+                    <input type="text" id="input-musikurl" placeholder="https://..." oninput="updateMediaFromInput('musik')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                </div>
+            </div>
+
+            <!-- TAB 5: AKSI & PENGATURAN -->
+            <div id="tab-content-settings" class="space-y-4 editor-tab-pane hidden">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-medium text-slate-400">⚡ Kecepatan Mesin Tik (Typewriter)</label>
+                        <span id="speed-label" class="text-xs font-mono text-rose-400 font-semibold">40 ms</span>
+                    </div>
+                    <input type="range" id="input-typespeed" min="10" max="150" step="5" value="40" oninput="updateLivePreview()" class="w-full accent-rose-500 bg-slate-950 cursor-pointer">
+                </div>
+                <div id="upload-status" class="text-xs text-center text-rose-400 font-medium h-5"></div>
+                <button onclick="saveCardData()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg interactive-scale">💾 Simpan Perubahan Kartu</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar (5 Tab Ikon di Bawah Layar Penuh) -->
+        <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
+            <button onclick="openEditorModal('text')" id="nav-btn-text" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+                <span class="text-base">✏️</span>
+                <span>Teks</span>
+            </button>
+            <button onclick="openEditorModal('design')" id="nav-btn-design" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+                <span class="text-base">🎨</span>
+                <span>Desain</span>
+            </button>
+            <button onclick="openEditorModal('decor')" id="nav-btn-decor" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+                <span class="text-base">✨</span>
+                <span>Stiker</span>
+            </button>
+            <button onclick="openEditorModal('media')" id="nav-btn-media" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+                <span class="text-base">📁</span>
+                <span>Media</span>
+            </button>
+            <button onclick="openEditorModal('settings')" id="nav-btn-settings" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+                <span class="text-base">⚙️</span>
+                <span>Aksi</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script>
+        let cardState = {
+            id: "",
+            nama: "Audylia Salsabilla",
+            judul: "Happy Birthday",
+            ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+            fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+            gifUrl: "",
+            videoUrl: "",
+            musikUrl: "",
+            textColor: "#f8fafc",
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: "normal",
+            bgStyle: "gradient-rose",
+            bgEffect: "none",
+            bgImgUrl: "",
+            frameStyle: "rounded-full",
+            typewriterSpeed: 40,
+            textDecoration: "shadow",
+            openingTitle: "ADA UCAPAN UNTUKMU",
+            openingButtonText: "BUKA KARTU",
+            greetingFrameStyle: "glass-blur",
+            hideJudul: false,
+            hideFoto: false,
+            hideNama: false,
+            hideUcapan: false,
+            hideGif: false
+        };
+
+        let dynamicDecorations = [
+            { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 50, y: 15, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
+            { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
+        ];
+
+        let activeDragItem = null;
+
+        function compressAndConvertImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxWidth = 400;
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                    callback(compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressAndConvertImage(file, function(resultUrl) {
+                if (type === 'foto') {
+                    cardState.fotoUrl = resultUrl;
+                    const inputEl = document.getElementById('input-fotourl');
+                    if (inputEl) inputEl.value = '(Foto dari HP terunggah)';
+                } else if (type === 'gif') {
+                    cardState.gifUrl = resultUrl;
+                }
+                updateLivePreview();
+                alert('File berhasil diunggah & dikompres otomatis! ✨');
+            });
+        }
+
+        function encodeCardToShortLink(obj) {
+            const compactObj = {
+                n: obj.nama,
+                j: obj.judul,
+                u: obj.ucapan,
+                f: obj.fotoUrl,
+                g: obj.gifUrl,
+                m: obj.musikUrl,
+                tc: obj.textColor,
+                ff: obj.fontFamily,
+                fs: obj.fontSize,
+                bs: obj.bgStyle,
+                be: obj.bgEffect,
+                bi: obj.bgImgUrl,
+                fr: obj.frameStyle,
+                ts: obj.typewriterSpeed,
+                td: obj.textDecoration,
+                ot: obj.openingTitle,
+                ob: obj.openingButtonText,
+                gf: obj.greetingFrameStyle,
+                hj: obj.hideJudul ? 1 : 0,
+                hf: obj.hideFoto ? 1 : 0,
+                hn: obj.hideNama ? 1 : 0,
+                hu: obj.hideUcapan ? 1 : 0,
+                hg: obj.hideGif ? 1 : 0,
+                dec: dynamicDecorations.map(d => ({t: d.text, x: d.x, y: d.y, s: d.size, c: d.color, fn: d.font}))
+            };
+            const jsonStr = JSON.stringify(compactObj);
+            return LZString.compressToEncodedURIComponent(jsonStr);
+        }
+
+        function decodeShortLinkToCard(compressedStr) {
+            const jsonStr = LZString.decompressFromEncodedURIComponent(compressedStr);
+            const c = JSON.parse(jsonStr);
+            return {
+                id: 'card_' + Date.now(),
+                nama: c.n,
+                judul: c.j,
+                ucapan: c.u,
+                fotoUrl: c.f,
+                gifUrl: c.g,
+                musikUrl: c.m,
+                textColor: c.tc,
+                fontFamily: c.ff,
+                fontSize: c.fs,
+                bgStyle: c.bs,
+                bgEffect: c.be || 'none',
+                bgImgUrl: c.bi,
+                frameStyle: c.fr,
+                typewriterSpeed: c.ts,
+                textDecoration: c.td,
+                openingTitle: c.ot,
+                openingButtonText: c.ob,
+                greetingFrameStyle: c.gf,
+                hideJudul: c.hj === 1,
+                hideFoto: c.hf === 1,
+                hideNama: c.hn === 1,
+                hideUcapan: c.hu === 1,
+                hideGif: c.hg === 1,
+                decorations: c.dec ? c.dec.map(d => ({id: 'dec_' + Math.random(), text: d.t, x: d.x, y: d.y, size: d.s, color: d.c, font: d.fn})) : []
+            };
+        }
+
+        window.onload = function() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const shortParam = urlParams.get('c');
+                const oldCardParam = urlParams.get('card');
+                const cardId = urlParams.get('id');
+
+                if (shortParam) {
+                    try {
+                        cardState = decodeShortLinkToCard(shortParam);
+                        if (cardState.decorations) dynamicDecorations = cardState.decorations;
+                        setupReceiverMode();
+                        return;
+                    } catch (e) {
+                        showErrorScreen("Gagal Memuat", "Data kartu di dalam link rusak atau tidak valid.");
+                        return;
+                    }
+                }
+
+                if (oldCardParam) {
+                    try {
+                        const decoded = decodeURIComponent(atob(oldCardParam).split('').map(function(c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        cardState = JSON.parse(decoded);
+                        if (cardState.decorations) dynamicDecorations = cardState.decorations;
+                        setupReceiverMode();
+                        return;
+                    } catch (e) {}
+                }
+
+                if (cardId) {
+                    const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+                    const found = allCards.find(c => c.id === cardId);
+                    if (found) {
+                        cardState = found;
+                        if (found.decorations) dynamicDecorations = found.decorations;
+                        setupReceiverMode();
+                    } else {
+                        showErrorScreen("Kartu Tidak Ditemukan", "Link kartu yang Anda akses tidak terdaftar di perangkat ini.");
+                    }
+                    return;
+                }
+
+                const activeEmail = localStorage.getItem('auth_email');
+                if (!activeEmail) {
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                } else {
+                    openDashboardMenu();
+                }
+                renderDecorEditorList();
+                renderDynamicDecorationsInPreview();
+            } catch (err) {
+                showErrorScreen("Terjadi Kesalahan", "Gagal memuat aplikasi.");
+            }
+        };
+
+        function setupReceiverMode() {
+            document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
+            document.getElementById('receiver-opening-title').innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
+            
+            const bottomNav = document.querySelector('.fixed.bottom-0');
+            if (bottomNav) bottomNav.style.display = 'none';
+            const topBar = document.getElementById('top-action-bar');
+            if (topBar) topBar.style.display = 'none';
+
+            document.getElementById('opening-screen').classList.remove('hidden');
+            applyCardStateToUI();
+        }
+
+        function submitLogin() {
+            const email = document.getElementById('auth-email').value.trim();
+            const statusEl = document.getElementById('auth-status');
+            if (!email || !email.includes('@')) {
+                statusEl.innerText = 'Masukkan email yang valid!';
+                return;
+            }
+            localStorage.setItem('auth_email', email);
+            document.getElementById('auth-screen').classList.add('hidden');
+            openDashboardMenu();
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('auth_email');
+            location.reload();
+        }
+
+        function openDashboardMenu() {
+            const email = localStorage.getItem('auth_email') || 'User';
+            document.getElementById('dashboard-user-email').innerText = 'Akun: ' + email;
+            document.getElementById('main-container').classList.add('hidden');
+            document.getElementById('dashboard-menu-screen').classList.remove('hidden');
+
+            const container = document.getElementById('user-cards-list');
+            const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            
+            if (allCards.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-500 text-xs py-8">Belum ada kartu tersimpan. Silakan buat baru!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            allCards.forEach(card => {
+                let itemDiv = document.createElement('div');
+                itemDiv.className = 'bg-slate-950 border border-slate-800 rounded-2xl p-4 flex justify-between items-center gap-3';
+                itemDiv.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-slate-200 text-sm">${card.judul || 'Tanpa Judul'}</h4>
+                        <p class="text-xs text-rose-300">Penerima: ${card.nama || '-'}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editCard('${card.id}')" class="bg-rose-600 text-white text-xs px-3 py-1.5 rounded-xl cursor-pointer">✏️ Edit</button>
+                        <button onclick="deleteCard('${card.id}')" class="bg-slate-800 text-slate-400 text-xs px-3 py-1.5 rounded-xl cursor-pointer">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function editCard(cardId) {
+            const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            const found = allCards.find(c => c.id === cardId);
+            if (found) {
+                cardState = found;
+                if (found.decorations) dynamicDecorations = found.decorations;
+                applyCardStateToUI();
+                renderDecorEditorList();
+                renderDynamicDecorationsInPreview();
+                document.getElementById('dashboard-menu-screen').classList.add('hidden');
+                document.getElementById('main-container').classList.remove('hidden');
+            }
+        }
+
+        function deleteCard(cardId) {
+            if (!confirm('Hapus kartu ini?')) return;
+            let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            allCards = allCards.filter(c => c.id !== cardId);
+            localStorage.setItem('my_digital_cards', JSON.stringify(allCards));
+            openDashboardMenu();
+        }
+
+        function createNewCard() {
+            cardState = {
+                id: 'card_' + Date.now(),
+                nama: "Audylia Salsabilla",
+                judul: "Happy Birthday",
+                ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+                fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+                gifUrl: "",
+                videoUrl: "",
+                musikUrl: "",
+                textColor: "#f8fafc",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "normal",
+                bgStyle: "gradient-rose",
+                bgEffect: "none",
+                bgImgUrl: "",
+                frameStyle: "rounded-full",
+                typewriterSpeed: 40,
+                textDecoration: "shadow",
+                openingTitle: "ADA UCAPAN UNTUKMU",
+                openingButtonText: "BUKA KARTU",
+                greetingFrameStyle: "glass-blur",
+                hideJudul: false,
+                hideFoto: false,
+                hideNama: false,
+                hideUcapan: false,
+                hideGif: false
+            };
+            dynamicDecorations = [
+                { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 50, y: 15, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
+                { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
+            ];
+            applyCardStateToUI();
+            renderDecorEditorList();
+            renderDynamicDecorationsInPreview();
+            document.getElementById('dashboard-menu-screen').classList.add('hidden');
+            document.getElementById('main-container').classList.remove('hidden');
+        }
+
+        function backToDashboard() { openDashboardMenu(); }
+
+        function openEditorModal(tabName) {
+            const modal = document.getElementById('editor-modal');
+            const panes = document.querySelectorAll('.editor-tab-pane');
+            panes.forEach(p => p.classList.add('hidden'));
+
+            const targetPane = document.getElementById('tab-content-' + tabName);
+            if (targetPane) targetPane.classList.remove('hidden');
+
+            const titles = {
+                'text': '✏️ Editor Teks & Saklar Tampilan',
+                'design': '🎨 Editor Desain & Animasi Latar',
+                'decor': '✨ Stiker & Drag & Drop Teks',
+                'media': '📁 Upload Berkas Media (HP)',
+                'settings': '⚙️ Pengaturan & Simpan'
+            };
+            document.getElementById('modal-title-text').innerText = titles[tabName] || 'Editor';
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditorModal() {
+            document.getElementById('editor-modal').classList.add('hidden');
+        }
+
+        function applyGenZPreset(presetName) {
+            if (presetName === 'genz-birthday') {
+                dynamicDecorations = [
+                    { id: 'p1', text: '🎂 LEVEL UNLOCKED 🎂', x: 50, y: 15, size: 'text-2xl', font: "'Poppins', sans-serif", color: '#ff3366' },
+                    { id: 'p2', text: '✨ MAIN CHARACTER ENERGY ✨', x: 50, y: 85, size: 'text-lg', font: "'Great Vibes', cursive", color: '#ff99cc' }
+                ];
+            } else if (presetName === 'cute-genz') {
+                dynamicDecorations = [
+                    { id: 'p1', text: '🧸 SO CUTE & COZY ☁️', x: 50, y: 15, size: 'text-xl', font: "'Sacramento', cursive", color: '#ffb3ba' },
+                    { id: 'p2', text: '💖 BEST DAY EVER 🌸', x: 50, y: 85, size: 'text-lg', font: "'Poppins', sans-serif", color: '#ffdfba' }
+                ];
+            } else if (presetName === 'neon-party') {
+                dynamicDecorations = [
+                    { id: 'p1', text: '🔥 VIBES ONLY 🔥', x: 50, y: 15, size: 'text-2xl', font: "'Cinzel', serif", color: '#00ffff' },
+                    { id: 'p2', text: '⚡ PARTY TIME ⚡', x: 50, y: 85, size: 'text-xl', font: "'Montserrat', sans-serif", color: '#ff00ff' }
+                ];
+            } else if (presetName === 'pastel-love') {
+                dynamicDecorations = [
+                    { id: 'p1', text: '💌 WITH LOVE & HUGS 💌', x: 50, y: 15, size: 'text-xl', font: "'Alex Brush', cursive", color: '#b5ead7' },
+                    { id: 'p2', text: '🌟 SHINE BRIGHT 🌟', x: 50, y: 85, size: 'text-lg', font: "'Poppins', sans-serif", color: '#c7ceea' }
+                ];
+            }
+            renderDynamicDecorationsInPreview();
+            renderDecorEditorList();
+        }
+
+        function addNewDecorationText() {
+            dynamicDecorations.push({
+                id: 'dec_' + Date.now(),
+                text: '✨ TEKS BARU ✨',
+                x: 50,
+                y: 50,
+                size: 'text-lg',
+                font: "'Poppins', sans-serif",
+                color: '#ffffff'
+            });
+            renderDynamicDecorationsInPreview();
+            renderDecorEditorList();
+        }
+
+        function renderDecorEditorList() {
+            const listEl = document.getElementById('dynamic-decor-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            dynamicDecorations.forEach((item) => {
+                let div = document.createElement('div');
+                div.className = 'bg-slate-950 border border-slate-800 p-2.5 rounded-xl space-y-2 text-xs';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <input type="text" value="${item.text}" oninput="updateDecorText('${item.id}', this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200 focus:outline-none">
+                        <button onclick="removeDecorItem('${item.id}')" class="text-slate-400 hover:text-red-400 p-1 cursor-pointer">🗑️</button>
+                    </div>
+                    <div class="flex items-center gap-2 justify-between">
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-400">Ukuran:</span>
+                            <button onclick="changeDecorSize('${item.id}', 'decrease')" class="bg-slate-800 px-2 py-0.5 rounded text-slate-200">A-</button>
+                            <button onclick="changeDecorSize('${item.id}', 'increase')" class="bg-slate-800 px-2 py-0.5 rounded text-slate-200">A+</button>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-400">Warna:</span>
+                            <input type="color" value="${item.color}" onchange="updateDecorColor('${item.id}', this.value)" class="w-6 h-6 bg-transparent cursor-pointer">
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function updateDecorText(id, val) {
+            let item = dynamicDecorations.find(d => d.id === id);
+            if (item) { item.text = val; renderDynamicDecorationsInPreview(); }
+        }
+
+        function updateDecorColor(id, val) {
+            let item = dynamicDecorations.find(d => d.id === id);
+            if (item) { item.color = val; renderDynamicDecorationsInPreview(); }
+        }
+
+        function changeDecorSize(id, action) {
+            let item = dynamicDecorations.find(d => d.id === id);
+            if (!item) return;
+            const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl'];
+            let idx = sizes.indexOf(item.size);
+            if (action === 'increase' && idx < sizes.length - 1) item.size = sizes[idx + 1];
+            if (action === 'decrease' && idx > 0) item.size = sizes[idx - 1];
+            renderDynamicDecorationsInPreview();
+        }
+
+        function removeDecorItem(id) {
+            dynamicDecorations = dynamicDecorations.filter(d => d.id !== id);
+            renderDynamicDecorationsInPreview();
+            renderDecorEditorList();
+        }
+
+        function renderDynamicDecorationsInPreview() {
+            const layer = document.getElementById('preview-stickers-layer');
+            if (!layer) return;
+            layer.innerHTML = '';
+            dynamicDecorations.forEach(item => {
+                let el = document.createElement('div');
+                el.className = `absolute select-none font-bold ${item.size} cursor-grab active:cursor-grabbing p-2 touch-none`;
+                el.style.left = item.x + '%';
+                el.style.top = item.y + '%';
+                el.style.transform = 'translate(-50%, -50%)';
+                el.style.color = item.color;
+                el.style.fontFamily = item.font;
+                el.style.textShadow = '0 2px 8px rgba(0,0,0,0.6)';
+                el.innerText = item.text;
+
+                // Drag & Drop Pointer Events (Mendukung Mouse & Sentuhan HP)
+                el.addEventListener('pointerdown', (e) => {
+                    activeDragItem = item;
+                    el.setPointerCapture(e.pointerId);
+                    e.stopPropagation();
+                });
+                el.addEventListener('pointermove', (e) => {
+                    if (activeDragItem !== item) return;
+                    const wrapper = document.getElementById('card-bg-wrapper');
+                    const rect = wrapper.getBoundingClientRect();
+                    let x = ((e.clientX - rect.left) / rect.width) * 100;
+                    let y = ((e.clientY - rect.top) / rect.height) * 100;
+                    item.x = Math.max(5, Math.min(95, x));
+                    item.y = Math.max(5, Math.min(95, y));
+                    renderDynamicDecorationsInPreview();
+                });
+                el.addEventListener('pointerup', (e) => {
+                    activeDragItem = null;
+                });
+
+                layer.appendChild(el);
+            });
+        }
+
+        function saveCardData() {
+            if (!cardState.id) cardState.id = 'card_' + Date.now();
+            let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            const index = allCards.findIndex(c => c.id === cardState.id);
+            if (index >= 0) allCards[index] = cardState;
+            else allCards.push(cardState);
+            localStorage.setItem('my_digital_cards', JSON.stringify(allCards));
+            
+            const statusEl = document.getElementById('upload-status');
+            if (statusEl) {
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.21)';
+                setTimeout(() => { statusEl.innerText = ''; }, 3000);
+            }
+        }
+
+        function getShareableLink() {
+            if (!cardState.id) cardState.id = 'card_' + Date.now();
+            const shortCode = encodeCardToShortLink(cardState);
+            return window.location.href.split('?')[0] + '?c=' + shortCode;
+        }
+
+        function shareWhatsApp() {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('🎉 Ada undangan spesial untukmu:\n' + getShareableLink())}`, '_blank');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(getShareableLink());
+            alert('Link Sangat Ringkas Berhasil Disalin! 📋 (Siap dikirim ke WhatsApp)');
+        }
+
+        function applyTextDecorationStyle(element, decoStyle) {
+            if (!element) return;
+            element.style.textShadow = '';
+            if (decoStyle === 'shadow') element.style.textShadow = '0 4px 12px rgba(0, 0, 0, 0.7)';
+            else if (decoStyle === 'glow') element.style.textShadow = '0 0 10px rgba(244, 63, 94, 0.8)';
+            else if (decoStyle === 'bold-outline') element.style.textShadow = '-1px -1px 0 #000, 1px -1px 0 #000';
+            else element.style.textShadow = 'none';
+        }
+
+        function applyGreetingBoxStyle(containerId, styleType) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            if (styleType === 'none') {
+                el.className = "mt-4 transition-all duration-300 bg-transparent border-none shadow-none p-0";
+                return;
+            }
+            el.className = "p-6 rounded-3xl mt-4 shadow-2xl transition-all duration-300 ";
+            if (styleType === 'glass-blur') el.className += "bg-black/25 backdrop-blur-md border border-white/20 text-slate-100";
+            else if (styleType === 'solid-dark') el.className += "bg-slate-950/90 border border-slate-800 text-slate-100";
+            else if (styleType === 'neon-glow') el.className += "bg-slate-950/80 border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.4)] text-slate-100";
+            else if (styleType === 'gradient-border') el.className += "bg-slate-900/90 border-2 border-rose-500/50 shadow-lg text-slate-100";
+            else if (styleType === 'polaroid-box') el.className += "bg-white text-slate-900 border-4 border-slate-200 shadow-2xl rounded-lg";
+        }
+
+        function applyCardStateToUI() {
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setVal('input-nama', cardState.nama);
+            setVal('input-judul', cardState.judul);
+            setVal('input-ucapan', cardState.ucapan);
+            setVal('input-openingtitle', cardState.openingTitle);
+            setVal('input-openingbtn', cardState.openingButtonText);
+            setVal('input-textcolor', cardState.textColor);
+            setVal('input-fontfamily', cardState.fontFamily);
+            setVal('input-fontsize', cardState.fontSize);
+            setVal('input-bgstyle', cardState.bgStyle || 'gradient-rose');
+            setVal('input-bgeffect', cardState.bgEffect || 'none');
+            setVal('input-bgimgurl', cardState.bgImgUrl);
+            setVal('input-framestyle', cardState.frameStyle);
+            setVal('input-greetingframe', cardState.greetingFrameStyle);
+            setVal('input-typespeed', cardState.typewriterSpeed || 40);
+            setVal('input-textdecoration', cardState.textDecoration);
+            setVal('input-fotourl', cardState.fotoUrl);
+            setVal('input-musikurl', cardState.musikUrl);
+
+            const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+            setChk('input-hidejudul', cardState.hideJudul);
+            setChk('input-hidefoto', cardState.hideFoto);
+            setChk('input-hidenama', cardState.hideNama);
+            setChk('input-hideucapan', cardState.hideUcapan);
+            setChk('input-hidegif', cardState.hideGif);
+
+            updateLivePreview();
+            renderDynamicDecorationsInPreview();
+        }
+
+        function runTypewriterEffect(elementId, text, speed) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.dataset.timer) {
+                clearTimeout(parseInt(el.dataset.timer));
+            }
+            el.innerText = "";
+            let i = 0;
+            function typeChar() {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                    let timer = setTimeout(typeChar, speed);
+                    el.dataset.timer = timer;
+                }
+            }
+            typeChar();
+        }
+
+        function updateLivePreview() {
+            cardState.nama = document.getElementById('input-nama').value;
+            cardState.judul = document.getElementById('input-judul').value;
+            cardState.ucapan = document.getElementById('input-ucapan').value;
+            cardState.openingTitle = document.getElementById('input-openingtitle').value;
+            cardState.openingButtonText = document.getElementById('input-openingbtn').value;
+            cardState.textColor = document.getElementById('input-textcolor').value;
+            cardState.fontFamily = document.getElementById('input-fontfamily').value;
+            cardState.fontSize = document.getElementById('input-fontsize').value;
+            cardState.bgStyle = document.getElementById('input-bgstyle').value;
+            cardState.bgEffect = document.getElementById('input-bgeffect').value;
+            cardState.bgImgUrl = document.getElementById('input-bgimgurl').value;
+            cardState.frameStyle = document.getElementById('input-framestyle').value;
+            cardState.greetingFrameStyle = document.getElementById('input-greetingframe').value;
+            cardState.typewriterSpeed = parseInt(document.getElementById('input-typespeed').value) || 40;
+            cardState.textDecoration = document.getElementById('input-textdecoration').value;
+            
+            const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
+            cardState.hideJudul = getChk('input-hidejudul');
+            cardState.hideFoto = getChk('input-hidefoto');
+            cardState.hideNama = getChk('input-hidenama');
+            cardState.hideUcapan = getChk('input-hideucapan');
+            cardState.hideGif = getChk('input-hidegif');
+
+            document.getElementById('speed-label').innerText = cardState.typewriterSpeed + ' ms';
+
+            const bgWrapper = document.getElementById('card-bg-wrapper');
+            const customBgBox = document.getElementById('custom-bg-url-box');
+
+            let animClass = "";
+            if (cardState.bgEffect === 'slomo') animClass = " bg-anim-slomo";
+            else if (cardState.bgEffect === 'right') animClass = " bg-anim-right";
+            else if (cardState.bgEffect === 'up') animClass = " bg-anim-up";
+
+            if (cardState.bgStyle === 'custom-image') {
+                customBgBox.classList.remove('hidden');
+                bgWrapper.style.backgroundImage = cardState.bgImgUrl ? `url('${cardState.bgImgUrl}')` : 'none';
+                bgWrapper.className = "w-full h-full relative bg-cover bg-center p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+            } else {
+                customBgBox.classList.add('hidden');
+                bgWrapper.style.backgroundImage = 'none';
+                if (cardState.bgStyle === 'gradient-rose') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                } else if (cardState.bgStyle === 'gradient-dark') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                } else if (cardState.bgStyle === 'solid-black') {
+                    bgWrapper.className = "w-full h-full relative bg-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                } else if (cardState.bgStyle === 'gradient-purple') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                }
+            }
+
+            const customColor = cardState.textColor;
+            const customFont = cardState.fontFamily;
+            const sizeSetting = cardState.fontSize;
+            const decoStyle = cardState.textDecoration;
+            const speed = cardState.typewriterSpeed;
+
+            let judulSize = "text-3xl md:text-4xl";
+            let namaSize = "text-2xl md:text-3xl";
+            let ucapanSize = "text-base md:text-lg";
+
+            if (sizeSetting === 'large') {
+                judulSize = "text-4xl md:text-5xl";
+                namaSize = "text-3xl md:text-4xl";
+                ucapanSize = "text-lg md:text-xl";
+            } else if (sizeSetting === 'xlarge') {
+                judulSize = "text-5xl md:text-6xl";
+                namaSize = "text-4xl md:text-5xl";
+                ucapanSize = "text-xl md:text-2xl";
+            }
+
+            // 1. Judul Kartu
+            const judulEl = document.getElementById('display-judul');
+            if (judulEl) {
+                if (cardState.hideJudul) {
+                    judulEl.classList.add('hidden');
+                } else {
+                    judulEl.classList.remove('hidden');
+                    judulEl.style.color = customColor;
+                    judulEl.style.fontFamily = customFont;
+                    judulEl.className = judulSize + " font-bold mb-4 typewriter-cursor";
+                    runTypewriterEffect('display-judul', cardState.judul, speed);
+                    applyTextDecorationStyle(judulEl, decoStyle);
+                }
+            }
+
+            // 2. Nama Penerima
+            const namaEl = document.getElementById('display-nama');
+            if (namaEl) {
+                if (cardState.hideNama) {
+                    namaEl.classList.add('hidden');
+                } else {
+                    namaEl.classList.remove('hidden');
+                    namaEl.style.color = customColor;
+                    namaEl.style.fontFamily = customFont;
+                    namaEl.className = namaSize + " font-semibold mb-3 typewriter-cursor";
+                    runTypewriterEffect('display-nama', cardState.nama, speed);
+                    applyTextDecorationStyle(namaEl, decoStyle);
+                }
+            }
+
+            // 3. Kotak Ucapan
+            const greetingBoxContainer = document.getElementById('greeting-box-container');
+            if (greetingBoxContainer) {
+                if (cardState.hideUcapan) {
+                    greetingBoxContainer.classList.add('hidden');
+                } else {
+                    greetingBoxContainer.classList.remove('hidden');
+                    applyGreetingBoxStyle('greeting-box-container', cardState.greetingFrameStyle);
+                    const ucapanEl = document.getElementById('display-ucapan');
+                    if (ucapanEl) {
+                        ucapanEl.style.color = cardState.greetingFrameStyle === 'polaroid-box' ? '#0f172a' : customColor;
+                        ucapanEl.style.fontFamily = customFont;
+                        ucapanEl.className = "italic leading-relaxed typewriter-cursor " + ucapanSize;
+                        runTypewriterEffect('display-ucapan', cardState.ucapan, speed);
+                        applyTextDecorationStyle(ucapanEl, decoStyle);
+                    }
+                }
+            }
+
+            // 4. Foto Utama
+            const fotoContainer = document.getElementById('foto-preview-container');
+            const fotoEl = document.getElementById('display-foto');
+            if (cardState.frameStyle === 'none' || cardState.hideFoto) {
+                if (fotoContainer) fotoContainer.classList.add('hidden');
+            } else {
+                if (fotoContainer) fotoContainer.classList.remove('hidden');
+                if (fotoEl && cardState.fotoUrl) {
+                    fotoEl.src = cardState.fotoUrl;
+                    fotoEl.className = "w-36 h-36 md:w-48 md:h-48 object-cover border-4 border-rose-500/40 shadow-xl animate-beat transition-all duration-300 " + cardState.frameStyle;
+                }
+            }
+
+            // 5. GIF / Stiker Bergerak
+            const gifEl = document.getElementById('display-gif');
+            const gifContainer = document.getElementById('gif-container');
+            if (cardState.gifUrl && gifEl && gifContainer && !cardState.hideGif) {
+                gifEl.src = cardState.gifUrl;
+                gifContainer.classList.remove('hidden');
+            } else if (gifContainer) {
+                gifContainer.classList.add('hidden');
+            }
+
+            document.getElementById('receiver-opening-title').innerText = cardState.openingTitle;
+            const openingBtn = document.getElementById('receiver-opening-btn');
+            if (openingBtn) openingBtn.innerText = cardState.openingButtonText;
+            document.getElementById('receiver-recipient-name').innerText = cardState.nama;
+        }
+
+        function updateMediaFromInput(type) {
+            if (type === 'foto') cardState.fotoUrl = document.getElementById('input-fotourl').value.trim();
+            if (type === 'musik') cardState.musikUrl = document.getElementById('input-musikurl').value.trim();
+            updateLivePreview();
+        }
+
+        function openReceiverCard() {
+            document.getElementById('opening-screen').style.display = 'none';
+            document.getElementById('main-container').classList.remove('hidden');
+            if (cardState.musikUrl) {
+                const audio = document.getElementById('bgm');
+                audio.src = cardState.musikUrl;
+                audio.play().catch(() => {});
+            }
+            if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            applyCardStateToUI();
+        }
+
+        function showErrorScreen(title, desc) {
+            document.getElementById('error-title').innerText = title;
+            document.getElementById('error-desc').innerText = desc;
+            document.getElementById('error-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
