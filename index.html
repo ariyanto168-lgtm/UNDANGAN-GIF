@@ -38,17 +38,16 @@
         
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
-            overflow: hidden; z-index: 1; opacity: 1; display: flex; flex-direction: column;
-            background: radial-gradient(circle, #2a2d42 0%, #080b12 100%);
+            overflow: hidden; z-index: 1; opacity: 1; background: #080b12;
         }
         #openedCard .gallery-container img { 
             width: 100vw; height: 100vh; object-fit: cover; object-position: center; border: none; display: block;
-            filter: brightness(1.4) contrast(1.2) saturate(1.2);
+            filter: brightness(1.2) contrast(0.92) saturate(1.05);
         }
 
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(8,11,18,0.15) 0%, rgba(8,11,18,0.65) 100%);
+            background: radial-gradient(circle, rgba(8,11,18,0.15) 0%, rgba(8,11,18,0.6) 100%);
             z-index: 2; pointer-events: none;
         }
 
@@ -86,14 +85,14 @@
         
         @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
         
-        /* EFEK BACKGROUND */
-        .effect-scroll-up { animation: scrollUpFull 40s linear infinite; }
-        .effect-slide-side { animation: slideSideFull 20s ease-in-out infinite alternate; width: 120vw !important; }
-        .effect-zoom-slow { animation: zoomSlow 25s ease-in-out infinite alternate; }
+        /* EFEK BACKGROUND ANIMASI */
+        .effect-zoom-slow img { animation: zoomSlow 25s ease-in-out infinite alternate; }
+        .effect-slide-side img { animation: slideSideFull 20s ease-in-out infinite alternate; width: 120vw !important; }
+        .effect-pulse img { animation: pulseSlow 10s ease-in-out infinite alternate; }
 
-        @keyframes scrollUpFull { 0% { transform: translateY(0); } 100% { transform: translateY(-100vh); } }
-        @keyframes slideSideFull { 0% { transform: translateX(0); } 100% { transform: translateX(-20vw); } }
-        @keyframes zoomSlow { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        @keyframes zoomSlow { 0% { transform: scale(1); } 100% { transform: scale(1.18); } }
+        @keyframes slideSideFull { 0% { transform: translateX(0); } 100% { transform: translateX(-15vw); } }
+        @keyframes pulseSlow { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
         @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         /* ANIMASI IKON KUSTOM */
@@ -156,7 +155,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v6.0 URL Photo</div>
+    <div class="version-badge" id="versionBadge">v6.3 TopConfetti</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -246,7 +245,6 @@
         <div class="settings-card">
             <div class="settings-header">🎵 Media & WhatsApp</div>
             
-            <!-- MENU URL FOTO BARU -->
             <div class="form-group">
                 <label>Link / URL Foto (Background Full Screen):</label>
                 <input type="text" id="inputPhotoUrl" placeholder="Contoh: https://i.imgur.com/xxxxx.jpg" oninput="previewPhotoUrl(this.value)">
@@ -290,8 +288,8 @@
 
     <!-- AREA KARTU UTAMA (Preview & Hasil) -->
     <div id="openedCard">
-        <!-- BACKGROUND FOTO FULL SCREEN -->
-        <div class="gallery-container effect-scroll-up" id="mainGalleryContainer"></div>
+        <!-- BACKGROUND FOTO FULL SCREEN UTUH -->
+        <div class="gallery-container" id="mainGalleryContainer"></div>
 
         <div class="drag-instruction" id="dragHint" style="display: none;">👆 Sentuh & Geser Teks untuk Pindah Posisi</div>
 
@@ -323,9 +321,9 @@
         <button class="modal-close-btn" onclick="closeEffectModal()">✕</button>
         <div class="modal-full-content">
             <h3 style="color: #ffb8c6; margin-bottom: 15px;">✨ Pilih Efek Background</h3>
-            <button class="effect-option-btn" onclick="applyEffect('scroll-up')">🎞️ Gulir Naik Penuh</button>
-            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan</button>
-            <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Out Pelan</button>
+            <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Out Pelan Sinematik</button>
+            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan Halus</button>
+            <button class="effect-option-btn" onclick="applyEffect('pulse')">💖 Denyut Lembut</button>
             <button class="effect-option-btn" onclick="applyEffect('none')">🎯 Diam Saja</button>
         </div>
     </div>
@@ -351,7 +349,7 @@
         let isTypewriterGlobal = false;
         let typewriterSpeedGlobal = 40;
         let finalMessageRaw = "";
-        let selectedAnimationType = 'scroll-up';
+        let selectedAnimationType = 'zoom-slow';
 
         let posData = { tema: { x: 50, y: 25 }, nama: { x: 50, y: 35 }, pesan: { x: 50, y: 60 } };
 
@@ -379,7 +377,6 @@
             typewriterSpeedGlobal = parseInt(val);
         }
 
-        // PRATINJAU THUMBNAIL DARI URL FOTO
         function previewPhotoUrl(url) {
             const container = document.getElementById('previewContainer');
             container.innerHTML = '';
@@ -507,28 +504,44 @@
             type();
         }
 
-        function triggerMassiveConfetti() {
-            let count = 200;
-            let defaults = { origin: { y: 0.7 } };
+        // KONFETI DARI ATAS MENYEBAR RATA (HUJAN KONFETI)
+        function triggerTopConfettiRain() {
+            let duration = 3.5 * 1000;
+            let animationEnd = Date.now() + duration;
 
-            function fire(particleRatio, opts) {
-                confetti(Object.assign({}, defaults, opts, {
-                    particleCount: Math.floor(count * particleRatio)
-                }));
-            }
+            let interval = setInterval(function() {
+                let timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
 
-            fire(0.25, { spread: 26, startVelocity: 55 });
-            fire(0.2, { spread: 60 });
-            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-            fire(0.1, { spread: 120, startVelocity: 45 });
+                // Tembakan partikel menyebar rata dari sisi kiri atas, tengah atas, dan kanan atas
+                confetti({
+                    particleCount: 15,
+                    angle: 270, // Jatuh ke bawah
+                    spread: 90,
+                    origin: { x: Math.random(), y: 0 },
+                    colors: ['#ff0055', '#ffb8c6', '#22c55e', '#3b82f6', '#eab308', '#ffffff'],
+                    zIndex: 9999
+                });
+            }, 250);
+        }
+
+        function setupSongDurationSync(audioElement, animatedElement) {
+            audioElement.onloadedmetadata = function() {
+                let songDuration = audioElement.duration;
+                if (songDuration && songDuration !== Infinity && !isNaN(songDuration)) {
+                    animatedElement.style.animationDuration = songDuration + 's';
+                }
+            };
         }
 
         function bukaKartu() {
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
             
-            triggerMassiveConfetti();
+            // Picu hujan konfeti dari atas menyebar rata
+            triggerTopConfettiRain();
 
             let galContainer = document.getElementById('mainGalleryContainer');
             galContainer.className = "gallery-container";
@@ -544,12 +557,7 @@
                 let audioPlayer = new Audio(currentMusicUrl);
                 audioPlayer.loop = true;
                 
-                audioPlayer.onloadedmetadata = function() {
-                    let songDuration = audioPlayer.duration;
-                    if (songDuration && songDuration !== Infinity && !isNaN(songDuration)) {
-                        galContainer.style.animationDuration = songDuration + 's';
-                    }
-                };
+                setupSongDurationSync(audioPlayer, galContainer.querySelector('img') || galContainer);
 
                 audioPlayer.play().catch(e => console.log("Audio autoplay diblokir browser"));
                 document.getElementById('musicEqualizer').style.display = 'flex';
@@ -561,17 +569,12 @@
             if(!photoUrl || photoUrl.trim() === "") return;
             galleryContainer.innerHTML = '';
 
-            // Render URL langsung
-            let displayUrls = [photoUrl.trim(), photoUrl.trim()]; 
-
-            displayUrls.forEach((url) => {
-                let img = document.createElement('img');
-                img.src = url;
-                img.onerror = function() { 
-                    this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; 
-                };
-                galleryContainer.appendChild(img);
-            });
+            let img = document.createElement('img');
+            img.src = photoUrl.trim();
+            img.onerror = function() { 
+                this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; 
+            };
+            galleryContainer.appendChild(img);
         }
 
         // ==========================================
@@ -608,7 +611,7 @@
             if(photoUrl) {
                 loadGalleryFullScreen(photoUrl);
             } else {
-                galleryContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Masukkan Link URL Foto terlebih dahulu di editor</div>';
+                galContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Masukkan Link URL Foto terlebih dahulu di editor</div>';
             }
 
             makeDraggable(document.getElementById('displayTheme'), 'tema');
@@ -681,7 +684,7 @@
             const fontsize = document.getElementById('inputFontSize').value;
             const fontcolor = document.getElementById('inputFontColor').value;
             const musik = document.getElementById('inputMusic').value.trim();
-            const foto = document.getElementById('inputPhotoUrl').value.trim(); // Ambil dari input URL foto
+            const foto = document.getElementById('inputPhotoUrl').value.trim();
             
             const typewriter = document.getElementById('inputTypewriter').checked;
             const twSpeed = typewriterSpeedGlobal;
@@ -747,7 +750,7 @@
         function applyEffect(effectType) {
             selectedAnimationType = effectType; 
             closeEffectModal();
-            alert("Efek animasi berhasil dipilih! Cek perubahannya di menu 'Preview'.");
+            alert("Efek animasi latar belakang berhasil dipilih! Durasi akan otomatis mengikuti lagu.");
         }
 
         function navAction(action) {
@@ -758,7 +761,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 6.0 URL Photo Edition\nFitur: Direct Image URL Input (100% Anti-Blank Photo), Massive Confetti, Butterfly Animation, Typewriter Speed Control.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 6.3 TopConfetti Edition\nFitur: Top Confetti Rain, Soft Bright Photo Filter, Fullscreen Image Sync, Butterfly Animation.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
