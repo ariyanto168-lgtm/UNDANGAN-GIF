@@ -45,18 +45,17 @@
             filter: brightness(1.2) contrast(0.92) saturate(1.05);
         }
 
-        /* BINGKAI FOTO DRAGGABLE & RESIZABLE */
+        /* BINGKAI FOTO MULTI-SHAPE & DRAG RESIZE */
         .photo-frame-wrapper {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 260px; height: 380px; z-index: 5; touch-action: none;
-            border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
             border: 4px solid rgba(255, 255, 255, 0.9); background: #000;
         }
         .photo-frame-wrapper img {
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
 
-        /* Garis dan handler ubah ukuran hanya muncul saat mode drag */
         .drag-mode .photo-frame-wrapper {
             border: 2px dashed #ff0055;
             cursor: move;
@@ -74,7 +73,7 @@
             z-index: 2; pointer-events: none;
         }
 
-        /* TEXT DRAGGABLE INDEPENDENT */
+        /* TEXT DRAGGABLE INDEPENDENT DENGAN AUTO-HEIGHT DINAMIS */
         .text-element {
             position: absolute; transform: translate(-50%, -50%); z-index: 10;
             width: 90%; max-width: 450px; text-align: center;
@@ -85,11 +84,9 @@
         
         .greeting-msg { 
             line-height: 1.6; word-break: break-word; margin: 0; 
-            max-height: 45vh; overflow-y: auto; overflow-x: hidden; padding: 5px; white-space: pre-wrap;
+            height: auto !important; max-height: none !important; overflow: visible !important; 
+            padding: 8px; white-space: pre-wrap;
         }
-        .greeting-msg::-webkit-scrollbar { width: 4px; }
-        .greeting-msg::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        .greeting-msg::-webkit-scrollbar-thumb { background: #ffb8c6; border-radius: 10px; }
 
         .drag-mode .text-element { 
             border: 1px dashed rgba(255, 184, 198, 0.8); 
@@ -116,11 +113,11 @@
         
         @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
         
-        /* EFEK BACKGROUND ANIMASI */
-        .effect-zoom-slow img { animation: zoomFastLoop 8s ease-in-out infinite alternate; }
-        .effect-slide-side img { animation: slideSideFastLoop 7s ease-in-out infinite alternate; width: 125vw !important; }
-        .effect-scroll-up img { animation: scrollUpFastLoop 6s linear infinite; height: 135vh !important; }
-        .effect-pulse img { animation: pulseFastLoop 5s ease-in-out infinite alternate; }
+        /* EFEK BACKGROUND ANIMASI ROBUST */
+        .effect-zoom-slow img { animation: zoomFastLoop 8s ease-in-out infinite alternate !important; }
+        .effect-slide-side img { animation: slideSideFastLoop 7s ease-in-out infinite alternate !important; width: 125vw !important; }
+        .effect-scroll-up img { animation: scrollUpFastLoop 6s linear infinite !important; height: 135vh !important; }
+        .effect-pulse img { animation: pulseFastLoop 5s ease-in-out infinite alternate !important; }
 
         @keyframes zoomFastLoop { 0% { transform: scale(1); } 100% { transform: scale(1.12); } }
         @keyframes slideSideFastLoop { 0% { transform: translateX(0); } 100% { transform: translateX(-12vw); } }
@@ -194,7 +191,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v7.2 FrameResize</div>
+    <div class="version-badge" id="versionBadge">v7.5 Production Stable</div>
 
     <div id="loadingPage">Ada kejutan buatmu ✨</div>
 
@@ -243,9 +240,9 @@
             </div>
         </div>
 
-        <!-- BAGIAN 2: PENGATURAN BINGKAI & FOTO DALAM BINGKAI -->
+        <!-- BAGIAN 2: PENGATURAN BINGKAI & BENTUKNYA -->
         <div class="settings-card">
-            <div class="settings-header">🖼️ Pengaturan Bingkai & Foto Dalam Bingkai</div>
+            <div class="settings-header">🖼️ Pengaturan Bingkai & Bentuk Dinamis</div>
             <div class="checkbox-group" style="margin-bottom: 12px;">
                 <input type="checkbox" id="showFrame" checked onchange="autoSaveDraft()">
                 <label for="showFrame">Tampilkan Bingkai Foto di Kartu</label>
@@ -258,18 +255,17 @@
             </div>
 
             <div class="form-group">
-                <label>Pilih Model Bingkai:</label>
+                <label>Pilih Bentuk & Gaya Bingkai:</label>
                 <select id="inputFrameStyle" onchange="autoSaveDraft()">
-                    <option value="frame-gold">✨ Klasik Emas Mewah (Gold Elegant)</option>
-                    <option value="frame-love">💖 Romantis Cinta Neon (Love Glow)</option>
-                    <option value="frame-floral">🌸 Karangan Bunga (Floral Garden)</option>
-                    <option value="frame-white">🤍 Minimalis Putih Bersih (Clean White)</option>
-                    <option value="frame-cyber">⚡ Cyber Neon Futuristis</option>
-                    <option value="frame-vintage">📜 Vintage Kayu Klasik</option>
-                    <option value="frame-silver">💿 Silver Metalik Modern</option>
-                    <option value="frame-diamond">💎 Berlian Berkilau (Sparkle Diamond)</option>
-                    <option value="frame-pastel">🎨 Pastel Ceria Warna-Warni</option>
-                    <option value="frame-royal">👑 Kerajaan Mewah (Royal Crown)</option>
+                    <option value="shape-rounded">🔲 Kotak Sudut Melengkung Elegan</option>
+                    <option value="shape-circle">⚪ Lingkaran Sempurna (Circle)</option>
+                    <option value="shape-pill">💊 Bentuk Kapsul / Oval Vertikal</option>
+                    <option value="frame-gold">✨ Klasik Emas Mewah (Gold Neon)</option>
+                    <option value="frame-love">❤️ Neon Pink Cinta</option>
+                    <option value="frame-cyber">⚡ Cyber Neon Biru Futuristis</option>
+                    <option value="frame-floral">🌸 Karangan Bunga Mewah</option>
+                    <option value="frame-white">🤍 Minimalis Putih Bersih</option>
+                    <option value="frame-royal">👑 Kerajaan Mewah (Royal)</option>
                 </select>
             </div>
         </div>
@@ -383,7 +379,7 @@
         <!-- BACKGROUND FOTO / WARNA SOLID / TESTUR KAIN -->
         <div class="gallery-container" id="mainGalleryContainer"></div>
 
-        <!-- BINGKAI FOTO DINAMIS YANG BISA DI-DRAG & RESIZE -->
+        <!-- BINGKAI FOTO MULTI-SHAPE YANG BISA DI-DRAG & RESIZE -->
         <div class="photo-frame-wrapper" id="photoFrameContainer" style="left: 50%; top: 50%;">
             <img id="displayFramePhoto" src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop" alt="Foto Bingkai">
             <div class="resize-handle" id="resizeHandleBtn">⤢</div>
@@ -391,7 +387,7 @@
 
         <div class="drag-instruction" id="dragHint" style="display: none;">👆 Geser teks/bingkai • Tarik sudut kanan bawah bingkai untuk ubah ukuran</div>
 
-        <!-- 3 TEKS MANDIRI -->
+        <!-- 3 TEKS MANDIRI DENGAN AUTO-HEIGHT DINAMIS -->
         <h2 class="text-element greeting-title" id="displayTheme" style="top: 25%; left: 50%;">Selamat</h2>
         <div class="text-element greeting-subtitle" id="displayName2" style="top: 35%; left: 50%;">Untuk: Nama</div>
         <p class="text-element greeting-msg" id="displayMessage" style="top: 60%; left: 50%;">Pesan...</p>
@@ -565,11 +561,11 @@
                 bgCustom: selectedBgColorOrTexture,
                 pos: posData
             };
-            localStorage.setItem('card_draft_v72', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v75', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v72');
+            let saved = localStorage.getItem('card_draft_v75');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -586,7 +582,7 @@
                     if(d.lTxt) document.getElementById('inputLoadingText').value = d.lTxt;
                     if(d.lTit) document.getElementById('inputLandingTitle').value = d.lTit;
                     if(d.lBtn) document.getElementById('inputLandingBtn').value = d.lBtn;
-                    if(d.lGif) { document.getElementById('inputLandingGif').value = d.lGif; updateIconPreview(); }
+                    if(d.lGif) document.getElementById('inputLandingGif').value = d.lGif; updateIconPreview();
                     if(d.wa) document.getElementById('inputWaMsg').value = d.wa;
                     if(d.showT !== undefined) document.getElementById('showTheme').checked = d.showT;
                     if(d.showN !== undefined) document.getElementById('showName').checked = d.showN;
@@ -638,7 +634,7 @@
                     let vis = { t: true, n: true, m: true };
                     let showFr = true;
                     let framePhotoUrl = "";
-                    let frStyle = 'frame-gold';
+                    let frStyle = 'shape-rounded';
 
                     if (msgText.startsWith("||OPTS:")) {
                         let parts = msgText.split("||MSG:");
@@ -720,7 +716,6 @@
             function type() {
                 if (i < text.length) {
                     element.textContent += text.charAt(i);
-                    element.scrollTop = element.scrollHeight;
                     i++;
                     setTimeout(type, speed);
                 }
@@ -765,9 +760,10 @@
             
             triggerDualConfettiRain();
 
+            // RENDER BACKGROUND DENGAN EFEK ANIMASI GERAK ROBUST
             let galContainer = document.getElementById('mainGalleryContainer');
             galContainer.className = "gallery-container";
-            if(selectedAnimationType !== 'none' && !selectedBgColorOrTexture) {
+            if (selectedAnimationType && selectedAnimationType !== 'none' && !selectedBgColorOrTexture) {
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
@@ -829,20 +825,41 @@
                 frameImg.src = framePhotoUrl.trim();
             }
 
-            // Terapkan border gaya bingkai
-            if (frStyle === 'frame-gold') {
-                frameWrapper.style.border = "6px solid #d4af37";
-                frameWrapper.style.boxShadow = "0 0 20px rgba(212,175,55,0.6)";
-            } else if (frStyle === 'frame-love') {
-                frameWrapper.style.border = "6px solid #ff0055";
-                frameWrapper.style.boxShadow = "0 0 20px rgba(255,0,85,0.6)";
-            } else if (frStyle === 'frame-floral') {
-                frameWrapper.style.border = "6px solid #f472b6";
+            // PENERAPAN BENTUK & GAYA BINGKAI DINAMIS ROBUST
+            if (frStyle === 'shape-circle') {
+                frameWrapper.style.borderRadius = "50%";
+                frameWrapper.style.border = "5px solid rgba(255,255,255,0.95)";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(255,255,255,0.5)";
+            } else if (frStyle === 'shape-pill') {
+                frameWrapper.style.borderRadius = "100px";
+                frameWrapper.style.border = "6px solid rgba(255,255,255,0.95)";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(0,0,0,0.8)";
+            } else if (frStyle === 'shape-rounded') {
                 frameWrapper.style.borderRadius = "24px";
+                frameWrapper.style.border = "4px solid rgba(255,255,255,0.9)";
+                frameWrapper.style.boxShadow = "0 15px 35px rgba(0,0,0,0.7)";
+            } else if (frStyle === 'frame-gold') {
+                frameWrapper.style.borderRadius = "12px";
+                frameWrapper.style.border = "6px solid #d4af37";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(212,175,55,0.7)";
+            } else if (frStyle === 'frame-love') {
+                frameWrapper.style.borderRadius = "16px";
+                frameWrapper.style.border = "6px solid #ff0055";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(255,0,85,0.8)";
             } else if (frStyle === 'frame-cyber') {
+                frameWrapper.style.borderRadius = "12px";
                 frameWrapper.style.border = "4px solid #38bdf8";
-                frameWrapper.style.boxShadow = "0 0 25px rgba(56,189,248,0.8)";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(56,189,248,0.9)";
+            } else if (frStyle === 'frame-floral') {
+                frameWrapper.style.borderRadius = "30px";
+                frameWrapper.style.border = "6px solid #f472b6";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(244,114,182,0.6)";
+            } else if (frStyle === 'frame-royal') {
+                frameWrapper.style.borderRadius = "15px";
+                frameWrapper.style.border = "6px solid #eab308";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(234,179,8,0.7)";
             } else {
+                frameWrapper.style.borderRadius = "12px";
                 frameWrapper.style.border = "4px solid rgba(255,255,255,0.9)";
             }
         }
@@ -977,7 +994,6 @@
             let isDragging = false;
             let startX, startY, startW, startH, initX, initY;
 
-            // Resize Handler
             resizeBtn.onmousedown = (e) => { startResize(e); };
             resizeBtn.ontouchstart = (e) => { startResize(e); };
 
@@ -1014,7 +1030,6 @@
                 document.ontouchend = null; document.ontouchmove = null;
             }
 
-            // Drag Handler Bingkai
             frameEl.onmousedown = (e) => { if(e.target === resizeBtn) return; startDrag(e); };
             frameEl.ontouchstart = (e) => { if(e.target === resizeBtn) return; startDrag(e); };
 
@@ -1171,7 +1186,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 7.2 FrameResize Edition\nFitur: Custom Frame Photo URL, Drag & Resize Frame Dinamis, Auto-Save Draft.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 7.5 Production Stable\nFitur: Robust Animation Loops, Multi-Shape Frames, Auto-Height Text, Auto-Save Draft.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
