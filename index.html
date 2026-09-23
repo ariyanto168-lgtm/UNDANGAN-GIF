@@ -49,6 +49,14 @@
         .bg-anim-right { animation: bgPanRight 15s linear infinite; background-size: 200% 200%; }
         .bg-anim-up { animation: bgPanUp 15s linear infinite; background-size: 200% 200%; }
 
+        /* Marquee / Text Berjalan */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .marquee-container { overflow: hidden; white-space: nowrap; width: 100%; }
+        .marquee-text { display: inline-block; animation: marquee 12s linear infinite; }
+
         .typewriter-cursor::after {
             content: '|';
             animation: blink 0.8s infinite;
@@ -60,6 +68,18 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.5); border-radius: 8px; }
+
+        /* Elemen draggable bebas */
+        .draggable-element {
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            transition: outline 0.2s;
+        }
+        .draggable-element:active {
+            cursor: grabbing;
+            outline: 2px dashed rgba(244, 63, 94, 0.6);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
@@ -106,7 +126,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.21</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.23</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -139,39 +159,22 @@
     <!-- MAIN FULLSCREEN CONTAINER -->
     <div id="main-container" class="fixed inset-0 bg-slate-950 z-30 flex flex-col hidden fade-in">
         
-        <!-- Fullscreen Preview Area (Layar Penuh 100%) -->
-        <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between bg-cover bg-center overflow-y-auto custom-scrollbar pb-28">
+        <!-- Fullscreen Preview Area (Layar Penuh 100% dengan Free Drag Canvas) -->
+        <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24">
             
             <!-- Top Bar Navigasi & Aksi Bagikan -->
-            <div id="top-action-bar" class="flex justify-between items-center z-20 max-w-4xl mx-auto w-full">
+            <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.21</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.23</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
             </div>
 
-            <!-- Box Konten Kartu Utama -->
-            <div id="card-preview-box" class="text-center py-8 my-auto animate-float z-10 max-w-xl mx-auto w-full relative">
-                <!-- Stiker / Teks Drag & Drop Layer -->
-                <div id="preview-stickers-layer" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
+            <!-- Free Canvas Container untuk Drag & Drop Seluruh Elemen -->
+            <div id="free-canvas" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
 
-                <div id="gif-container" class="my-3 flex justify-center hidden">
-                    <img id="display-gif" class="w-24 h-24 object-contain rounded-xl shadow-md" alt="GIF">
-                </div>
-                <h2 id="display-judul" class="font-bold mb-4 text-white drop-shadow-md text-3xl md:text-5xl"></h2>
-                <div id="foto-preview-container" class="my-6 flex justify-center">
-                    <img id="display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-48 md:h-48 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat transition-all duration-300" alt="Foto">
-                </div>
-                <div id="video-container" class="my-4 flex justify-center hidden">
-                    <video id="display-video" class="w-full max-h-56 rounded-2xl border border-slate-700 shadow-lg" controls playsinline></video>
-                </div>
-                <p id="display-nama" class="font-semibold text-rose-300 mb-3 drop-shadow text-2xl md:text-3xl"></p>
-                <div id="greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-6 rounded-3xl mt-4 shadow-2xl transition-all duration-300">
-                    <p id="display-ucapan" class="text-slate-100 italic leading-relaxed text-base md:text-lg"></p>
-                </div>
-            </div>
             <div></div>
         </div>
 
@@ -320,7 +323,21 @@
                 </div>
             </div>
 
-            <!-- TAB 3: GEN Z DECORATIONS & DRAG DROP -->
+            <!-- TAB 3: RUNNING TEXT -->
+            <div id="tab-content-running" class="space-y-4 editor-tab-pane hidden">
+                <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-rose-400">🏃‍♂️ Teks Berjalan (Running Text)</label>
+                        <label class="flex items-center gap-1.5 text-[10px] text-rose-300 cursor-pointer">
+                            <input type="checkbox" id="input-hiderunningtext" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan
+                        </label>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Anda dapat mendesain posisi teks berjalan ini secara bebas di layar pratinjau menggunakan geser (*drag & drop*).</p>
+                    <input type="text" id="input-runningtext" value="✨ Selamat Datang di Undangan Spesial Kami ✨" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500" placeholder="Teks berjalan...">
+                </div>
+            </div>
+
+            <!-- TAB 4: STIKER & TAMBAH TEKS BEBAS -->
             <div id="tab-content-decor" class="space-y-4 editor-tab-pane hidden">
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
@@ -334,16 +351,16 @@
                 <div class="space-y-3 pt-2 border-t border-slate-800/80">
                     <div class="flex justify-between items-center">
                         <div>
-                            <label class="text-xs font-medium text-slate-300">✋ Teks Bebas (Drag & Drop)</label>
-                            <p class="text-[10px] text-slate-500">Anda bisa geser teks langsung di layar pratinjau!</p>
+                            <label class="text-xs font-medium text-slate-300">✋ Stiker Teks Tambahan</label>
+                            <p class="text-[10px] text-slate-500">Seret langsung di layar pratinjau!</p>
                         </div>
-                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-semibold interactive-scale">+ Tambah Teks</button>
+                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-semibold interactive-scale">+ Tambah Stiker</button>
                     </div>
                     <div id="dynamic-decor-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar"></div>
                 </div>
             </div>
 
-            <!-- TAB 4: MEDIA -->
+            <!-- TAB 5: MEDIA -->
             <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload Foto Utama (Dari HP)</label>
@@ -364,7 +381,7 @@
                 </div>
             </div>
 
-            <!-- TAB 5: AKSI & PENGATURAN -->
+            <!-- TAB 6: AKSI & PENGATURAN -->
             <div id="tab-content-settings" class="space-y-4 editor-tab-pane hidden">
                 <div>
                     <div class="flex justify-between items-center mb-1">
@@ -378,25 +395,29 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar (5 Tab Ikon di Bawah Layar Penuh) -->
+        <!-- Bottom Navigation Bar (6 Tab Ikon di Bawah Layar Penuh) -->
         <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
-            <button onclick="openEditorModal('text')" id="nav-btn-text" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+            <button onclick="openEditorModal('text')" id="nav-btn-text" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">✏️</span>
                 <span>Teks</span>
             </button>
-            <button onclick="openEditorModal('design')" id="nav-btn-design" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+            <button onclick="openEditorModal('design')" id="nav-btn-design" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">🎨</span>
                 <span>Desain</span>
             </button>
-            <button onclick="openEditorModal('decor')" id="nav-btn-decor" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+            <button onclick="openEditorModal('running')" id="nav-btn-running" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
+                <span class="text-base">🏃‍♂️</span>
+                <span>Running</span>
+            </button>
+            <button onclick="openEditorModal('decor')" id="nav-btn-decor" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">✨</span>
                 <span>Stiker</span>
             </button>
-            <button onclick="openEditorModal('media')" id="nav-btn-media" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+            <button onclick="openEditorModal('media')" id="nav-btn-media" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">📁</span>
                 <span>Media</span>
             </button>
-            <button onclick="openEditorModal('settings')" id="nav-btn-settings" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2.5 rounded-xl transition interactive-scale">
+            <button onclick="openEditorModal('settings')" id="nav-btn-settings" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">⚙️</span>
                 <span>Aksi</span>
             </button>
@@ -410,6 +431,7 @@
             nama: "Audylia Salsabilla",
             judul: "Happy Birthday",
             ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+            runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
             fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
             gifUrl: "",
             videoUrl: "",
@@ -430,12 +452,20 @@
             hideFoto: false,
             hideNama: false,
             hideUcapan: false,
-            hideGif: false
+            hideGif: false,
+            hideRunningText: false,
+            // Posisi Koordinat Persentase Bebas untuk Drag & Drop Seluruh Elemen
+            posGif: { x: 50, y: 15 },
+            posJudul: { x: 50, y: 30 },
+            posFoto: { x: 50, y: 50 },
+            posNama: { x: 50, y: 70 },
+            posUcapan: { x: 50, y: 86 },
+            posRunningText: { x: 50, y: 95 }
         };
 
         let dynamicDecorations = [
-            { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 50, y: 15, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
-            { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
+            { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 20, y: 10, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
+            { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 80, y: 90, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
         ];
 
         let activeDragItem = null;
@@ -486,6 +516,7 @@
                 n: obj.nama,
                 j: obj.judul,
                 u: obj.ucapan,
+                rt: obj.runningText,
                 f: obj.fotoUrl,
                 g: obj.gifUrl,
                 m: obj.musikUrl,
@@ -506,6 +537,13 @@
                 hn: obj.hideNama ? 1 : 0,
                 hu: obj.hideUcapan ? 1 : 0,
                 hg: obj.hideGif ? 1 : 0,
+                hr: obj.hideRunningText ? 1 : 0,
+                pg: obj.posGif,
+                pj: obj.posJudul,
+                pf: obj.posFoto,
+                pn: obj.posNama,
+                pu: obj.posUcapan,
+                pr: obj.posRunningText,
                 dec: dynamicDecorations.map(d => ({t: d.text, x: d.x, y: d.y, s: d.size, c: d.color, fn: d.font}))
             };
             const jsonStr = JSON.stringify(compactObj);
@@ -520,6 +558,7 @@
                 nama: c.n,
                 judul: c.j,
                 ucapan: c.u,
+                runningText: c.rt || "✨ Selamat Datang di Undangan Spesial Kami ✨",
                 fotoUrl: c.f,
                 gifUrl: c.g,
                 musikUrl: c.m,
@@ -540,6 +579,13 @@
                 hideNama: c.hn === 1,
                 hideUcapan: c.hu === 1,
                 hideGif: c.hg === 1,
+                hideRunningText: c.hr === 1,
+                posGif: c.pg || { x: 50, y: 15 },
+                posJudul: c.pj || { x: 50, y: 30 },
+                posFoto: c.pf || { x: 50, y: 50 },
+                posNama: c.pn || { x: 50, y: 70 },
+                posUcapan: c.pu || { x: 50, y: 86 },
+                posRunningText: c.pr || { x: 50, y: 95 },
                 decorations: c.dec ? c.dec.map(d => ({id: 'dec_' + Math.random(), text: d.t, x: d.x, y: d.y, size: d.s, color: d.c, font: d.fn})) : []
             };
         }
@@ -595,7 +641,7 @@
                     openDashboardMenu();
                 }
                 renderDecorEditorList();
-                renderDynamicDecorationsInPreview();
+                updateLivePreview();
             } catch (err) {
                 showErrorScreen("Terjadi Kesalahan", "Gagal memuat aplikasi.");
             }
@@ -671,7 +717,6 @@
                 if (found.decorations) dynamicDecorations = found.decorations;
                 applyCardStateToUI();
                 renderDecorEditorList();
-                renderDynamicDecorationsInPreview();
                 document.getElementById('dashboard-menu-screen').classList.add('hidden');
                 document.getElementById('main-container').classList.remove('hidden');
             }
@@ -691,6 +736,7 @@
                 nama: "Audylia Salsabilla",
                 judul: "Happy Birthday",
                 ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+                runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
                 fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
                 gifUrl: "",
                 videoUrl: "",
@@ -711,15 +757,21 @@
                 hideFoto: false,
                 hideNama: false,
                 hideUcapan: false,
-                hideGif: false
+                hideGif: false,
+                hideRunningText: false,
+                posGif: { x: 50, y: 15 },
+                posJudul: { x: 50, y: 30 },
+                posFoto: { x: 50, y: 50 },
+                posNama: { x: 50, y: 70 },
+                posUcapan: { x: 50, y: 86 },
+                posRunningText: { x: 50, y: 95 }
             };
             dynamicDecorations = [
-                { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 50, y: 15, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
-                { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
+                { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 20, y: 10, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
+                { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 80, y: 90, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
             ];
             applyCardStateToUI();
             renderDecorEditorList();
-            renderDynamicDecorationsInPreview();
             document.getElementById('dashboard-menu-screen').classList.add('hidden');
             document.getElementById('main-container').classList.remove('hidden');
         }
@@ -737,7 +789,8 @@
             const titles = {
                 'text': '✏️ Editor Teks & Saklar Tampilan',
                 'design': '🎨 Editor Desain & Animasi Latar',
-                'decor': '✨ Stiker & Drag & Drop Teks',
+                'running': '🏃‍♂️ Pengaturan Teks Berjalan',
+                'decor': '✨ Stiker & Drag & Drop Bebas',
                 'media': '📁 Upload Berkas Media (HP)',
                 'settings': '⚙️ Pengaturan & Simpan'
             };
@@ -752,26 +805,26 @@
         function applyGenZPreset(presetName) {
             if (presetName === 'genz-birthday') {
                 dynamicDecorations = [
-                    { id: 'p1', text: '🎂 LEVEL UNLOCKED 🎂', x: 50, y: 15, size: 'text-2xl', font: "'Poppins', sans-serif", color: '#ff3366' },
-                    { id: 'p2', text: '✨ MAIN CHARACTER ENERGY ✨', x: 50, y: 85, size: 'text-lg', font: "'Great Vibes', cursive", color: '#ff99cc' }
+                    { id: 'p1', text: '🎂 LEVEL UNLOCKED 🎂', x: 50, y: 12, size: 'text-2xl', font: "'Poppins', sans-serif", color: '#ff3366' },
+                    { id: 'p2', text: '✨ MAIN CHARACTER ENERGY ✨', x: 50, y: 88, size: 'text-lg', font: "'Great Vibes', cursive", color: '#ff99cc' }
                 ];
             } else if (presetName === 'cute-genz') {
                 dynamicDecorations = [
-                    { id: 'p1', text: '🧸 SO CUTE & COZY ☁️', x: 50, y: 15, size: 'text-xl', font: "'Sacramento', cursive", color: '#ffb3ba' },
-                    { id: 'p2', text: '💖 BEST DAY EVER 🌸', x: 50, y: 85, size: 'text-lg', font: "'Poppins', sans-serif", color: '#ffdfba' }
+                    { id: 'p1', text: '🧸 SO CUTE & COZY ☁️', x: 50, y: 12, size: 'text-xl', font: "'Sacramento', cursive", color: '#ffb3ba' },
+                    { id: 'p2', text: '💖 BEST DAY EVER 🌸', x: 50, y: 88, size: 'text-lg', font: "'Poppins', sans-serif", color: '#ffdfba' }
                 ];
             } else if (presetName === 'neon-party') {
                 dynamicDecorations = [
-                    { id: 'p1', text: '🔥 VIBES ONLY 🔥', x: 50, y: 15, size: 'text-2xl', font: "'Cinzel', serif", color: '#00ffff' },
-                    { id: 'p2', text: '⚡ PARTY TIME ⚡', x: 50, y: 85, size: 'text-xl', font: "'Montserrat', sans-serif", color: '#ff00ff' }
+                    { id: 'p1', text: '🔥 VIBES ONLY 🔥', x: 50, y: 12, size: 'text-2xl', font: "'Cinzel', serif", color: '#00ffff' },
+                    { id: 'p2', text: '⚡ PARTY TIME ⚡', x: 50, y: 88, size: 'text-xl', font: "'Montserrat', sans-serif", color: '#ff00ff' }
                 ];
             } else if (presetName === 'pastel-love') {
                 dynamicDecorations = [
-                    { id: 'p1', text: '💌 WITH LOVE & HUGS 💌', x: 50, y: 15, size: 'text-xl', font: "'Alex Brush', cursive", color: '#b5ead7' },
-                    { id: 'p2', text: '🌟 SHINE BRIGHT 🌟', x: 50, y: 85, size: 'text-lg', font: "'Poppins', sans-serif", color: '#c7ceea' }
+                    { id: 'p1', text: '💌 WITH LOVE & HUGS 💌', x: 50, y: 12, size: 'text-xl', font: "'Alex Brush', cursive", color: '#b5ead7' },
+                    { id: 'p2', text: '🌟 SHINE BRIGHT 🌟', x: 50, y: 88, size: 'text-lg', font: "'Poppins', sans-serif", color: '#c7ceea' }
                 ];
             }
-            renderDynamicDecorationsInPreview();
+            updateLivePreview();
             renderDecorEditorList();
         }
 
@@ -785,7 +838,7 @@
                 font: "'Poppins', sans-serif",
                 color: '#ffffff'
             });
-            renderDynamicDecorationsInPreview();
+            updateLivePreview();
             renderDecorEditorList();
         }
 
@@ -819,12 +872,12 @@
 
         function updateDecorText(id, val) {
             let item = dynamicDecorations.find(d => d.id === id);
-            if (item) { item.text = val; renderDynamicDecorationsInPreview(); }
+            if (item) { item.text = val; updateLivePreview(); }
         }
 
         function updateDecorColor(id, val) {
             let item = dynamicDecorations.find(d => d.id === id);
-            if (item) { item.color = val; renderDynamicDecorationsInPreview(); }
+            if (item) { item.color = val; updateLivePreview(); }
         }
 
         function changeDecorSize(id, action) {
@@ -834,56 +887,18 @@
             let idx = sizes.indexOf(item.size);
             if (action === 'increase' && idx < sizes.length - 1) item.size = sizes[idx + 1];
             if (action === 'decrease' && idx > 0) item.size = sizes[idx - 1];
-            renderDynamicDecorationsInPreview();
+            updateLivePreview();
         }
 
         function removeDecorItem(id) {
             dynamicDecorations = dynamicDecorations.filter(d => d.id !== id);
-            renderDynamicDecorationsInPreview();
+            updateLivePreview();
             renderDecorEditorList();
-        }
-
-        function renderDynamicDecorationsInPreview() {
-            const layer = document.getElementById('preview-stickers-layer');
-            if (!layer) return;
-            layer.innerHTML = '';
-            dynamicDecorations.forEach(item => {
-                let el = document.createElement('div');
-                el.className = `absolute select-none font-bold ${item.size} cursor-grab active:cursor-grabbing p-2 touch-none`;
-                el.style.left = item.x + '%';
-                el.style.top = item.y + '%';
-                el.style.transform = 'translate(-50%, -50%)';
-                el.style.color = item.color;
-                el.style.fontFamily = item.font;
-                el.style.textShadow = '0 2px 8px rgba(0,0,0,0.6)';
-                el.innerText = item.text;
-
-                // Drag & Drop Pointer Events (Mendukung Mouse & Sentuhan HP)
-                el.addEventListener('pointerdown', (e) => {
-                    activeDragItem = item;
-                    el.setPointerCapture(e.pointerId);
-                    e.stopPropagation();
-                });
-                el.addEventListener('pointermove', (e) => {
-                    if (activeDragItem !== item) return;
-                    const wrapper = document.getElementById('card-bg-wrapper');
-                    const rect = wrapper.getBoundingClientRect();
-                    let x = ((e.clientX - rect.left) / rect.width) * 100;
-                    let y = ((e.clientY - rect.top) / rect.height) * 100;
-                    item.x = Math.max(5, Math.min(95, x));
-                    item.y = Math.max(5, Math.min(95, y));
-                    renderDynamicDecorationsInPreview();
-                });
-                el.addEventListener('pointerup', (e) => {
-                    activeDragItem = null;
-                });
-
-                layer.appendChild(el);
-            });
         }
 
         function saveCardData() {
             if (!cardState.id) cardState.id = 'card_' + Date.now();
+            cardState.decorations = dynamicDecorations;
             let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
             const index = allCards.findIndex(c => c.id === cardState.id);
             if (index >= 0) allCards[index] = cardState;
@@ -892,13 +907,14 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.21)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.23)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
         }
 
         function getShareableLink() {
             if (!cardState.id) cardState.id = 'card_' + Date.now();
+            cardState.decorations = dynamicDecorations;
             const shortCode = encodeCardToShortLink(cardState);
             return window.location.href.split('?')[0] + '?c=' + shortCode;
         }
@@ -925,10 +941,10 @@
             const el = document.getElementById(containerId);
             if (!el) return;
             if (styleType === 'none') {
-                el.className = "mt-4 transition-all duration-300 bg-transparent border-none shadow-none p-0";
+                el.className = "draggable-element absolute transition-all duration-300 bg-transparent border-none shadow-none p-0";
                 return;
             }
-            el.className = "p-6 rounded-3xl mt-4 shadow-2xl transition-all duration-300 ";
+            el.className = "draggable-element absolute p-5 rounded-3xl shadow-2xl transition-all duration-300 max-w-sm w-[90%] ";
             if (styleType === 'glass-blur') el.className += "bg-black/25 backdrop-blur-md border border-white/20 text-slate-100";
             else if (styleType === 'solid-dark') el.className += "bg-slate-950/90 border border-slate-800 text-slate-100";
             else if (styleType === 'neon-glow') el.className += "bg-slate-950/80 border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.4)] text-slate-100";
@@ -941,6 +957,7 @@
             setVal('input-nama', cardState.nama);
             setVal('input-judul', cardState.judul);
             setVal('input-ucapan', cardState.ucapan);
+            setVal('input-runningtext', cardState.runningText);
             setVal('input-openingtitle', cardState.openingTitle);
             setVal('input-openingbtn', cardState.openingButtonText);
             setVal('input-textcolor', cardState.textColor);
@@ -962,9 +979,9 @@
             setChk('input-hidenama', cardState.hideNama);
             setChk('input-hideucapan', cardState.hideUcapan);
             setChk('input-hidegif', cardState.hideGif);
+            setChk('input-hiderunningtext', cardState.hideRunningText);
 
             updateLivePreview();
-            renderDynamicDecorationsInPreview();
         }
 
         function runTypewriterEffect(elementId, text, speed) {
@@ -986,10 +1003,33 @@
             typeChar();
         }
 
+        // Helper untuk memasang event Drag & Drop bebas pada elemen canvas
+        function attachDragEvent(el, posObj) {
+            el.addEventListener('pointerdown', (e) => {
+                activeDragItem = posObj;
+                el.setPointerCapture(e.pointerId);
+                e.stopPropagation();
+            });
+            el.addEventListener('pointermove', (e) => {
+                if (activeDragItem !== posObj) return;
+                const wrapper = document.getElementById('card-bg-wrapper');
+                const rect = wrapper.getBoundingClientRect();
+                let x = ((e.clientX - rect.left) / rect.width) * 100;
+                let y = ((e.clientY - rect.top) / rect.height) * 100;
+                posObj.x = Math.max(5, Math.min(95, x));
+                posObj.y = Math.max(5, Math.min(95, y));
+                updateLivePreview();
+            });
+            el.addEventListener('pointerup', (e) => {
+                activeDragItem = null;
+            });
+        }
+
         function updateLivePreview() {
             cardState.nama = document.getElementById('input-nama').value;
             cardState.judul = document.getElementById('input-judul').value;
             cardState.ucapan = document.getElementById('input-ucapan').value;
+            cardState.runningText = document.getElementById('input-runningtext').value;
             cardState.openingTitle = document.getElementById('input-openingtitle').value;
             cardState.openingButtonText = document.getElementById('input-openingbtn').value;
             cardState.textColor = document.getElementById('input-textcolor').value;
@@ -1009,6 +1049,7 @@
             cardState.hideNama = getChk('input-hidenama');
             cardState.hideUcapan = getChk('input-hideucapan');
             cardState.hideGif = getChk('input-hidegif');
+            cardState.hideRunningText = getChk('input-hiderunningtext');
 
             document.getElementById('speed-label').innerText = cardState.typewriterSpeed + ' ms';
 
@@ -1023,18 +1064,18 @@
             if (cardState.bgStyle === 'custom-image') {
                 customBgBox.classList.remove('hidden');
                 bgWrapper.style.backgroundImage = cardState.bgImgUrl ? `url('${cardState.bgImgUrl}')` : 'none';
-                bgWrapper.className = "w-full h-full relative bg-cover bg-center p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                bgWrapper.className = "w-full h-full relative bg-cover bg-center p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
             } else {
                 customBgBox.classList.add('hidden');
                 bgWrapper.style.backgroundImage = 'none';
                 if (cardState.bgStyle === 'gradient-rose') {
-                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
                 } else if (cardState.bgStyle === 'gradient-dark') {
-                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
                 } else if (cardState.bgStyle === 'solid-black') {
-                    bgWrapper.className = "w-full h-full relative bg-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                    bgWrapper.className = "w-full h-full relative bg-black p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
                 } else if (cardState.bgStyle === 'gradient-purple') {
-                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28" + animClass;
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
                 }
             }
 
@@ -1044,91 +1085,134 @@
             const decoStyle = cardState.textDecoration;
             const speed = cardState.typewriterSpeed;
 
-            let judulSize = "text-3xl md:text-4xl";
-            let namaSize = "text-2xl md:text-3xl";
-            let ucapanSize = "text-base md:text-lg";
+            let judulSize = "text-2xl md:text-4xl";
+            let namaSize = "text-xl md:text-3xl";
+            let ucapanSize = "text-sm md:text-base";
 
             if (sizeSetting === 'large') {
-                judulSize = "text-4xl md:text-5xl";
-                namaSize = "text-3xl md:text-4xl";
-                ucapanSize = "text-lg md:text-xl";
+                judulSize = "text-3xl md:text-5xl";
+                namaSize = "text-2xl md:text-4xl";
+                ucapanSize = "text-base md:text-lg";
             } else if (sizeSetting === 'xlarge') {
-                judulSize = "text-5xl md:text-6xl";
-                namaSize = "text-4xl md:text-5xl";
-                ucapanSize = "text-xl md:text-2xl";
+                judulSize = "text-4xl md:text-6xl";
+                namaSize = "text-3xl md:text-5xl";
+                ucapanSize = "text-lg md:text-xl";
             }
 
-            // 1. Judul Kartu
-            const judulEl = document.getElementById('display-judul');
-            if (judulEl) {
-                if (cardState.hideJudul) {
-                    judulEl.classList.add('hidden');
-                } else {
-                    judulEl.classList.remove('hidden');
-                    judulEl.style.color = customColor;
-                    judulEl.style.fontFamily = customFont;
-                    judulEl.className = judulSize + " font-bold mb-4 typewriter-cursor";
-                    runTypewriterEffect('display-judul', cardState.judul, speed);
-                    applyTextDecorationStyle(judulEl, decoStyle);
-                }
+            // Render Free Canvas (Semua elemen diposisikan absolute & bisa di-drag bebas)
+            const canvas = document.getElementById('free-canvas');
+            if (!canvas) return;
+            canvas.innerHTML = '';
+
+            // 1. GIF / Stiker Bergerak
+            if (cardState.gifUrl && !cardState.hideGif) {
+                let div = document.createElement('div');
+                div.className = 'draggable-element absolute flex justify-center';
+                div.style.left = cardState.posGif.x + '%';
+                div.style.top = cardState.posGif.y + '%';
+                div.style.transform = 'translate(-50%, -50%)';
+                div.innerHTML = `<img src="${cardState.gifUrl}" class="w-20 h-20 object-contain rounded-xl shadow-md pointer-events-none" alt="GIF">`;
+                attachDragEvent(div, cardState.posGif);
+                canvas.appendChild(div);
             }
 
-            // 2. Nama Penerima
-            const namaEl = document.getElementById('display-nama');
-            if (namaEl) {
-                if (cardState.hideNama) {
-                    namaEl.classList.add('hidden');
-                } else {
-                    namaEl.classList.remove('hidden');
-                    namaEl.style.color = customColor;
-                    namaEl.style.fontFamily = customFont;
-                    namaEl.className = namaSize + " font-semibold mb-3 typewriter-cursor";
-                    runTypewriterEffect('display-nama', cardState.nama, speed);
-                    applyTextDecorationStyle(namaEl, decoStyle);
-                }
+            // 2. Judul Kartu
+            if (!cardState.hideJudul) {
+                let h2 = document.createElement('h2');
+                h2.id = 'display-judul';
+                h2.className = `draggable-element absolute font-bold text-center whitespace-nowrap ${judulSize} typewriter-cursor`;
+                h2.style.left = cardState.posJudul.x + '%';
+                h2.style.top = cardState.posJudul.y + '%';
+                h2.style.transform = 'translate(-50%, -50%)';
+                h2.style.color = customColor;
+                h2.style.fontFamily = customFont;
+                runTypewriterEffect('display-judul', cardState.judul, speed);
+                applyTextDecorationStyle(h2, decoStyle);
+                attachDragEvent(h2, cardState.posJudul);
+                canvas.appendChild(h2);
             }
 
-            // 3. Kotak Ucapan
-            const greetingBoxContainer = document.getElementById('greeting-box-container');
-            if (greetingBoxContainer) {
-                if (cardState.hideUcapan) {
-                    greetingBoxContainer.classList.add('hidden');
-                } else {
-                    greetingBoxContainer.classList.remove('hidden');
-                    applyGreetingBoxStyle('greeting-box-container', cardState.greetingFrameStyle);
-                    const ucapanEl = document.getElementById('display-ucapan');
-                    if (ucapanEl) {
-                        ucapanEl.style.color = cardState.greetingFrameStyle === 'polaroid-box' ? '#0f172a' : customColor;
-                        ucapanEl.style.fontFamily = customFont;
-                        ucapanEl.className = "italic leading-relaxed typewriter-cursor " + ucapanSize;
-                        runTypewriterEffect('display-ucapan', cardState.ucapan, speed);
-                        applyTextDecorationStyle(ucapanEl, decoStyle);
-                    }
-                }
+            // 3. Foto & Bingkai Utama
+            if (cardState.frameStyle !== 'none' && !cardState.hideFoto && cardState.fotoUrl) {
+                let wrap = document.createElement('div');
+                wrap.className = 'draggable-element absolute flex justify-center';
+                wrap.style.left = cardState.posFoto.x + '%';
+                wrap.style.top = cardState.posFoto.y + '%';
+                wrap.style.transform = 'translate(-50%, -50%)';
+                wrap.innerHTML = `<img src="${cardState.fotoUrl}" class="w-32 h-32 md:w-44 md:h-44 object-cover border-4 border-rose-500/40 shadow-xl animate-beat transition-all duration-300 pointer-events-none ${cardState.frameStyle}" alt="Foto">`;
+                attachDragEvent(wrap, cardState.posFoto);
+                canvas.appendChild(wrap);
             }
 
-            // 4. Foto Utama
-            const fotoContainer = document.getElementById('foto-preview-container');
-            const fotoEl = document.getElementById('display-foto');
-            if (cardState.frameStyle === 'none' || cardState.hideFoto) {
-                if (fotoContainer) fotoContainer.classList.add('hidden');
-            } else {
-                if (fotoContainer) fotoContainer.classList.remove('hidden');
-                if (fotoEl && cardState.fotoUrl) {
-                    fotoEl.src = cardState.fotoUrl;
-                    fotoEl.className = "w-36 h-36 md:w-48 md:h-48 object-cover border-4 border-rose-500/40 shadow-xl animate-beat transition-all duration-300 " + cardState.frameStyle;
-                }
+            // 4. Nama Penerima
+            if (!cardState.hideNama) {
+                let p = document.createElement('p');
+                p.id = 'display-nama';
+                p.className = `draggable-element absolute font-semibold text-center whitespace-nowrap ${namaSize} drop-shadow typewriter-cursor`;
+                p.style.left = cardState.posNama.x + '%';
+                p.style.top = cardState.posNama.y + '%';
+                p.style.transform = 'translate(-50%, -50%)';
+                p.style.color = customColor;
+                p.style.fontFamily = customFont;
+                runTypewriterEffect('display-nama', cardState.nama, speed);
+                applyTextDecorationStyle(p, decoStyle);
+                attachDragEvent(p, cardState.posNama);
+                canvas.appendChild(p);
             }
 
-            // 5. GIF / Stiker Bergerak
-            const gifEl = document.getElementById('display-gif');
-            const gifContainer = document.getElementById('gif-container');
-            if (cardState.gifUrl && gifEl && gifContainer && !cardState.hideGif) {
-                gifEl.src = cardState.gifUrl;
-                gifContainer.classList.remove('hidden');
-            } else if (gifContainer) {
-                gifContainer.classList.add('hidden');
+            // 5. Kotak Ucapan
+            if (!cardState.hideUcapan) {
+                let box = document.createElement('div');
+                box.id = 'greeting-box-container';
+                box.style.left = cardState.posUcapan.x + '%';
+                box.style.top = cardState.posUcapan.y + '%';
+                box.style.transform = 'translate(-50%, -50%)';
+                applyGreetingBoxStyle('greeting-box-container', cardState.greetingFrameStyle);
+                
+                let ucapanP = document.createElement('p');
+                ucapanP.id = 'display-ucapan';
+                ucapanP.style.color = cardState.greetingFrameStyle === 'polaroid-box' ? '#0f172a' : customColor;
+                ucapanP.style.fontFamily = customFont;
+                ucapanP.className = "italic leading-relaxed typewriter-cursor text-center " + ucapanSize;
+                runTypewriterEffect('display-ucapan', cardState.ucapan, speed);
+                applyTextDecorationStyle(ucapanP, decoStyle);
+                box.appendChild(ucapanP);
+                attachDragEvent(box, cardState.posUcapan);
+                canvas.appendChild(box);
             }
+
+            // 6. Running Text (Teks Berjalan)
+            if (!cardState.hideRunningText) {
+                let marqueeWrap = document.createElement('div');
+                marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]';
+                marqueeWrap.style.left = cardState.posRunningText.x + '%';
+                marqueeWrap.style.top = cardState.posRunningText.y + '%';
+                marqueeWrap.style.transform = 'translate(-50%, -50%)';
+                
+                let span = document.createElement('span');
+                span.style.color = customColor;
+                span.style.fontFamily = customFont;
+                span.className = 'marquee-text text-xs md:text-sm font-semibold px-4 pointer-events-none';
+                span.innerText = cardState.runningText;
+                marqueeWrap.appendChild(span);
+                attachDragEvent(marqueeWrap, cardState.posRunningText);
+                canvas.appendChild(marqueeWrap);
+            }
+
+            // 7. Stiker Dekorasi Gen Z Tambahan
+            dynamicDecorations.forEach(item => {
+                let el = document.createElement('div');
+                el.className = `draggable-element absolute font-bold ${item.size} p-2`;
+                el.style.left = item.x + '%';
+                el.style.top = item.y + '%';
+                el.style.transform = 'translate(-50%, -50%)';
+                el.style.color = item.color;
+                el.style.fontFamily = item.font;
+                el.style.textShadow = '0 2px 8px rgba(0,0,0,0.6)';
+                el.innerText = item.text;
+                attachDragEvent(el, item);
+                canvas.appendChild(el);
+            });
 
             document.getElementById('receiver-opening-title').innerText = cardState.openingTitle;
             const openingBtn = document.getElementById('receiver-opening-btn');
