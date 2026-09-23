@@ -202,9 +202,9 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v7.8 TopSlideText</div>
+    <div class="version-badge" id="versionBadge">v7.9 Instant</div>
 
-    <div id="loadingPage">Ada kejutan buatmu ✨</div>
+    <div id="loadingPage">Memuat Kartu... ✨</div>
 
     <div id="editorPage">
         <h2 class="editor-title">🎬 Studio Pembuat Kartu</h2>
@@ -363,11 +363,11 @@
         <!-- TOMBOL AKSI -->
         <div class="btn-row">
             <button class="btn-preview-live" onclick="openDragPreview()">👁️ Preview & Drag Posisi</button>
-            <button class="btn-generate" id="btnGen" onclick="generateLink()">🚀 Buat Kartu</button>
+            <button class="btn-generate" id="btnGen" onclick="generateLink()">🚀 Buat Kartu (Instan)</button>
         </div>
 
         <div id="resultLink" class="result-box">
-            <p style="color: #22c55e; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem;">✅ Kartu Berhasil Dibuat!</p>
+            <p style="color: #22c55e; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem;">✅ Link Super Cepat Berhasil Dibuat!</p>
             <a id="shareableUrl" href="#" target="_blank" style="color: #66b3ff; font-size: 0.85rem; word-break: break-all;">Link</a>
             <a id="whatsappDirectBtn" href="#" target="_blank" class="btn-wa-direct">
                 <span>💬</span> Kirim Langsung ke Penerima
@@ -460,8 +460,6 @@
     </nav>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUv53A4_UqoaNdM3cOC2YPD5U442tbfoH3y6hHsyhlcvRf04fLBhSOIjxDtxP5M2aM/exec';
-
         let generatedCardUrl = "";
         let currentRecipientName = "";
         let currentTheme = "";
@@ -572,11 +570,11 @@
                 bgCustom: selectedBgColorOrTexture,
                 pos: posData
             };
-            localStorage.setItem('card_draft_v78', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v79', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v78');
+            let saved = localStorage.getItem('card_draft_v79');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -609,113 +607,92 @@
             }
         }
 
+        // ==========================================
+        // INSTANT URL PARAMETER LOADER (0 DELAY)
+        // ==========================================
         const urlParams = new URLSearchParams(window.location.search);
-        const cardId = urlParams.get('id');
+        const cardParam = urlParams.get('card');
 
-        if (cardId) {
+        if (cardParam) {
             document.getElementById('versionBadge').style.display = 'none';
             document.getElementById('editorNavBar').style.display = 'none';
             document.getElementById('recipientWaBtn').style.display = 'flex';
 
             const loadingEl = document.getElementById('loadingPage');
-            loadingEl.style.display = 'block';
+            loadingEl.style.display = 'none';
+            document.getElementById('landingPage').style.display = 'flex';
 
-            fetch(`${SCRIPT_URL}?action=read&id=${cardId}`)
-                .then(response => response.json())
-                .then(data => {
-                    loadingEl.style.display = 'none';
-                    document.getElementById('landingPage').style.display = 'flex';
-                    
-                    document.getElementById('displayTargetName').innerText = data.nama;
-                    document.getElementById('displayName2').innerText = data.nama;
-                    document.getElementById('displayTheme').innerText = data.tema;
-                    
-                    if(data.musik) currentMusicUrl = data.musik;
+            try {
+                let jsonString = decodeURIComponent(escape(atob(cardParam)));
+                let data = JSON.parse(jsonString);
 
-                    let msgText = data.pesan;
-                    let fSize = data.fontsize || 16;
-                    let fColor = data.fontcolor || "#ffffff";
-                    
-                    let fFam = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-                    let fOpa = 1.0;
-                    let waMsg = "Halo, lihat kartu ucapan ini! Keren lho!";
-                    let lTitle = "ADA UCAPAN UNTUKMU";
-                    let lBtn = "✨ BUKA KARTU";
-                    let lGifFull = "🎁|bounce"; 
-                    let lTxt = "Ada kejutan buatmu ✨";
-                    let vis = { t: true, n: true, m: true };
-                    let showFr = true;
-                    let framePhotoUrl = "";
-                    let frStyle = 'shape-rounded';
+                document.getElementById('displayTargetName').innerText = data.n;
+                document.getElementById('displayName2').innerText = data.n;
+                document.getElementById('displayTheme').innerText = data.t;
+                
+                if(data.mu) currentMusicUrl = data.mu;
 
-                    if (msgText.startsWith("||OPTS:")) {
-                        let parts = msgText.split("||MSG:");
-                        let optsStr = parts[0].replace("||OPTS:", "");
-                        try {
-                            let parsedOpts = JSON.parse(optsStr);
-                            isTypewriterGlobal = parsedOpts.tw || false;
-                            if(parsedOpts.twSpeed) typewriterSpeedGlobal = parsedOpts.twSpeed;
-                            if(parsedOpts.lTxt) lTxt = parsedOpts.lTxt;
-                            if(parsedOpts.vis) vis = parsedOpts.vis;
-                            if(parsedOpts.showFr !== undefined) showFr = parsedOpts.showFr;
-                            if(parsedOpts.frameFoto) framePhotoUrl = parsedOpts.frameFoto;
-                            if(parsedOpts.frStyle) frStyle = parsedOpts.frStyle;
-                            if (parsedOpts.fFam) fFam = parsedOpts.fFam;
-                            if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
-                            if (parsedOpts.wa) waMsg = parsedOpts.wa;
-                            if (parsedOpts.lTit) lTitle = parsedOpts.lTit;
-                            if (parsedOpts.lBtn) lBtn = parsedOpts.lBtn;
-                            if (parsedOpts.lGif) lGifFull = parsedOpts.lGif;
-                            if (parsedOpts.anim) selectedAnimationType = parsedOpts.anim;
-                            if (parsedOpts.bgCustom) selectedBgColorOrTexture = parsedOpts.bgCustom;
-                            
-                            if(parsedOpts.pos) {
-                                posData = parsedOpts.pos;
-                            }
-                            msgText = parts[1] || "";
-                        } catch(e) { msgText = data.pesan; }
-                    }
-                    
-                    finalMessageRaw = msgText;
-                    
-                    document.getElementById('loadingPage').innerText = lTxt;
-                    document.getElementById('displayLandingTitle').innerText = lTitle;
-                    document.getElementById('displayLandingBtn').innerText = lBtn;
-                    let gifArr = lGifFull.split('|');
-                    let iconEl = document.getElementById('displayLandingGif');
-                    iconEl.innerText = gifArr[0];
-                    iconEl.className = 'gift-icon anim-' + (gifArr[1] || 'bounce');
+                let msgText = data.m;
+                let fSize = data.fs || 16;
+                let fColor = data.fc || "#ffffff";
+                let fFam = data.ffam || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+                let fOpa = data.fopa !== undefined ? data.fopa : 1.0;
+                let waMsg = data.wa || "Halo, lihat kartu ucapan ini! Keren lho!";
+                let lTitle = data.ltit || "ADA UCAPAN UNTUKMU";
+                let lBtn = data.lbtn || "✨ BUKA KARTU";
+                let lGifFull = data.lgif || "🎁|bounce";
+                let lTxt = data.lt || "Ada kejutan buatmu ✨";
+                let vis = data.vis || { t: true, n: true, m: true };
+                let showFr = data.sf !== undefined ? data.sf : true;
+                let framePhotoUrl = data.ff || "";
+                let frStyle = data.frs || 'shape-rounded';
 
-                    let elT = document.getElementById('displayTheme');
-                    let elN = document.getElementById('displayName2');
-                    let elM = document.getElementById('displayMessage');
+                isTypewriterGlobal = data.tw || false;
+                if(data.tws) typewriterSpeedGlobal = data.tws;
+                if(data.anim) selectedAnimationType = data.anim;
+                if(data.bg) selectedBgColorOrTexture = data.bg;
+                if(data.pos) posData = data.pos;
 
-                    elT.style.left = posData.tema.x + "%"; elT.style.top = posData.tema.y + "%";
-                    elN.style.left = posData.nama.x + "%"; elN.style.top = posData.nama.y + "%";
-                    elM.style.left = posData.pesan.x + "%"; elM.style.top = posData.pesan.y + "%";
+                finalMessageRaw = msgText;
 
-                    elT.style.display = vis.t ? 'block' : 'none';
-                    elN.style.display = vis.n ? 'block' : 'none';
-                    elM.style.display = vis.m ? 'block' : 'none';
+                loadingEl.innerText = lTxt;
+                document.getElementById('displayLandingTitle').innerText = lTitle;
+                document.getElementById('displayLandingBtn').innerText = lBtn;
+                let gifArr = lGifFull.split('|');
+                let iconEl = document.getElementById('displayLandingGif');
+                iconEl.innerText = gifArr[0];
+                iconEl.className = 'gift-icon anim-' + (gifArr[1] || 'bounce');
 
-                    applyTextStylesToElements(fFam, fColor, fOpa, fSize);
-                    
-                    if(!isTypewriterGlobal) {
-                        elM.innerText = msgText;
-                    } else {
-                        elM.innerText = ""; 
-                    }
+                let elT = document.getElementById('displayTheme');
+                let elN = document.getElementById('displayName2');
+                let elM = document.getElementById('displayMessage');
 
-                    renderCardBackground(data.foto, selectedBgColorOrTexture);
-                    renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, posData.frame);
+                elT.style.left = posData.tema.x + "%"; elT.style.top = posData.tema.y + "%";
+                elN.style.left = posData.nama.x + "%"; elN.style.top = posData.nama.y + "%";
+                elM.style.left = posData.pesan.x + "%"; elM.style.top = posData.pesan.y + "%";
 
-                    const currentUrl = window.location.href;
-                    document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + currentUrl)}`;
-                })
-                .catch(err => {
-                    loadingEl.style.display = 'none';
-                    alert("Gagal memuat data kartu.");
-                });
+                elT.style.display = vis.t ? 'block' : 'none';
+                elN.style.display = vis.n ? 'block' : 'none';
+                elM.style.display = vis.m ? 'block' : 'none';
+
+                applyTextStylesToElements(fFam, fColor, fOpa, fSize);
+
+                if(!isTypewriterGlobal) {
+                    elM.innerText = msgText;
+                } else {
+                    elM.innerText = ""; 
+                }
+
+                renderCardBackground(data.f, selectedBgColorOrTexture);
+                renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, posData.frame);
+
+                const currentUrl = window.location.href;
+                document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + currentUrl)}`;
+
+            } catch(e) {
+                loadingEl.style.display = 'none';
+                alert("Gagal membaca data kartu dari link.");
+            }
         } else {
             document.getElementById('editorPage').style.display = 'block';
             document.getElementById('recipientWaBtn').style.display = 'none';
@@ -778,7 +755,6 @@
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
-            // TAMBAHKAN ANIMASI MELUNCUR DARI ATAS PADA TEKS SAAT DIBUKA
             let elT = document.getElementById('displayTheme');
             let elN = document.getElementById('displayName2');
             let elM = document.getElementById('displayMessage');
@@ -918,7 +894,6 @@
             elN.style.left = posData.nama.x + "%"; elN.style.top = posData.nama.y + "%";
             elM.style.left = posData.pesan.x + "%"; elM.style.top = posData.pesan.y + "%";
 
-            // Hapus animasi slide saat mode drag agar tidak mengganggu posisi
             [elT, elN, elM].forEach(el => { el.classList.remove('anim-slide-from-top'); });
 
             let fFam = document.getElementById('inputFontFamily').value;
@@ -1097,7 +1072,10 @@
             }
         }
 
-        async function generateLink() {
+        // ==========================================
+        // GENERATE LINK INSTAN (0 DETIK / TANPA SERVER)
+        // ==========================================
+        function generateLink() {
             const nama = document.getElementById('inputName').value.trim();
             const tema = document.getElementById('inputTheme').value;
             const pesanRaw = document.getElementById('inputMessage').value.trim();
@@ -1132,54 +1110,47 @@
                 return; 
             }
 
-            let payloadData = { 
+            let cardData = { 
+                n: nama,
+                t: tema,
+                m: pesanRaw,
+                fs: fontsize,
+                fc: fontcolor,
+                mu: musik,
+                f: foto,
                 tw: typewriter, 
-                twSpeed: twSpeed,
-                lTxt: loadingText,
+                tws: twSpeed,
+                lt: loadingText,
                 vis: visState,
-                showFr: showFr,
-                frameFoto: frameFoto,
-                frStyle: frStyle,
+                sf: showFr,
+                ff: frameFoto,
+                frs: frStyle,
                 pos: posData,
-                fFam: fontFam,
-                fOpa: fontOpa,
-                lTit: landingTitle,
-                lBtn: landingBtn,
-                lGif: landingGif,
+                ffam: fontFam,
+                fopa: fontOpa,
+                ltit: landingTitle,
+                lbtn: landingBtn,
+                lgif: landingGif,
                 wa: waMsg,
                 anim: selectedAnimationType,
-                bgCustom: selectedBgColorOrTexture
+                bg: selectedBgColorOrTexture
             };
             
-            let pesan = `||OPTS:${JSON.stringify(payloadData)}||MSG:${pesanRaw}`;
-            currentRecipientName = nama;
-            currentTheme = tema;
-
-            const btn = document.getElementById('btnGen');
-            btn.innerText = "Menyimpan... ⏳";
-            btn.disabled = true;
-
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ nama, tema, pesan, fontsize, fontcolor, foto, musik }) 
-                });
-                const data = await response.json();
-
-                const baseUrl = window.location.href.split('?')[0];
-                generatedCardUrl = baseUrl + '?id=' + data.id;
+                let jsonStr = JSON.stringify(cardData);
+                let encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+                
+                let baseUrl = window.location.href.split('?')[0].split('#')[0];
+                generatedCardUrl = baseUrl + '?card=' + encoded;
 
                 document.getElementById('resultLink').style.display = 'block';
                 document.getElementById('shareableUrl').href = generatedCardUrl;
                 document.getElementById('shareableUrl').innerText = generatedCardUrl;
                 document.getElementById('whatsappDirectBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + generatedCardUrl)}`;
 
-                btn.innerText = "Buat Kartu";
-                btn.disabled = false;
+                alert("🚀 Link berhasil dibuat dengan super cepat!");
             } catch (error) {
-                alert("Gagal menyimpan data! Pastikan internet stabil.");
-                btn.innerText = "Coba Lagi"; btn.disabled = false;
+                alert("Gagal membuat link. Periksa kembali input Anda.");
             }
         }
 
@@ -1203,11 +1174,11 @@
             if (action === 'home' || action === 'edit') { window.location.href = window.location.href.split('?')[0]; } 
             else if (action === 'effects') { document.getElementById('effectModal').style.display = 'flex'; } 
             else if (action === 'share') {
-                let shareUrl = window.location.search.includes('id=') ? window.location.href : generatedCardUrl;
+                let shareUrl = window.location.search.includes('card=') ? window.location.href : generatedCardUrl;
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 7.8 TopSlideText Edition\nFitur: Cinematic Top-Slide Text Animation, Universal BG Motion, Multi-Shape Frames, Auto-Height Text.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 7.9 Instant Link Edition\nFitur: 0-Second Instant Load, Top-Slide Text Animation, Universal BG Motion.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
