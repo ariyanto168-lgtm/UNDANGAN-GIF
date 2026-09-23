@@ -130,11 +130,7 @@
         .checkbox-group label { margin: 0; cursor: pointer; color: #ffb8c6; font-weight: bold; }
         
         .style-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .upload-box { border: 2px dashed #475569; padding: 20px; text-align: center; border-radius: 8px; background: rgba(8,11,18,0.5); cursor: pointer; transition: border-color 0.2s; font-size: 0.9rem;}
-        .upload-box:hover { border-color: #ff0055; }
-        #previewContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto; }
-        .preview-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #ffb8c6; }
-        .upload-status { font-size: 0.85rem; color: #22c55e; margin-top: 5px; font-weight: bold; }
+        .preview-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #ffb8c6; margin-top: 5px; }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .btn-generate { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
@@ -160,7 +156,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v5.9 Fix Photo</div>
+    <div class="version-badge" id="versionBadge">v6.0 URL Photo</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -246,20 +242,18 @@
             </div>
         </div>
 
-        <!-- BAGIAN 4: MEDIA & SHARE WA -->
+        <!-- BAGIAN 4: MEDIA (URL FOTO) & SHARE WA -->
         <div class="settings-card">
             <div class="settings-header">🎵 Media & WhatsApp</div>
+            
+            <!-- MENU URL FOTO BARU -->
             <div class="form-group">
-                <label>Foto Layar Penuh (1 Foto Super Kompres):</label>
-                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                    📁 Pilih Foto dari HP
-                    <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
-                </div>
-                <div id="uploadStatus" class="upload-status"></div>
+                <label>Link / URL Foto (Background Full Screen):</label>
+                <input type="text" id="inputPhotoUrl" placeholder="Contoh: https://i.imgur.com/xxxxx.jpg" oninput="previewPhotoUrl(this.value)">
                 <div id="previewContainer"></div>
-                <input type="hidden" id="inputPhotosBase64">
             </div>
-            <div class="form-group">
+
+            <div class="form-group" style="margin-top: 10px;">
                 <label>Lagu Latar (URL MP3) - Animasi pas durasi lagu!</label>
                 <input type="text" id="inputMusic" placeholder="Contoh: https://link-ke-lagu.mp3">
             </div>
@@ -350,7 +344,6 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUv53A4_UqoaNdM3cOC2YPD5U442tbfoH3y6hHsyhlcvRf04fLBhSOIjxDtxP5M2aM/exec';
 
-        let compressedPhotoArray = [];
         let generatedCardUrl = "";
         let currentRecipientName = "";
         let currentTheme = "";
@@ -386,52 +379,16 @@
             typewriterSpeedGlobal = parseInt(val);
         }
 
-        // FUNGSI KOMPRESI EKSTRA KECIL AGAR AMAN DI GOOGLE SHEETS
-        function handleFiles(files) {
-            const previewContainer = document.getElementById('previewContainer');
-            const statusEl = document.getElementById('uploadStatus');
-            previewContainer.innerHTML = '';
-            compressedPhotoArray = [];
-
-            if (files.length > 0) statusEl.innerText = "⏳ Kompresi foto agar muat di server...";
-
-            const maxFiles = Math.min(files.length, 1);
-            for (let i = 0; i < maxFiles; i++) {
-                let file = files[i];
-                let reader = new FileReader();
-                reader.onload = function (event) {
-                    let img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function () {
-                        let canvas = document.createElement('canvas');
-                        let ctx = canvas.getContext('2d');
-                        
-                        let maxWidth = 250; // Lebar optimal agar aman dari batasan sel
-                        let scaleSize = maxWidth / img.width;
-                        canvas.width = maxWidth;
-                        canvas.height = img.height * scaleSize;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        let quality = 0.4;
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                        
-                        while(compressedDataUrl.length > 35000 && quality > 0.1) {
-                            quality -= 0.05;
-                            compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                        }
-
-                        compressedPhotoArray.push(compressedDataUrl);
-
-                        let thumb = document.createElement('img');
-                        thumb.src = compressedDataUrl;
-                        thumb.className = 'preview-thumb';
-                        previewContainer.appendChild(thumb);
-
-                        document.getElementById('inputPhotosBase64').value = compressedPhotoArray.join('|||');
-                        statusEl.innerText = "✅ Foto siap dikirim!";
-                    }
-                }
-                reader.readAsDataURL(file);
+        // PRATINJAU THUMBNAIL DARI URL FOTO
+        function previewPhotoUrl(url) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            if(url.trim() !== '') {
+                let img = document.createElement('img');
+                img.src = url.trim();
+                img.className = 'preview-thumb';
+                img.onerror = function() { container.innerHTML = '<span style="color:#ef4444;font-size:0.8rem;">⚠️ Link gambar tidak valid/gagal dimuat</span>'; };
+                container.appendChild(img);
             }
         }
 
@@ -599,29 +556,26 @@
             }
         }
 
-        function loadGalleryFullScreen(photoString) {
+        function loadGalleryFullScreen(photoUrl) {
             const galleryContainer = document.getElementById('mainGalleryContainer');
-            if(!photoString || photoString.trim() === "") return;
+            if(!photoUrl || photoUrl.trim() === "") return;
             galleryContainer.innerHTML = '';
 
-            const separator = photoString.includes('|||') ? '|||' : ',';
-            const photos = photoString.split(separator).map(item => item.trim()).filter(item => item.length > 0);
-            let displayPhotos = [...photos, ...photos]; 
+            // Render URL langsung
+            let displayUrls = [photoUrl.trim(), photoUrl.trim()]; 
 
-            displayPhotos.forEach((url) => {
+            displayUrls.forEach((url) => {
                 let img = document.createElement('img');
-                // Format ulang ke data url jika belum ada
-                if (url.startsWith('data:image')) {
-                    img.src = url;
-                } else {
-                    img.src = 'data:image/jpeg;base64,' + url;
-                }
+                img.src = url;
+                img.onerror = function() { 
+                    this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; 
+                };
                 galleryContainer.appendChild(img);
             });
         }
 
         // ==========================================
-        // FITUR DRAG & DROP DENGAN PERBAIKAN FOTO PREVIEW
+        // FITUR DRAG & DROP
         // ==========================================
         function openDragPreview() {
             document.getElementById('editorPage').style.display = 'none';
@@ -650,12 +604,11 @@
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
-            // Tampilkan foto dari input tersembunyi
-            let base64Foto = document.getElementById('inputPhotosBase64').value;
-            if(base64Foto) {
-                loadGalleryFullScreen(base64Foto);
+            let photoUrl = document.getElementById('inputPhotoUrl').value.trim();
+            if(photoUrl) {
+                loadGalleryFullScreen(photoUrl);
             } else {
-                galleryContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Belum ada foto yang dipilih di editor</div>';
+                galleryContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Masukkan Link URL Foto terlebih dahulu di editor</div>';
             }
 
             makeDraggable(document.getElementById('displayTheme'), 'tema');
@@ -728,7 +681,7 @@
             const fontsize = document.getElementById('inputFontSize').value;
             const fontcolor = document.getElementById('inputFontColor').value;
             const musik = document.getElementById('inputMusic').value.trim();
-            const foto = document.getElementById('inputPhotosBase64').value.trim();
+            const foto = document.getElementById('inputPhotoUrl').value.trim(); // Ambil dari input URL foto
             
             const typewriter = document.getElementById('inputTypewriter').checked;
             const twSpeed = typewriterSpeedGlobal;
@@ -739,11 +692,9 @@
             const landingGif = document.getElementById('inputLandingGif').value;
             const waMsg = document.getElementById('inputWaMsg').value;
 
-            if(!nama || !pesanRaw) { alert("Nama Penerima dan Pesan wajib diisi!"); return; }
-
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length > 0 && foto === "") {
-                alert("Foto sedang diproses atau gagal dikompresi. Tunggu tulisan 'Foto siap dikirim!'"); return;
+            if(!nama || !pesanRaw || !foto) { 
+                alert("Nama Penerima, Pesan, dan Link URL Foto wajib diisi!"); 
+                return; 
             }
 
             let payloadData = { 
@@ -807,7 +758,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 5.9 Fix Photo\nFitur: Enhanced Base64 Image Render, Massive Confetti, Butterfly Animation, Adjustable Typewriter Speed.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 6.0 URL Photo Edition\nFitur: Direct Image URL Input (100% Anti-Blank Photo), Massive Confetti, Butterfly Animation, Typewriter Speed Control.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
