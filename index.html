@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kartu Ucapan Sinematik Digital</title>
+    <!-- Library Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -38,15 +39,16 @@
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
             overflow: hidden; z-index: 1; opacity: 1; display: flex; flex-direction: column;
+            background: radial-gradient(circle, #2a2d42 0%, #080b12 100%);
         }
         #openedCard .gallery-container img { 
             width: 100vw; height: 100vh; object-fit: cover; object-position: center; border: none; display: block;
-            filter: brightness(1.5) contrast(1.2) saturate(1.2);
+            filter: brightness(1.4) contrast(1.2) saturate(1.2);
         }
 
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(8,11,18,0.1) 0%, rgba(8,11,18,0.7) 100%);
+            background: radial-gradient(circle, rgba(8,11,18,0.15) 0%, rgba(8,11,18,0.65) 100%);
             z-index: 2; pointer-events: none;
         }
 
@@ -105,7 +107,7 @@
         @keyframes anim-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
         @keyframes anim-heartbeat { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.15); } 50% { transform: scale(1); } 75% { transform: scale(1.15); } }
         @keyframes anim-wobble { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
-        @keyframes anim-tada { 0% {transform: scale(1);} 10%, 20% {transform: scale(0.9) rotate(-3deg);} 30%, 50%, 70%, 90% {transform: scale(1.1) rotate(3deg);} 40%, 60%, 80% {transform: scale(1.1) rotate(-3deg);} 100% {transform: scale(1) rotate(0);} }
+        @keyframes anim-tada { 0% {transform: scale(1);} 10%, 20% {transform: scale(0.9) rotate(-3deg);} 30%, 50%, 70%, 90% {transform: scale(1.1) rotate(3deg);} 40%, 60%, 80% {transform: scale(1.1) rotate(-3deg);} 100% {transform: scale(1) rotate(0);}}
         @keyframes anim-swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         @keyframes anim-fly { 0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); } 50% { transform: translateY(-20px) translateX(10deg) rotate(-10deg); } }
 
@@ -158,13 +160,14 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v5.8 Master</div>
+    <div class="version-badge" id="versionBadge">v5.9 Fix Photo</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
     <div id="editorPage">
         <h2 class="editor-title">🎬 Studio Pembuat Kartu</h2>
         
+        <!-- BAGIAN 1: DATA & PESAN -->
         <div class="settings-card">
             <div class="settings-header">📝 Data Utama & Typewriter</div>
             <div class="form-group">
@@ -183,12 +186,14 @@
                     <label for="inputTypewriter">✍️ Efek Mengetik Otomatis</label>
                 </div>
             </div>
+            <!-- PENGATURAN KECEPATAN TYPEWRITER -->
             <div class="form-group" id="typewriterSpeedGroup" style="display: none; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
                 <label>Kecepatan Ketik: <span id="twSpeedVal" class="range-value">Sedang (40ms)</span></label>
                 <input type="range" id="inputTwSpeed" min="10" max="120" step="10" value="40" oninput="updateTwSpeedLabel(this.value)">
             </div>
         </div>
 
+        <!-- BAGIAN 2: DESAIN TEKS -->
         <div class="settings-card">
             <div class="settings-header">🎨 Desain Teks & Font</div>
             <div class="form-group">
@@ -217,6 +222,7 @@
             </div>
         </div>
 
+        <!-- BAGIAN 3: HALAMAN DEPAN (AMPLOP) -->
         <div class="settings-card">
             <div class="settings-header">✉️ Halaman Depan (Amplop)</div>
             <div class="form-group">
@@ -240,10 +246,11 @@
             </div>
         </div>
 
+        <!-- BAGIAN 4: MEDIA & SHARE WA -->
         <div class="settings-card">
             <div class="settings-header">🎵 Media & WhatsApp</div>
             <div class="form-group">
-                <label>Foto Layar Penuh (1 Foto Anti-Gagal):</label>
+                <label>Foto Layar Penuh (1 Foto Super Kompres):</label>
                 <div class="upload-box" onclick="document.getElementById('fileInput').click()">
                     📁 Pilih Foto dari HP
                     <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
@@ -262,6 +269,7 @@
             </div>
         </div>
 
+        <!-- TOMBOL AKSI -->
         <div class="btn-row">
             <button class="btn-preview-live" onclick="openDragPreview()">👁️ Preview & Drag Posisi</button>
             <button class="btn-generate" id="btnGen" onclick="generateLink()">🚀 Buat Kartu</button>
@@ -276,6 +284,7 @@
         </div>
     </div>
 
+    <!-- HALAMAN DEPAN PENERIMA -->
     <div id="landingPage">
         <div class="card-container">
             <div class="gift-icon anim-bounce" id="displayLandingGif">🎁</div>
@@ -285,15 +294,19 @@
         </div>
     </div>
 
+    <!-- AREA KARTU UTAMA (Preview & Hasil) -->
     <div id="openedCard">
+        <!-- BACKGROUND FOTO FULL SCREEN -->
         <div class="gallery-container effect-scroll-up" id="mainGalleryContainer"></div>
 
         <div class="drag-instruction" id="dragHint" style="display: none;">👆 Sentuh & Geser Teks untuk Pindah Posisi</div>
 
+        <!-- 3 TEKS MANDIRI -->
         <h2 class="text-element greeting-title" id="displayTheme" style="top: 25%; left: 50%;">Selamat</h2>
         <div class="text-element greeting-subtitle" id="displayName2" style="top: 35%; left: 50%;">Untuk: Nama</div>
         <p class="text-element greeting-msg" id="displayMessage" style="top: 60%; left: 50%;">Pesan...</p>
 
+        <!-- ANIMASI EQUALIZER -->
         <div class="equalizer" id="musicEqualizer">
             <span class="eq-bar eq-1"></span>
             <span class="eq-bar eq-2"></span>
@@ -301,6 +314,7 @@
             <span class="eq-bar eq-4"></span>
         </div>
 
+        <!-- TOMBOL WA BULAT KECIL (PENERIMA) -->
         <a id="recipientWaBtn" href="#" target="_blank" class="wa-circle-btn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
               <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
@@ -310,6 +324,7 @@
         <button id="closeDragBtn" class="modal-close-drag" style="display: none;" onclick="closeDragPreview()">✅ Simpan Posisi</button>
     </div>
 
+    <!-- MODAL EFEK -->
     <div class="modal-overlay" id="effectModal">
         <button class="modal-close-btn" onclick="closeEffectModal()">✕</button>
         <div class="modal-full-content">
@@ -323,6 +338,7 @@
 
     <div class="powered-footer">Powered by Ari GPM</div>
 
+    <!-- NAVBAR -->
     <nav class="bottom-nav" id="editorNavBar">
         <button class="nav-item active" onclick="navAction('home')"><span>🏠</span>Beranda</button>
         <button class="nav-item" onclick="navAction('edit')"><span>✏️</span>Edit</button>
@@ -370,13 +386,14 @@
             typewriterSpeedGlobal = parseInt(val);
         }
 
+        // FUNGSI KOMPRESI EKSTRA KECIL AGAR AMAN DI GOOGLE SHEETS
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
             const statusEl = document.getElementById('uploadStatus');
             previewContainer.innerHTML = '';
             compressedPhotoArray = [];
 
-            if (files.length > 0) statusEl.innerText = "⏳ Memproses & Kompresi Ekstra Aman...";
+            if (files.length > 0) statusEl.innerText = "⏳ Kompresi foto agar muat di server...";
 
             const maxFiles = Math.min(files.length, 1);
             for (let i = 0; i < maxFiles; i++) {
@@ -389,17 +406,17 @@
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
                         
-                        let maxWidth = 350;
+                        let maxWidth = 250; // Lebar optimal agar aman dari batasan sel
                         let scaleSize = maxWidth / img.width;
                         canvas.width = maxWidth;
                         canvas.height = img.height * scaleSize;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        let quality = 0.5;
+                        let quality = 0.4;
                         let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
                         
-                        while(compressedDataUrl.length > 45000 && quality > 0.1) {
-                            quality -= 0.1;
+                        while(compressedDataUrl.length > 35000 && quality > 0.1) {
+                            quality -= 0.05;
                             compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
                         }
 
@@ -411,7 +428,7 @@
                         previewContainer.appendChild(thumb);
 
                         document.getElementById('inputPhotosBase64').value = compressedPhotoArray.join('|||');
-                        statusEl.innerText = "✅ Foto sukses dikompresi (Aman dikirim!)";
+                        statusEl.innerText = "✅ Foto siap dikirim!";
                     }
                 }
                 reader.readAsDataURL(file);
@@ -533,7 +550,6 @@
             type();
         }
 
-        // FUNGSI KONFETI BERTEBARAN MELIMPAH SAAT BUKA KARTU
         function triggerMassiveConfetti() {
             let count = 200;
             let defaults = { origin: { y: 0.7 } };
@@ -555,7 +571,6 @@
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
             
-            // Picu tebaran konfeti banyak warna-warni
             triggerMassiveConfetti();
 
             let galContainer = document.getElementById('mainGalleryContainer');
@@ -595,13 +610,18 @@
 
             displayPhotos.forEach((url) => {
                 let img = document.createElement('img');
-                img.src = url.startsWith('data:image') ? url : 'data:image/jpeg;base64,' + url;
+                // Format ulang ke data url jika belum ada
+                if (url.startsWith('data:image')) {
+                    img.src = url;
+                } else {
+                    img.src = 'data:image/jpeg;base64,' + url;
+                }
                 galleryContainer.appendChild(img);
             });
         }
 
         // ==========================================
-        // FITUR DRAG & DROP
+        // FITUR DRAG & DROP DENGAN PERBAIKAN FOTO PREVIEW
         // ==========================================
         function openDragPreview() {
             document.getElementById('editorPage').style.display = 'none';
@@ -630,9 +650,12 @@
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
+            // Tampilkan foto dari input tersembunyi
             let base64Foto = document.getElementById('inputPhotosBase64').value;
             if(base64Foto) {
                 loadGalleryFullScreen(base64Foto);
+            } else {
+                galleryContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Belum ada foto yang dipilih di editor</div>';
             }
 
             makeDraggable(document.getElementById('displayTheme'), 'tema');
@@ -784,7 +807,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 5.8 Master Edition\nFitur: Massive Confetti Explosion, Butterfly 🦋 Animation Option, Adjustable Typewriter Speed Dimmer, Fixed State Persistence & Anti-Blank Photos.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 5.9 Fix Photo\nFitur: Enhanced Base64 Image Render, Massive Confetti, Butterfly Animation, Adjustable Typewriter Speed.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
