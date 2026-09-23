@@ -127,7 +127,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.37</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.38</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -167,7 +167,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.37</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.38</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -208,16 +208,13 @@
                             <input type="checkbox" id="input-hidejudul" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Judul
                         </label>
                         <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                            <input type="checkbox" id="input-hidefoto" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Foto
+                            <input type="checkbox" id="input-hidefoto" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Foto & Galeri
                         </label>
                         <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                             <input type="checkbox" id="input-hidenama" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Nama
                         </label>
                         <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                             <input type="checkbox" id="input-hideucapan" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Kotak Ucapan
-                        </label>
-                        <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800 col-span-2">
-                            <input type="checkbox" id="input-hidegif" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan GIF / Stiker Bergerak
                         </label>
                     </div>
                 </div>
@@ -258,14 +255,14 @@
 
                 <div id="custom-bg-url-box" class="hidden space-y-3 bg-slate-950 border border-slate-800 p-3 rounded-2xl">
                     <div>
-                        <label class="block text-xs font-medium text-rose-400 mb-1">🔗 Link URL Gambar Background</label>
-                        <input type="text" id="input-bgimgurl" placeholder="https://..." oninput="updateMediaFromInput('bg')" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                        <label class="block text-xs font-medium text-rose-400 mb-1">🖼️ Upload Foto Background dari HP</label>
+                        <input type="file" accept="image/*" onchange="handleFileSelect(event, 'bg')" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white cursor-pointer">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto</label>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto Utama</label>
                         <select id="input-framestyle" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
                             <option value="rounded-full">Lingkaran Sempurna (Circle)</option>
                             <option value="rounded-2xl">Kotak Sudut Melengkung</option>
@@ -363,24 +360,27 @@
                 </div>
             </div>
 
-            <!-- TAB 5: MEDIA & 10 FOTO GALERI -->
+            <!-- TAB 5: MEDIA & GALERI 10 FOTO MANUAL DARI HP -->
             <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Link URL Foto Utama</label>
-                    <input type="text" id="input-fotourl" placeholder="https://..." oninput="updateMediaFromInput('foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                    <button onclick="setPhotoAsFullScreenBg()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs py-2 rounded-xl font-medium interactive-scale border border-slate-700 cursor-pointer">🌌 Jadikan Foto Ini Background Full Layar</button>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload Foto Utama dari HP</label>
+                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white cursor-pointer">
+                    <button onclick="setPhotoAsFullScreenBg()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs py-2 rounded-xl font-medium interactive-scale border border-slate-700 cursor-pointer">🌌 Jadikan Foto Utama Ini Background Full Layar</button>
                 </div>
 
-                <!-- GALERI HINGGA 10 FOTO (STANDART LINK AMAN WA) -->
+                <!-- GALERI FOTO MANUAL DARI HP (MAKSIMAL 10 FOTO) -->
                 <div class="pt-3 border-t border-slate-800 space-y-3">
                     <div class="flex justify-between items-center">
                         <div>
-                            <label class="text-xs font-bold text-rose-400">📸 Galeri Foto Kenangan (Maksimal 10 Foto)</label>
-                            <p class="text-[10px] text-slate-400">Masukkan link URL foto (Imgur / Drive / Link Gambar)</p>
+                            <label class="text-xs font-bold text-rose-400">📸 Galeri Foto Kenangan (Maks. 10 Foto dari HP)</label>
+                            <p class="text-[10px] text-slate-400">Upload foto galeri langsung dari penyimpanan HP Anda.</p>
                         </div>
-                        <button onclick="addGalleryPhotoInput()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-semibold interactive-scale">+ Tambah Foto</button>
+                        <label class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-3 py-2 rounded-xl font-semibold cursor-pointer interactive-scale">
+                            + Pilih Foto HP
+                            <input type="file" accept="image/*" multiple onchange="handleGalleryFilesSelect(event)" class="hidden">
+                        </label>
                     </div>
-                    <div id="gallery-url-inputs-list" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar"></div>
+                    <div id="gallery-editor-list" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar"></div>
                 </div>
 
                 <div>
@@ -447,12 +447,7 @@
             ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
             runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
             fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
-            galleryPhotos: [
-                "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=70",
-                "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=300&q=70"
-            ],
-            gifUrl: "",
-            videoUrl: "",
+            galleryPhotos: [],
             musikUrl: "",
             textColor: "#f8fafc",
             fontFamily: "'Poppins', sans-serif",
@@ -470,9 +465,7 @@
             hideFoto: false,
             hideNama: false,
             hideUcapan: false,
-            hideGif: false,
             hideRunningText: false,
-            posGif: { x: 50, y: 15 },
             posJudul: { x: 50, y: 25 },
             posFoto: { x: 50, y: 42 },
             posNama: { x: 50, y: 60 },
@@ -487,46 +480,121 @@
         let activeDragItem = null;
         let isReceiverView = false;
 
-        function addGalleryPhotoInput() {
+        // Kompresi Foto Cerdas untuk HP (Aman 10 Foto di Link Share WhatsApp)
+        function compressAndConvertImage(file, callback, targetType = 'foto') {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    let maxWidth = 300;
+                    let quality = 0.5;
+                    
+                    if (targetType === 'bg') {
+                        maxWidth = 400;
+                        quality = 0.55;
+                    } else if (targetType === 'foto') {
+                        maxWidth = 350;
+                        quality = 0.55;
+                    } else if (targetType === 'gallery') {
+                        maxWidth = 240;
+                        quality = 0.45;
+                    }
+
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    callback(compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressAndConvertImage(file, function(resultUrl) {
+                if (type === 'foto') {
+                    cardState.fotoUrl = resultUrl;
+                } else if (type === 'bg') {
+                    cardState.bgImgUrl = resultUrl;
+                    cardState.bgStyle = 'custom-image';
+                    const bgStyleEl = document.getElementById('input-bgstyle');
+                    if (bgStyleEl) bgStyleEl.value = 'custom-image';
+                }
+                updateLivePreview();
+                alert('Foto berhasil diunggah dari HP! ✨');
+            }, type);
+        }
+
+        function handleGalleryFilesSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
             if (!cardState.galleryPhotos) cardState.galleryPhotos = [];
-            if (cardState.galleryPhotos.length >= 10) {
-                alert('Maksimal galeri adalah 10 foto!');
-                return;
+
+            let addedCount = 0;
+            for (let i = 0; i < files.length; i++) {
+                if (cardState.galleryPhotos.length >= 10) {
+                    alert('Maksimal galeri adalah 10 foto!');
+                    break;
+                }
+                compressAndConvertImage(files[i], function(resultUrl) {
+                    cardState.galleryPhotos.push(resultUrl);
+                    renderGalleryEditorList();
+                    updateLivePreview();
+                }, 'gallery');
+                addedCount++;
             }
-            cardState.galleryPhotos.push("");
-            renderGalleryInputs();
-            updateLivePreview();
+            event.target.value = '';
         }
 
-        function removeGalleryPhoto(index) {
-            cardState.galleryPhotos.splice(index, 1);
-            renderGalleryInputs();
-            updateLivePreview();
-        }
-
-        function updateGalleryPhotoUrl(index, val) {
-            cardState.galleryPhotos[index] = val;
-            updateLivePreview();
-        }
-
-        function renderGalleryInputs() {
-            const container = document.getElementById('gallery-url-inputs-list');
+        function renderGalleryEditorList() {
+            const container = document.getElementById('gallery-editor-list');
             if (!container) return;
             container.innerHTML = '';
             if (!cardState.galleryPhotos || cardState.galleryPhotos.length === 0) {
-                container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-2">Belum ada foto galeri.</p>';
+                container.innerHTML = '<p class="text-[10px] text-slate-500 text-center py-2">Belum ada foto galeri diunggah dari HP.</p>';
                 return;
             }
             cardState.galleryPhotos.forEach((url, idx) => {
                 let div = document.createElement('div');
-                div.className = 'flex items-center gap-2';
+                div.className = 'flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800';
                 div.innerHTML = `
-                    <span class="text-[10px] font-mono text-rose-400 w-5">${idx+1}.</span>
-                    <input type="text" value="${url}" placeholder="https://link-foto.jpg" oninput="updateGalleryPhotoUrl(${idx}, this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                    <button onclick="removeGalleryPhoto(${idx})" class="text-slate-400 hover:text-red-400 p-1 cursor-pointer text-xs">🗑️</button>
+                    <img src="${url}" class="w-10 h-10 object-cover rounded-lg border border-slate-700 shrink-0">
+                    <span class="text-xs text-slate-300 flex-1 truncate">Foto Galeri ${idx+1}</span>
+                    <button onclick="removeGalleryPhoto(${idx})" class="text-slate-400 hover:text-red-400 p-1 cursor-pointer text-xs">🗑️ Hapus</button>
                 `;
                 container.appendChild(div);
             });
+        }
+
+        function removeGalleryPhoto(index) {
+            cardState.galleryPhotos.splice(index, 1);
+            renderGalleryEditorList();
+            updateLivePreview();
+        }
+
+        function setPhotoAsFullScreenBg() {
+            if (!cardState.fotoUrl) {
+                alert('Silakan upload foto utama terlebih dahulu!');
+                return;
+            }
+            cardState.bgStyle = 'custom-image';
+            cardState.bgImgUrl = cardState.fotoUrl;
+            const bgStyleEl = document.getElementById('input-bgstyle');
+            if (bgStyleEl) bgStyleEl.value = 'custom-image';
+            updateLivePreview();
+            alert('Berhasil! Foto Anda kini menjadi latar belakang full layar. 🌌✨');
         }
 
         function encodeCardToShortLink(obj) {
@@ -554,9 +622,7 @@
                 hf: obj.hideFoto ? 1 : 0,
                 hn: obj.hideNama ? 1 : 0,
                 hu: obj.hideUcapan ? 1 : 0,
-                hg: obj.hideGif ? 1 : 0,
                 hr: obj.hideRunningText ? 1 : 0,
-                pg: obj.posGif,
                 pj: obj.posJudul,
                 pf: obj.posFoto,
                 pn: obj.posNama,
@@ -598,9 +664,7 @@
                     hideFoto: c.hf === 1,
                     hideNama: c.hn === 1,
                     hideUcapan: c.hu === 1,
-                    hideGif: c.hg === 1,
                     hideRunningText: c.hr === 1,
-                    posGif: c.pg || { x: 50, y: 15 },
                     posJudul: c.pj || { x: 50, y: 25 },
                     posFoto: c.pf || { x: 50, y: 42 },
                     posNama: c.pn || { x: 50, y: 60 },
@@ -665,7 +729,7 @@
                     openDashboardMenu();
                 }
                 renderDecorEditorList();
-                renderGalleryInputs();
+                renderGalleryEditorList();
                 updateLivePreview();
             } catch (err) {
                 showErrorScreen("Terjadi Kesalahan", "Gagal memuat aplikasi.");
@@ -746,7 +810,7 @@
                 if (!cardState.galleryPhotos) cardState.galleryPhotos = [];
                 applyCardStateToUI();
                 renderDecorEditorList();
-                renderGalleryInputs();
+                renderGalleryEditorList();
                 document.getElementById('dashboard-menu-screen').classList.add('hidden');
                 document.getElementById('main-container').classList.remove('hidden');
             }
@@ -770,8 +834,6 @@
                 runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
                 fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
                 galleryPhotos: [],
-                gifUrl: "",
-                videoUrl: "",
                 musikUrl: "",
                 textColor: "#f8fafc",
                 fontFamily: "'Poppins', sans-serif",
@@ -789,9 +851,7 @@
                 hideFoto: false,
                 hideNama: false,
                 hideUcapan: false,
-                hideGif: false,
                 hideRunningText: false,
-                posGif: { x: 50, y: 15 },
                 posJudul: { x: 50, y: 25 },
                 posFoto: { x: 50, y: 42 },
                 posNama: { x: 50, y: 60 },
@@ -803,7 +863,7 @@
             ];
             applyCardStateToUI();
             renderDecorEditorList();
-            renderGalleryInputs();
+            renderGalleryEditorList();
             document.getElementById('dashboard-menu-screen').classList.add('hidden');
             document.getElementById('main-container').classList.remove('hidden');
         }
@@ -829,7 +889,7 @@
                 'design': '🎨 Editor Desain & Animasi Latar',
                 'running': '🏃‍♂️ Pengaturan Teks Berjalan',
                 'decor': '✨ Stiker & Drag & Drop Bebas',
-                'media': '📁 Galeri 10 Foto & Media',
+                'media': '📁 Galeri 10 Foto HP & Media',
                 'settings': '⚙️ Pengaturan & Simpan'
             };
             document.getElementById('modal-title-text').innerText = titles[tabName] || 'Editor';
@@ -916,7 +976,7 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.37)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.38)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
             alert('Perubahan kartu berhasil disimpan! 💾');
@@ -986,12 +1046,10 @@
             setVal('input-fontsize', cardState.fontSize);
             setVal('input-bgstyle', cardState.bgStyle || 'gradient-rose');
             setVal('input-bgeffect', cardState.bgEffect || 'none');
-            setVal('input-bgimgurl', cardState.bgImgUrl || '');
             setVal('input-framestyle', cardState.frameStyle);
             setVal('input-greetingframe', cardState.greetingFrameStyle);
             setVal('input-typespeed', cardState.typewriterSpeed || 40);
             setVal('input-textdecoration', cardState.textDecoration);
-            setVal('input-fotourl', cardState.fotoUrl || '');
             setVal('input-musikurl', cardState.musikUrl);
 
             const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
@@ -999,10 +1057,9 @@
             setChk('input-hidefoto', cardState.hideFoto);
             setChk('input-hidenama', cardState.hideNama);
             setChk('input-hideucapan', cardState.hideUcapan);
-            setChk('input-hidegif', cardState.hideGif);
             setChk('input-hiderunningtext', cardState.hideRunningText);
 
-            renderGalleryInputs();
+            renderGalleryEditorList();
             updateLivePreview();
         }
 
@@ -1061,19 +1118,12 @@
             cardState.greetingFrameStyle = document.getElementById('input-greetingframe').value;
             cardState.typewriterSpeed = parseInt(document.getElementById('input-typespeed').value) || 40;
             cardState.textDecoration = document.getElementById('input-textdecoration').value;
-
-            const bgInputVal = document.getElementById('input-bgimgurl').value.trim();
-            if (bgInputVal) cardState.bgImgUrl = bgInputVal;
-            
-            const fotoInputVal = document.getElementById('input-fotourl').value.trim();
-            if (fotoInputVal) cardState.fotoUrl = fotoInputVal;
             
             const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
             cardState.hideJudul = getChk('input-hidejudul');
             cardState.hideFoto = getChk('input-hidefoto');
             cardState.hideNama = getChk('input-hidenama');
             cardState.hideUcapan = getChk('input-hideucapan');
-            cardState.hideGif = getChk('input-hidegif');
             cardState.hideRunningText = getChk('input-hiderunningtext');
 
             document.getElementById('speed-label').innerText = cardState.typewriterSpeed + ' ms';
@@ -1148,30 +1198,29 @@
                 canvas.appendChild(h2);
             }
 
-            // 2. Foto Utama & Bingkai + Galeri 10 Foto di Bawahnya
-            if (!cardState.hideFoto && cardState.fotoUrl) {
+            // 2. Foto Utama & Galeri (Hingga 10 Foto dari HP)
+            if (!cardState.hideFoto && (cardState.fotoUrl || (cardState.galleryPhotos && cardState.galleryPhotos.length > 0))) {
                 let wrap = document.createElement('div');
                 wrap.className = 'draggable-element absolute flex flex-col items-center gap-2' + (!isReceiverView ? ' is-editable' : '');
                 wrap.style.left = cardState.posFoto.x + '%';
                 wrap.style.top = cardState.posFoto.y + '%';
                 wrap.style.transform = 'translate(-50%, -50%)';
                 
-                if (cardState.frameStyle !== 'none') {
+                if (cardState.fotoUrl && cardState.frameStyle !== 'none') {
                     let mainImg = document.createElement('img');
                     mainImg.src = cardState.fotoUrl;
                     mainImg.className = `w-28 h-28 md:w-36 md:h-36 object-cover border-4 border-rose-500/40 shadow-xl animate-beat ${cardState.frameStyle} pointer-events-none`;
                     wrap.appendChild(mainImg);
                 }
 
-                // Render Galeri (Hingga 10 Foto) jika ada
                 if (cardState.galleryPhotos && cardState.galleryPhotos.length > 0) {
                     let galleryContainer = document.createElement('div');
-                    galleryContainer.className = 'flex gap-1.5 max-w-[280px] overflow-x-auto p-1 custom-scrollbar bg-black/30 backdrop-blur-md rounded-xl border border-white/10';
+                    galleryContainer.className = 'flex gap-1.5 max-w-[280px] overflow-x-auto p-1.5 custom-scrollbar bg-black/40 backdrop-blur-md rounded-2xl border border-white/10';
                     cardState.galleryPhotos.forEach(gUrl => {
-                        if (gUrl.trim()) {
+                        if (gUrl) {
                             let gImg = document.createElement('img');
-                            gImg.src = gUrl.trim();
-                            gImg.className = 'w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg border border-white/20 shrink-0 pointer-events-none';
+                            gImg.src = gUrl;
+                            gImg.className = 'w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl border border-white/20 shrink-0 pointer-events-none shadow-md';
                             galleryContainer.appendChild(gImg);
                         }
                     });
@@ -1262,9 +1311,7 @@
         }
 
         function updateMediaFromInput(type) {
-            if (type === 'foto') cardState.fotoUrl = document.getElementById('input-fotourl').value.trim();
             if (type === 'musik') cardState.musikUrl = document.getElementById('input-musikurl').value.trim();
-            if (type === 'bg') cardState.bgImgUrl = document.getElementById('input-bgimgurl').value.trim();
             updateLivePreview();
         }
 
