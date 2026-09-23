@@ -119,7 +119,7 @@
         </div>
 
         <div class="form-group">
-            <label>Upload Foto Galeri (Maksimal 3 Foto Terbaik):</label>
+            <label>Upload Foto Galeri (Maks 3 foto dari HP):</label>
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
                 📁 Pilih Foto dari HP (Auto-Compress Aman)
                 <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
@@ -187,20 +187,21 @@
     </nav>
 
     <script>
-        const SCRIPT_URL = 'PASTE_URL_WEB_APP_DISINI_YANG_BERAKHIRAN_EXEC';
+        // SCRIPT_URL Google Apps Script terbaru kamu
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUv53A4_UqoaNdM3cOC2YPD5U442tbfoH3y6hHsyhlcvRf04fLBhSOIjxDtxP5M2aM/exec';
 
         let compressedPhotoArray = [];
         let generatedCardUrl = "";
         let currentRecipientName = "";
         let currentTheme = "";
 
-        // Kompresi ketat maks 3 foto & ukuran aman di bawah limit sel Google Sheets
+        // Fungsi Kompresi Optimal untuk mencegah error payload besar
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.innerHTML = '';
             compressedPhotoArray = [];
 
-            const maxFiles = Math.min(files.length, 3); // Dibatasi maks 3 foto
+            const maxFiles = Math.min(files.length, 3);
             for (let i = 0; i < maxFiles; i++) {
                 let file = files[i];
                 let reader = new FileReader();
@@ -211,14 +212,14 @@
                     img.onload = function () {
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
-                        let maxWidth = 400; // Lebar diperkecil agar teks Base64 sangat ringan
+                        let maxWidth = 400; // Optimal untuk menjaga ukuran data foto tetap ringan dan aman
                         let scaleSize = maxWidth / img.width;
                         
                         canvas.width = maxWidth;
                         canvas.height = img.height * scaleSize;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.4); // Kualitas 40% sangat aman dari limit sel GS
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.4); // Kompresi 40% aman dari limit server
                         compressedPhotoArray.push(compressedDataUrl);
 
                         let thumb = document.createElement('img');
@@ -337,7 +338,7 @@
                 btn.innerText = "Buat Kartu";
                 btn.disabled = false;
             } catch (error) {
-                alert("Gagal menyimpan data! Periksa kembali SCRIPT_URL Google Apps Script Anda.");
+                alert("Gagal menyimpan data! Periksa kembali koneksi atau ukuran foto Anda.");
                 btn.innerText = "Coba Lagi";
                 btn.disabled = false;
             }
@@ -403,7 +404,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.2\nFitur: Safe Cell Limit, Full-Screen Preview, WhatsApp Direct.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.2\nFitur: Optimized Auto-Compress, Full-Screen Preview, WhatsApp Direct.\n\nPowered by Ari GPM");
             }
         }
     </script>
