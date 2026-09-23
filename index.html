@@ -45,6 +45,15 @@
             filter: brightness(1.2) contrast(0.92) saturate(1.05);
         }
 
+        /* CONTAINER BINGKAI FOTO DINAMIS */
+        .photo-frame-wrapper {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 5; pointer-events: none; transition: all 0.3s ease;
+        }
+        .photo-frame-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, rgba(8,11,18,0.15) 0%, rgba(8,11,18,0.6) 100%);
@@ -95,15 +104,16 @@
         @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
         
         /* EFEK BACKGROUND ANIMASI */
-        .effect-zoom-slow img { animation: zoomSlow 25s ease-in-out infinite alternate; }
-        .effect-slide-side img { animation: slideSideFull 20s ease-in-out infinite alternate; width: 120vw !important; }
-        .effect-scroll-up img { animation: scrollUpFull 18s linear infinite; height: 130vh !important; }
-        .effect-pulse img { animation: pulseSlow 10s ease-in-out infinite alternate; }
+        .effect-zoom-slow img { animation: zoomFastLoop 8s ease-in-out infinite alternate; }
+        .effect-slide-side img { animation: slideSideFastLoop 7s ease-in-out infinite alternate; width: 125vw !important; }
+        .effect-scroll-up img { animation: scrollUpFastLoop 6s linear infinite; height: 135vh !important; }
+        .effect-pulse img { animation: pulseFastLoop 5s ease-in-out infinite alternate; }
 
-        @keyframes zoomSlow { 0% { transform: scale(1); } 100% { transform: scale(1.18); } }
-        @keyframes slideSideFull { 0% { transform: translateX(0); } 100% { transform: translateX(-15vw); } }
-        @keyframes scrollUpFull { 0% { transform: translateY(0); } 100% { transform: translateY(-20vh); } }
-        @keyframes pulseSlow { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+        @keyframes zoomFastLoop { 0% { transform: scale(1); } 100% { transform: scale(1.12); } }
+        @keyframes slideSideFastLoop { 0% { transform: translateX(0); } 100% { transform: translateX(-12vw); } }
+        @keyframes scrollUpFastLoop { 0% { transform: translateY(0); } 100% { transform: translateY(-15vh); } }
+        @keyframes pulseFastLoop { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+
         @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         /* ANIMASI IKON KUSTOM */
@@ -149,13 +159,18 @@
         .result-box { margin-top: 20px; padding: 15px; background-color: #080b12; border-radius: 8px; display: none; text-align: left; border: 1px dashed #22c55e; }
         .btn-wa-direct { background: #25d366; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 0.95rem; }
 
-        /* POPUP MODAL */
+        /* POPUP MODAL EFEK & BG */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8,11,18,0.95); display: none; flex-direction: column; z-index: 3000; padding: 20px; overflow-y: auto; align-items: center; justify-content: center; }
-        .modal-full-content { width: 100%; max-width: 450px; margin: 0 auto; text-align: center; position: relative; padding-bottom: 40px; background: rgba(20,25,40,0.9); border: 1px solid rgba(255,107,129,0.3); border-radius: 16px; padding: 30px 20px; }
+        .modal-full-content { width: 100%; max-width: 450px; margin: 0 auto; text-align: center; position: relative; padding-bottom: 40px; background: rgba(20,25,40,0.9); border: 1px solid rgba(255,107,129,0.3); border-radius: 16px; padding: 30px 20px; max-height: 85vh; overflow-y: auto; }
         .modal-close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 1rem; z-index: 3100; }
         .modal-close-drag { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; z-index: 5000; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.8); }
+        
         .effect-option-btn { background: linear-gradient(135deg, #1a2238, #2a3656); color: #ffb8c6; border: 1px solid rgba(255,184,198,0.3); padding: 12px 20px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
         .effect-option-btn:hover { transform: scale(1.03); background: linear-gradient(135deg, #ff0055, #ff5e7e); color: white; }
+
+        .color-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .color-option-btn { border: 1px solid rgba(255,255,255,0.3); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; text-align: center; transition: transform 0.2s; }
+        .color-option-btn:hover { transform: scale(1.03); opacity: 0.9; }
 
         /* NAVIGATION BAR */
         .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 420px; background: rgba(20, 25, 40, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; padding: 10px 10px; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
@@ -166,7 +181,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v6.7 SafeStore</div>
+    <div class="version-badge" id="versionBadge">v7.1 Frame Edition</div>
 
     <div id="loadingPage">Ada kejutan buatmu ✨</div>
 
@@ -215,7 +230,37 @@
             </div>
         </div>
 
-        <!-- BAGIAN 2: DESAIN TEKS & SLIDER UKURAN FONT -->
+        <!-- BAGIAN 2: PENGATURAN BINGKAI FOTO -->
+        <div class="settings-card">
+            <div class="settings-header">🖼️ Pengaturan Bingkai Foto Dinamis</div>
+            <div class="checkbox-group" style="margin-bottom: 12px;">
+                <input type="checkbox" id="showFrame" checked onchange="autoSaveDraft()">
+                <label for="showFrame">Tampilkan Bingkai Foto di Kartu</label>
+            </div>
+            
+            <div class="form-group">
+                <label>Pilih Model Bingkai:</label>
+                <select id="inputFrameStyle" onchange="autoSaveDraft()">
+                    <option value="frame-gold">✨ Klasik Emas Mewah (Gold Elegant)</option>
+                    <option value="frame-love">💖 Romantis Cinta Neon (Love Glow)</option>
+                    <option value="frame-floral">🌸 Karangan Bunga (Floral Garden)</option>
+                    <option value="frame-white">🤍 Minimalis Putih Bersih (Clean White)</option>
+                    <option value="frame-cyber">⚡ Cyber Neon Futuristis</option>
+                    <option value="frame-vintage">📜 Vintage Kayu Klasik</option>
+                    <option value="frame-silver">💿 Silver Metalik Modern</option>
+                    <option value="frame-diamond">💎 Berlian Berkilau (Sparkle Diamond)</option>
+                    <option value="frame-pastel">🎨 Pastel Ceria Warna-Warni</option>
+                    <option value="frame-royal">👑 Kerajaan Mewah (Royal Crown)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Ukuran Bingkai: <span id="frameSizeVal" class="range-value">85%</span></label>
+                <input type="range" id="inputFrameSize" min="50" max="100" step="1" value="85" oninput="updateFrameSizeLabel(this.value); autoSaveDraft();">
+            </div>
+        </div>
+
+        <!-- BAGIAN 3: DESAIN TEKS & SLIDER UKURAN FONT -->
         <div class="settings-card">
             <div class="settings-header">🎨 Desain Teks & Ukuran (Slider)</div>
             <div class="form-group">
@@ -246,7 +291,7 @@
             </div>
         </div>
 
-        <!-- BAGIAN 3: HALAMAN DEPAN (AMPLOP) -->
+        <!-- BAGIAN 4: HALAMAN DEPAN (AMPLOP) -->
         <div class="settings-card">
             <div class="settings-header">✉️ Halaman Depan & Teks Loading</div>
             <div class="form-group">
@@ -274,7 +319,7 @@
             </div>
         </div>
 
-        <!-- BAGIAN 4: MEDIA (URL FOTO) & SHARE WA -->
+        <!-- BAGIAN 5: MEDIA (URL FOTO) & SHARE WA -->
         <div class="settings-card">
             <div class="settings-header">🎵 Media & WhatsApp</div>
             
@@ -285,7 +330,7 @@
             </div>
 
             <div class="form-group" style="margin-top: 10px;">
-                <label>Lagu Latar (URL MP3) - Animasi pas durasi lagu!</label>
+                <label>Lagu Latar (URL MP3) - Pemutaran musik mandiri!</label>
                 <input type="text" id="inputMusic" placeholder="Contoh: https://link-ke-lagu.mp3" oninput="autoSaveDraft()">
             </div>
             <div class="form-group">
@@ -321,8 +366,11 @@
 
     <!-- AREA KARTU UTAMA (Preview & Hasil) -->
     <div id="openedCard">
-        <!-- BACKGROUND FOTO FULL SCREEN UTUH -->
+        <!-- BACKGROUND FOTO / WARNA SOLID / TESTUR KAIN -->
         <div class="gallery-container" id="mainGalleryContainer"></div>
+
+        <!-- BINGKAI FOTO DINAMIS DI ATAS BACKGROUND -->
+        <div class="photo-frame-wrapper" id="photoFrameContainer"></div>
 
         <div class="drag-instruction" id="dragHint" style="display: none;">👆 Sentuh & Geser Teks untuk Pindah Posisi</div>
 
@@ -349,16 +397,32 @@
         <button id="closeDragBtn" class="modal-close-drag" style="display: none;" onclick="closeDragPreview()">✅ Simpan Posisi</button>
     </div>
 
-    <!-- MODAL EFEK -->
+    <!-- MODAL EFEK & BACKGROUND -->
     <div class="modal-overlay" id="effectModal">
         <button class="modal-close-btn" onclick="closeEffectModal()">✕</button>
         <div class="modal-full-content">
-            <h3 style="color: #ffb8c6; margin-bottom: 15px;">✨ Pilih Efek Background</h3>
-            <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Out Pelan Sinematik</button>
+            <h3 style="color: #ffb8c6; margin-bottom: 12px; font-size: 1.1rem;">✨ Pilih Efek Animasi BG</h3>
+            <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Out Cepat Sinematik</button>
             <button class="effect-option-btn" onclick="applyEffect('scroll-up')">⬆️ Gulir Foto ke Atas (Pan Up)</button>
-            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan Halus</button>
+            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan Cepat</button>
             <button class="effect-option-btn" onclick="applyEffect('pulse')">💖 Denyut Lembut</button>
             <button class="effect-option-btn" onclick="applyEffect('none')">🎯 Diam Saja</button>
+
+            <h3 style="color: #ffb8c6; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem;">🎨 Warna / Tekstur Background</h3>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">Pilih warna cerah/tekstur jika tidak memakai foto URL:</p>
+            
+            <div class="color-grid">
+                <button class="color-option-btn" style="background:#e8dfd8; color:#333;" onclick="applyBgColor('texture-fabric', 'Tekstur Kain Klasik')">🧵 Tekstur Kain Klasik</button>
+                <button class="color-option-btn" style="background:#ffffff; color:#333;" onclick="applyBgColor('#ffffff', 'Putih Bersih')">⬜ Putih Bersih</button>
+                <button class="color-option-btn" style="background:#fff3e0; color:#333;" onclick="applyBgColor('#fff3e0', 'Cream Hangat')">🥞 Cream Hangat</button>
+                <button class="color-option-btn" style="background:#ffe4e6; color:#333;" onclick="applyBgColor('#ffe4e6', 'Soft Pink')">🌸 Soft Pink</button>
+                <button class="color-option-btn" style="background:#f3e8ff; color:#333;" onclick="applyBgColor('#f3e8ff', 'Ungu Lilac')">💜 Ungu Lilac</button>
+                <button class="color-option-btn" style="background:#e0f2fe; color:#333;" onclick="applyBgColor('#e0f2fe', 'Biru Langit')">🌊 Biru Langit</button>
+                <button class="color-option-btn" style="background:#dcfce7; color:#333;" onclick="applyBgColor('#dcfce7', 'Mint Segar')">🍃 Mint Hijau</button>
+                <button class="color-option-btn" style="background:#fef9c3; color:#333;" onclick="applyBgColor('#fef9c3', 'Kuning Pastel')">⭐ Kuning Pastel</button>
+                <button class="color-option-btn" style="background:#ffedd5; color:#333;" onclick="applyBgColor('#ffedd5', 'Peach Manis')">🍑 Peach Manis</button>
+                <button class="color-option-btn" style="background:#0f172a; color:#fff;" onclick="applyBgColor('#0f172a', 'Hitam Elegan')">🖤 Hitam Elegan</button>
+            </div>
         </div>
     </div>
 
@@ -384,11 +448,26 @@
         let typewriterSpeedGlobal = 40;
         let finalMessageRaw = "";
         let selectedAnimationType = 'zoom-slow';
+        let selectedBgColorOrTexture = '';
 
         let posData = { 
             tema: { x: 50, y: 25 }, 
             nama: { x: 50, y: 35 }, 
             pesan: { x: 50, y: 60 } 
+        };
+
+        // KUMPULAN URL BINGKAI FOTO ESTETIK (10 MACAM MODEL)
+        const frameSvgList = {
+            'frame-gold': 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=800&auto=format&fit=crop', // Placeholder dekoratif mewah
+            'frame-love': 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop',
+            'frame-floral': 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=800&auto=format&fit=crop',
+            'frame-white': 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&auto=format&fit=crop',
+            'frame-cyber': 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop',
+            'frame-vintage': 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop',
+            'frame-silver': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
+            'frame-diamond': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop',
+            'frame-pastel': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop',
+            'frame-royal': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop'
         };
 
         function hexToRgba(hex, alpha) {
@@ -417,6 +496,15 @@
 
         function updateFontSizeLabel(val) {
             document.getElementById('fontSizeVal').innerText = val + "px";
+        }
+
+        function updateFrameSizeLabel(val) {
+            document.getElementById('frameSizeVal').innerText = val + "%";
+            let frameWrapper = document.getElementById('photoFrameContainer');
+            if(frameWrapper) {
+                frameWrapper.style.width = val + "vw";
+                frameWrapper.style.height = (val * 1.3) + "vh";
+            }
         }
 
         function previewPhotoUrl(url) {
@@ -463,16 +551,20 @@
                 showT: document.getElementById('showTheme').checked,
                 showN: document.getElementById('showName').checked,
                 showM: document.getElementById('showMessage').checked,
+                showFr: document.getElementById('showFrame').checked,
+                frStyle: document.getElementById('inputFrameStyle').value,
+                frSize: document.getElementById('inputFrameSize').value,
                 tw: document.getElementById('inputTypewriter').checked,
                 twSpeed: typewriterSpeedGlobal,
                 anim: selectedAnimationType,
+                bgCustom: selectedBgColorOrTexture,
                 pos: posData
             };
-            localStorage.setItem('card_draft_v67', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v71', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v67');
+            let saved = localStorage.getItem('card_draft_v71');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -493,9 +585,13 @@
                     if(d.showT !== undefined) document.getElementById('showTheme').checked = d.showT;
                     if(d.showN !== undefined) document.getElementById('showName').checked = d.showN;
                     if(d.showM !== undefined) document.getElementById('showMessage').checked = d.showM;
+                    if(d.showFr !== undefined) document.getElementById('showFrame').checked = d.showFr;
+                    if(d.frStyle) document.getElementById('inputFrameStyle').value = d.frStyle;
+                    if(d.frSize) { document.getElementById('inputFrameSize').value = d.frSize; updateFrameSizeLabel(d.frSize); }
                     if(d.tw !== undefined) { document.getElementById('inputTypewriter').checked = d.tw; toggleTypewriterSpeedSetting(d.tw); }
                     if(d.twSpeed) { typewriterSpeedGlobal = d.twSpeed; document.getElementById('inputTwSpeed').value = d.twSpeed; updateTwSpeedLabel(d.twSpeed); }
                     if(d.anim) selectedAnimationType = d.anim;
+                    if(d.bgCustom) selectedBgColorOrTexture = d.bgCustom;
                     if(d.pos) posData = d.pos;
                 } catch(e) {}
             }
@@ -535,6 +631,9 @@
                     let lGifFull = "🎁|bounce"; 
                     let lTxt = "Ada kejutan buatmu ✨";
                     let vis = { t: true, n: true, m: true };
+                    let showFr = true;
+                    let frStyle = 'frame-gold';
+                    let frSize = 85;
 
                     if (msgText.startsWith("||OPTS:")) {
                         let parts = msgText.split("||MSG:");
@@ -545,6 +644,9 @@
                             if(parsedOpts.twSpeed) typewriterSpeedGlobal = parsedOpts.twSpeed;
                             if(parsedOpts.lTxt) lTxt = parsedOpts.lTxt;
                             if(parsedOpts.vis) vis = parsedOpts.vis;
+                            if(parsedOpts.showFr !== undefined) showFr = parsedOpts.showFr;
+                            if(parsedOpts.frStyle) frStyle = parsedOpts.frStyle;
+                            if(parsedOpts.frSize) frSize = parsedOpts.frSize;
                             if (parsedOpts.fFam) fFam = parsedOpts.fFam;
                             if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
                             if (parsedOpts.wa) waMsg = parsedOpts.wa;
@@ -552,6 +654,7 @@
                             if (parsedOpts.lBtn) lBtn = parsedOpts.lBtn;
                             if (parsedOpts.lGif) lGifFull = parsedOpts.lGif;
                             if (parsedOpts.anim) selectedAnimationType = parsedOpts.anim;
+                            if (parsedOpts.bgCustom) selectedBgColorOrTexture = parsedOpts.bgCustom;
                             
                             if(parsedOpts.pos) {
                                 posData = parsedOpts.pos;
@@ -570,7 +673,6 @@
                     iconEl.innerText = gifArr[0];
                     iconEl.className = 'gift-icon anim-' + (gifArr[1] || 'bounce');
 
-                    // Terapkan posisi persis dari posData
                     let elT = document.getElementById('displayTheme');
                     let elN = document.getElementById('displayName2');
                     let elM = document.getElementById('displayMessage');
@@ -579,7 +681,6 @@
                     elN.style.left = posData.nama.x + "%"; elN.style.top = posData.nama.y + "%";
                     elM.style.left = posData.pesan.x + "%"; elM.style.top = posData.pesan.y + "%";
 
-                    // Terapkan Visibilitas Kolom Teks
                     elT.style.display = vis.t ? 'block' : 'none';
                     elN.style.display = vis.n ? 'block' : 'none';
                     elM.style.display = vis.m ? 'block' : 'none';
@@ -592,10 +693,11 @@
                         elM.innerText = ""; 
                     }
 
+                    renderCardBackground(data.foto, selectedBgColorOrTexture);
+                    renderPhotoFrame(showFr, frStyle, frSize);
+
                     const currentUrl = window.location.href;
                     document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + currentUrl)}`;
-
-                    loadGalleryFullScreen(data.foto);
                 })
                 .catch(err => {
                     loadingEl.style.display = 'none';
@@ -604,7 +706,7 @@
         } else {
             document.getElementById('editorPage').style.display = 'block';
             document.getElementById('recipientWaBtn').style.display = 'none';
-            loadDraft(); // Muat data tersimpan saat halaman kosong/editor
+            loadDraft(); 
         }
 
         function startTypewriter(element, text, speed) {
@@ -621,9 +723,10 @@
             type();
         }
 
-        function triggerTopConfettiRain() {
+        function triggerDualConfettiRain() {
             let duration = 3.5 * 1000;
             let animationEnd = Date.now() + duration;
+            let colorsList = ['#ff0055', '#ffb8c6', '#22c55e', '#3b82f6', '#eab308', '#ffffff'];
 
             let interval = setInterval(function() {
                 let timeLeft = animationEnd - Date.now();
@@ -636,30 +739,30 @@
                     angle: 270,
                     spread: 90,
                     origin: { x: Math.random(), y: 0 },
-                    colors: ['#ff0055', '#ffb8c6', '#22c55e', '#3b82f6', '#eab308', '#ffffff'],
+                    colors: colorsList,
+                    zIndex: 9999
+                });
+
+                confetti({
+                    particleCount: 15,
+                    angle: 90,
+                    spread: 90,
+                    origin: { x: Math.random(), y: 1 },
+                    colors: colorsList,
                     zIndex: 9999
                 });
             }, 250);
-        }
-
-        function setupSongDurationSync(audioElement, animatedElement) {
-            audioElement.onloadedmetadata = function() {
-                let songDuration = audioElement.duration;
-                if (songDuration && songDuration !== Infinity && !isNaN(songDuration)) {
-                    animatedElement.style.animationDuration = songDuration + 's';
-                }
-            };
         }
 
         function bukaKartu() {
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
             
-            triggerTopConfettiRain();
+            triggerDualConfettiRain();
 
             let galContainer = document.getElementById('mainGalleryContainer');
             galContainer.className = "gallery-container";
-            if(selectedAnimationType !== 'none') {
+            if(selectedAnimationType !== 'none' && !selectedBgColorOrTexture) {
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
@@ -670,25 +773,58 @@
             if (currentMusicUrl && currentMusicUrl.trim() !== "") {
                 let audioPlayer = new Audio(currentMusicUrl);
                 audioPlayer.loop = true;
-                
-                setupSongDurationSync(audioPlayer, galContainer.querySelector('img') || galContainer);
-
                 audioPlayer.play().catch(e => console.log("Audio autoplay diblokir browser"));
                 document.getElementById('musicEqualizer').style.display = 'flex';
             }
         }
 
-        function loadGalleryFullScreen(photoUrl) {
+        function renderCardBackground(photoUrl, bgCustom) {
             const galleryContainer = document.getElementById('mainGalleryContainer');
-            if(!photoUrl || photoUrl.trim() === "") return;
             galleryContainer.innerHTML = '';
 
-            let img = document.createElement('img');
-            img.src = photoUrl.trim();
-            img.onerror = function() { 
-                this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; 
-            };
-            galleryContainer.appendChild(img);
+            if (bgCustom === 'texture-fabric') {
+                galleryContainer.style.backgroundColor = '#e8dfd8';
+                galleryContainer.style.backgroundImage = `
+                    repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px),
+                    repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px),
+                    radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.08) 100%)
+                `;
+            } else if (bgCustom && bgCustom.startsWith('#')) {
+                galleryContainer.style.backgroundColor = bgCustom;
+                galleryContainer.style.backgroundImage = 'none';
+            } else if (photoUrl && photoUrl.trim() !== "") {
+                galleryContainer.style.backgroundImage = 'none';
+                let img = document.createElement('img');
+                img.src = photoUrl.trim();
+                img.onerror = function() { 
+                    this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; 
+                };
+                galleryContainer.appendChild(img);
+            } else {
+                galleryContainer.style.backgroundColor = '#080b12';
+            }
+        }
+
+        function renderPhotoFrame(showFr, frStyle, frSize) {
+            const frameContainer = document.getElementById('photoFrameContainer');
+            frameContainer.innerHTML = '';
+            
+            if (!showFr) {
+                frameContainer.style.display = 'none';
+                return;
+            }
+
+            frameContainer.style.display = 'block';
+            frameContainer.style.width = frSize + "vw";
+            frameContainer.style.height = (frSize * 1.3) + "vh";
+
+            let frameImgUrl = frameSvgList[frStyle] || frameSvgList['frame-gold'];
+            let frameImg = document.createElement('img');
+            frameImg.src = frameImgUrl;
+            frameImg.style.borderRadius = "12px";
+            frameImg.style.boxShadow = "0 10px 30px rgba(0,0,0,0.6)";
+            frameImg.style.border = "4px solid rgba(255,255,255,0.8)";
+            frameContainer.appendChild(frameImg);
         }
 
         // ==========================================
@@ -700,7 +836,7 @@
             
             let openedCard = document.getElementById('openedCard');
             openedCard.style.display = 'block';
-            openedCard.classList.add('drag-mode'); // Nyalakan kotak/garis putus-putus HANYA DI SINI
+            openedCard.classList.add('drag-mode'); 
             
             document.getElementById('dragHint').style.display = 'block';
             document.getElementById('closeDragBtn').style.display = 'block';
@@ -722,7 +858,6 @@
             elN.innerText = "Untuk: " + (document.getElementById('inputName').value || "Nama");
             elM.innerText = document.getElementById('inputMessage').value || "Pesan ucapan...";
             
-            // Terapkan posisi persis dari posData
             elT.style.left = posData.tema.x + "%"; elT.style.top = posData.tema.y + "%";
             elN.style.left = posData.nama.x + "%"; elN.style.top = posData.nama.y + "%";
             elM.style.left = posData.pesan.x + "%"; elM.style.top = posData.pesan.y + "%";
@@ -735,16 +870,17 @@
 
             let galContainer = document.getElementById('mainGalleryContainer');
             galContainer.className = "gallery-container";
-            if(selectedAnimationType !== 'none') {
+            if(selectedAnimationType !== 'none' && !selectedBgColorOrTexture) {
                 galContainer.classList.add('effect-' + selectedAnimationType);
             }
 
             let photoUrl = document.getElementById('inputPhotoUrl').value.trim();
-            if(photoUrl) {
-                loadGalleryFullScreen(photoUrl);
-            } else {
-                galContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Masukkan Link URL Foto terlebih dahulu di editor</div>';
-            }
+            renderCardBackground(photoUrl, selectedBgColorOrTexture);
+
+            let showFr = document.getElementById('showFrame').checked;
+            let frStyle = document.getElementById('inputFrameStyle').value;
+            let frSize = document.getElementById('inputFrameSize').value;
+            renderPhotoFrame(showFr, frStyle, frSize);
 
             makeDraggable(elT, 'tema');
             makeDraggable(elN, 'nama');
@@ -753,7 +889,7 @@
 
         function closeDragPreview() {
             let openedCard = document.getElementById('openedCard');
-            openedCard.classList.remove('drag-mode'); // HILANGKAN garis kotak pembatas, jadi bersih seperti hasil akhir!
+            openedCard.classList.remove('drag-mode'); 
             openedCard.style.display = 'none';
             
             document.getElementById('editorPage').style.display = 'block';
@@ -762,7 +898,7 @@
             document.getElementById('dragHint').style.display = 'none';
             document.getElementById('closeDragBtn').style.display = 'none';
             
-            autoSaveDraft(); // Simpan posisi terbaru ke localStorage
+            autoSaveDraft(); 
             alert("✅ Posisi teks berhasil dikunci & disimpan!");
         }
 
@@ -831,6 +967,10 @@
                 m: document.getElementById('showMessage').checked
             };
 
+            const showFr = document.getElementById('showFrame').checked;
+            const frStyle = document.getElementById('inputFrameStyle').value;
+            const frSize = document.getElementById('inputFrameSize').value;
+
             const fontFam = document.getElementById('inputFontFamily').value;
             const fontOpa = document.getElementById('inputTextOpacity').value;
             const landingTitle = document.getElementById('inputLandingTitle').value;
@@ -838,8 +978,8 @@
             const landingGif = document.getElementById('inputLandingGif').value;
             const waMsg = document.getElementById('inputWaMsg').value;
 
-            if(!foto) { 
-                alert("Link URL Foto wajib diisi!"); 
+            if(!foto && !selectedBgColorOrTexture) { 
+                alert("Harap isi Link URL Foto atau pilih Background Warna/Tekstur di menu 'Efek BG'!"); 
                 return; 
             }
 
@@ -848,6 +988,9 @@
                 twSpeed: twSpeed,
                 lTxt: loadingText,
                 vis: visState,
+                showFr: showFr,
+                frStyle: frStyle,
+                frSize: frSize,
                 pos: posData,
                 fFam: fontFam,
                 fOpa: fontOpa,
@@ -855,7 +998,8 @@
                 lBtn: landingBtn,
                 lGif: landingGif,
                 wa: waMsg,
-                anim: selectedAnimationType
+                anim: selectedAnimationType,
+                bgCustom: selectedBgColorOrTexture
             };
             
             let pesan = `||OPTS:${JSON.stringify(payloadData)}||MSG:${pesanRaw}`;
@@ -894,9 +1038,17 @@
         
         function applyEffect(effectType) {
             selectedAnimationType = effectType; 
+            selectedBgColorOrTexture = ''; 
             closeEffectModal();
             autoSaveDraft();
-            alert("Efek animasi latar belakang berhasil dipilih! Durasi akan otomatis mengikuti lagu.");
+            alert("Efek animasi latar belakang berhasil dipilih!");
+        }
+
+        function applyBgColor(colorCode, nameDesc) {
+            selectedBgColorOrTexture = colorCode;
+            closeEffectModal();
+            autoSaveDraft();
+            alert("Background '" + nameDesc + "' berhasil diterapkan!");
         }
 
         function navAction(action) {
@@ -907,7 +1059,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 6.7 SafeStore Edition\nFitur: Auto-Save Draft (LocalStorage), Clean View Text (Garis sembunyi setelah simpan posisi), ScrollUp BG Animation.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 7.1 Frame Edition\nFitur: Dynamic Photo Frames (10 Models), Frame Size Slider, Show/Hide Frame, 10 BG Textures & Colors, Dual Confetti.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
