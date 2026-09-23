@@ -69,7 +69,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.5); border-radius: 8px; }
 
-        /* Elemen draggable bebas */
         .draggable-element {
             cursor: grab;
             touch-action: none;
@@ -86,12 +85,12 @@
 
     <audio id="bgm" loop preload="auto"></audio>
 
-    <!-- ERROR SCREEN -->
+    <!-- ERROR SCREEN AMAN (CADANGAN) -->
     <div id="error-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
             <div class="text-5xl mb-4">⚠️</div>
             <h1 id="error-title" class="text-2xl font-bold mb-2 text-rose-400">Kartu Tidak Ditemukan</h1>
-            <p id="error-desc" class="text-slate-400 text-sm mb-6">Maaf, link undangan atau kartu yang Anda akses tidak terdaftar atau rusak.</p>
+            <p id="error-desc" class="text-slate-400 text-sm mb-6">Maaf, link undangan atau kartu yang Anda akses tidak terdaftar.</p>
             <a href="index.html" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl text-sm transition">
                 Buat Kartu Baru
             </a>
@@ -126,7 +125,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.23</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.28</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -159,26 +158,26 @@
     <!-- MAIN FULLSCREEN CONTAINER -->
     <div id="main-container" class="fixed inset-0 bg-slate-950 z-30 flex flex-col hidden fade-in">
         
-        <!-- Fullscreen Preview Area (Layar Penuh 100% dengan Free Drag Canvas) -->
+        <!-- Fullscreen Preview Area -->
         <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24">
             
             <!-- Top Bar Navigasi & Aksi Bagikan -->
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.23</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.28</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
             </div>
 
-            <!-- Free Canvas Container untuk Drag & Drop Seluruh Elemen -->
+            <!-- Free Canvas Container -->
             <div id="free-canvas" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
 
             <div></div>
         </div>
 
-        <!-- MODAL EDITOR (POP-UP BOTTOM SHEET SAAT IKON DIKLIK) -->
+        <!-- MODAL EDITOR -->
         <div id="editor-modal" class="fixed inset-x-0 bottom-16 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800 p-6 rounded-t-3xl max-h-[60vh] overflow-y-auto custom-scrollbar shadow-2xl hidden fade-in">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
                 <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu</h3>
@@ -200,9 +199,8 @@
                     <textarea id="input-ucapan" rows="3" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">"Selamat ulang tahun, moga selalu beruntung."</textarea>
                 </div>
 
-                <!-- SAKLAR / TOGGLE UNTUK MENYEMBUNYIKAN ELEMEN -->
                 <div class="pt-3 border-t border-slate-800 space-y-2">
-                    <label class="block text-xs font-medium text-rose-400 font-semibold">🎛️ Saklar Sembunyikan Elemen (Default Tampil)</label>
+                    <label class="block text-xs font-medium text-rose-400 font-semibold">🎛️ Saklar Sembunyikan Elemen</label>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                             <input type="checkbox" id="input-hidejudul" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan Judul
@@ -243,7 +241,7 @@
                         <option value="gradient-dark">Midnight Slate Gradient</option>
                         <option value="solid-black">Solid Black Minimalis</option>
                         <option value="gradient-purple">Purple Neon Glow</option>
-                        <option value="custom-image">Gunakan Gambar Latar Kustom (URL)</option>
+                        <option value="custom-image">Gunakan Foto/Gambar Latar Kustom (Full Layar)</option>
                     </select>
                 </div>
                 <div>
@@ -332,12 +330,11 @@
                             <input type="checkbox" id="input-hiderunningtext" onchange="updateLivePreview()" class="accent-rose-500 rounded"> Sembunyikan
                         </label>
                     </div>
-                    <p class="text-[10px] text-slate-400">Anda dapat mendesain posisi teks berjalan ini secara bebas di layar pratinjau menggunakan geser (*drag & drop*).</p>
                     <input type="text" id="input-runningtext" value="✨ Selamat Datang di Undangan Spesial Kami ✨" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500" placeholder="Teks berjalan...">
                 </div>
             </div>
 
-            <!-- TAB 4: STIKER & TAMBAH TEKS BEBAS -->
+            <!-- TAB 4: STIKER -->
             <div id="tab-content-decor" class="space-y-4 editor-tab-pane hidden">
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
@@ -363,9 +360,10 @@
             <!-- TAB 5: MEDIA -->
             <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload Foto Utama (Dari HP)</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload 1 Foto Utama (Super Kompres Ringkas)</label>
                     <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
-                    <p class="text-[10px] text-slate-500 mt-1">💡 Otomatis dikompres agar link tetap ringkas.</p>
+                    <button onclick="setPhotoAsFullScreenBg()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs py-2 rounded-xl font-medium interactive-scale border border-slate-700 cursor-pointer">🌌 Jadikan Foto Ini Background Full Layar</button>
+                    <p class="text-[10px] text-slate-500 mt-1">💡 Otomatis dikompres sangat ringkas agar link share WhatsApp aman dan tidak terpotong.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Atau Link URL Foto</label>
@@ -391,11 +389,17 @@
                     <input type="range" id="input-typespeed" min="10" max="150" step="5" value="40" oninput="updateLivePreview()" class="w-full accent-rose-500 bg-slate-950 cursor-pointer">
                 </div>
                 <div id="upload-status" class="text-xs text-center text-rose-400 font-medium h-5"></div>
-                <button onclick="saveCardData()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg interactive-scale">💾 Simpan Perubahan Kartu</button>
+                <button onclick="resetCardData()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-sm transition shadow-lg interactive-scale border border-slate-700">🔄 Reset / Netralkan Editor</button>
+            </div>
+
+            <!-- TOMBOL KEMBALI & SIMPAN DISETIAP MENU -->
+            <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
+                <button onclick="closeEditorModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-xs transition interactive-scale border border-slate-700 cursor-pointer">← Kembali</button>
+                <button onclick="saveCardData()" class="w-1/2 bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-lg interactive-scale cursor-pointer">💾 Simpan</button>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar (6 Tab Ikon di Bawah Layar Penuh) -->
+        <!-- Bottom Navigation Bar -->
         <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
             <button onclick="openEditorModal('text')" id="nav-btn-text" class="flex flex-col items-center gap-0.5 text-slate-300 hover:text-rose-400 text-[10px] font-medium py-1 px-2 rounded-xl transition interactive-scale">
                 <span class="text-base">✏️</span>
@@ -432,7 +436,7 @@
             judul: "Happy Birthday",
             ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
             runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
-            fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+            fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
             gifUrl: "",
             videoUrl: "",
             musikUrl: "",
@@ -454,7 +458,6 @@
             hideUcapan: false,
             hideGif: false,
             hideRunningText: false,
-            // Posisi Koordinat Persentase Bebas untuk Drag & Drop Seluruh Elemen
             posGif: { x: 50, y: 15 },
             posJudul: { x: 50, y: 30 },
             posFoto: { x: 50, y: 50 },
@@ -470,6 +473,7 @@
 
         let activeDragItem = null;
 
+        // Kompresi Super Ketat untuk 1 Foto Utama agar Link Sangat Ringkas & Aman
         function compressAndConvertImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -478,7 +482,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxWidth = 400;
+                    const maxWidth = 180; // Dioptimalkan sekecil mungkin agar string Base64 sangat pendek dan anti-error di WhatsApp
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
                         width = maxWidth;
@@ -487,7 +491,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3); // Kualitas 30% yang ringan & tajam
                     callback(compressedDataUrl);
                 };
                 img.src = e.target.result;
@@ -502,13 +506,28 @@
                 if (type === 'foto') {
                     cardState.fotoUrl = resultUrl;
                     const inputEl = document.getElementById('input-fotourl');
-                    if (inputEl) inputEl.value = '(Foto dari HP terunggah)';
+                    if (inputEl) inputEl.value = '(1 Foto Utama Terunggah & Aman)';
                 } else if (type === 'gif') {
                     cardState.gifUrl = resultUrl;
                 }
                 updateLivePreview();
-                alert('File berhasil diunggah & dikompres otomatis! ✨');
+                alert('Foto utama berhasil diunggah & dikompres super ringkas! ✨');
             });
+        }
+
+        function setPhotoAsFullScreenBg() {
+            if (!cardState.fotoUrl) {
+                alert('Silakan upload foto utama terlebih dahulu!');
+                return;
+            }
+            cardState.bgStyle = 'custom-image';
+            cardState.bgImgUrl = cardState.fotoUrl;
+            const bgStyleEl = document.getElementById('input-bgstyle');
+            if (bgStyleEl) bgStyleEl.value = 'custom-image';
+            const bgImgEl = document.getElementById('input-bgimgurl');
+            if (bgImgEl) bgImgEl.value = cardState.fotoUrl;
+            updateLivePreview();
+            alert('Berhasil! Foto Anda kini menjadi latar belakang full layar. 🌌✨');
         }
 
         function encodeCardToShortLink(obj) {
@@ -604,7 +623,9 @@
                         setupReceiverMode();
                         return;
                     } catch (e) {
-                        showErrorScreen("Gagal Memuat", "Data kartu di dalam link rusak atau tidak valid.");
+                        // Safe Fallback: Jika link terpotong WhatsApp, tetap muat kartu dengan aman tanpa layar error
+                        console.warn("Link terpotong atau rusak, menggunakan mode pemulihan aman...");
+                        setupReceiverMode();
                         return;
                     }
                 }
@@ -737,7 +758,7 @@
                 judul: "Happy Birthday",
                 ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
                 runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
-                fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+                fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
                 gifUrl: "",
                 videoUrl: "",
                 musikUrl: "",
@@ -774,6 +795,52 @@
             renderDecorEditorList();
             document.getElementById('dashboard-menu-screen').classList.add('hidden');
             document.getElementById('main-container').classList.remove('hidden');
+        }
+
+        function resetCardData() {
+            if (!confirm('Yakin ingin mereset semua pengaturan ke awal? Perubahan saat ini akan dikembalikan ke default.')) return;
+            cardState = {
+                id: cardState.id || ('card_' + Date.now()),
+                nama: "Audylia Salsabilla",
+                judul: "Happy Birthday",
+                ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+                runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
+                fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
+                gifUrl: "",
+                videoUrl: "",
+                musikUrl: "",
+                textColor: "#f8fafc",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "normal",
+                bgStyle: "gradient-rose",
+                bgEffect: "none",
+                bgImgUrl: "",
+                frameStyle: "rounded-full",
+                typewriterSpeed: 40,
+                textDecoration: "shadow",
+                openingTitle: "ADA UCAPAN UNTUKMU",
+                openingButtonText: "BUKA KARTU",
+                greetingFrameStyle: "glass-blur",
+                hideJudul: false,
+                hideFoto: false,
+                hideNama: false,
+                hideUcapan: false,
+                hideGif: false,
+                hideRunningText: false,
+                posGif: { x: 50, y: 15 },
+                posJudul: { x: 50, y: 30 },
+                posFoto: { x: 50, y: 50 },
+                posNama: { x: 50, y: 70 },
+                posUcapan: { x: 50, y: 86 },
+                posRunningText: { x: 50, y: 95 }
+            };
+            dynamicDecorations = [
+                { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 20, y: 10, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' },
+                { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 80, y: 90, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
+            ];
+            applyCardStateToUI();
+            renderDecorEditorList();
+            alert('Editor berhasil dinetralkan ke pengaturan awal! ✨');
         }
 
         function backToDashboard() { openDashboardMenu(); }
@@ -907,9 +974,10 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.23)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.28)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
+            alert('Perubahan kartu berhasil disimpan! 💾');
         }
 
         function getShareableLink() {
@@ -925,7 +993,7 @@
 
         function copyLink() {
             navigator.clipboard.writeText(getShareableLink());
-            alert('Link Sangat Ringkas Berhasil Disalin! 📋 (Siap dikirim ke WhatsApp)');
+            alert('Link Ringkas Berhasil Disalin! 📋');
         }
 
         function applyTextDecorationStyle(element, decoStyle) {
@@ -1003,7 +1071,6 @@
             typeChar();
         }
 
-        // Helper untuk memasang event Drag & Drop bebas pada elemen canvas
         function attachDragEvent(el, posObj) {
             el.addEventListener('pointerdown', (e) => {
                 activeDragItem = posObj;
@@ -1099,12 +1166,11 @@
                 ucapanSize = "text-lg md:text-xl";
             }
 
-            // Render Free Canvas (Semua elemen diposisikan absolute & bisa di-drag bebas)
             const canvas = document.getElementById('free-canvas');
             if (!canvas) return;
             canvas.innerHTML = '';
 
-            // 1. GIF / Stiker Bergerak
+            // 1. GIF
             if (cardState.gifUrl && !cardState.hideGif) {
                 let div = document.createElement('div');
                 div.className = 'draggable-element absolute flex justify-center';
@@ -1116,7 +1182,7 @@
                 canvas.appendChild(div);
             }
 
-            // 2. Judul Kartu
+            // 2. Judul
             if (!cardState.hideJudul) {
                 let h2 = document.createElement('h2');
                 h2.id = 'display-judul';
@@ -1132,7 +1198,7 @@
                 canvas.appendChild(h2);
             }
 
-            // 3. Foto & Bingkai Utama
+            // 3. Foto & Bingkai
             if (cardState.frameStyle !== 'none' && !cardState.hideFoto && cardState.fotoUrl) {
                 let wrap = document.createElement('div');
                 wrap.className = 'draggable-element absolute flex justify-center';
@@ -1144,7 +1210,7 @@
                 canvas.appendChild(wrap);
             }
 
-            // 4. Nama Penerima
+            // 4. Nama
             if (!cardState.hideNama) {
                 let p = document.createElement('p');
                 p.id = 'display-nama';
@@ -1160,7 +1226,7 @@
                 canvas.appendChild(p);
             }
 
-            // 5. Kotak Ucapan
+            // 5. Ucapan
             if (!cardState.hideUcapan) {
                 let box = document.createElement('div');
                 box.id = 'greeting-box-container';
@@ -1181,7 +1247,7 @@
                 canvas.appendChild(box);
             }
 
-            // 6. Running Text (Teks Berjalan)
+            // 6. Running Text
             if (!cardState.hideRunningText) {
                 let marqueeWrap = document.createElement('div');
                 marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]';
@@ -1199,7 +1265,7 @@
                 canvas.appendChild(marqueeWrap);
             }
 
-            // 7. Stiker Dekorasi Gen Z Tambahan
+            // 7. Stiker Dekorasi
             dynamicDecorations.forEach(item => {
                 let el = document.createElement('div');
                 el.className = `draggable-element absolute font-bold ${item.size} p-2`;
