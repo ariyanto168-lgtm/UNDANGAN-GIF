@@ -6,6 +6,8 @@
     <title>Kartu Ucapan Sinematik Digital</title>
     <!-- Library Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Library Kompresi Link Agar Singkat & Rapi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #080b12; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 90px; }
@@ -202,7 +204,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v7.9 Instant</div>
+    <div class="version-badge" id="versionBadge">v8.0 Compact</div>
 
     <div id="loadingPage">Memuat Kartu... ✨</div>
 
@@ -363,11 +365,11 @@
         <!-- TOMBOL AKSI -->
         <div class="btn-row">
             <button class="btn-preview-live" onclick="openDragPreview()">👁️ Preview & Drag Posisi</button>
-            <button class="btn-generate" id="btnGen" onclick="generateLink()">🚀 Buat Kartu (Instan)</button>
+            <button class="btn-generate" id="btnGen" onclick="generateLink()">🚀 Buat Kartu (Super Cepat & Rapi)</button>
         </div>
 
         <div id="resultLink" class="result-box">
-            <p style="color: #22c55e; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem;">✅ Link Super Cepat Berhasil Dibuat!</p>
+            <p style="color: #22c55e; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem;">✅ Link Rapi & Instan Berhasil Dibuat!</p>
             <a id="shareableUrl" href="#" target="_blank" style="color: #66b3ff; font-size: 0.85rem; word-break: break-all;">Link</a>
             <a id="whatsappDirectBtn" href="#" target="_blank" class="btn-wa-direct">
                 <span>💬</span> Kirim Langsung ke Penerima
@@ -570,11 +572,11 @@
                 bgCustom: selectedBgColorOrTexture,
                 pos: posData
             };
-            localStorage.setItem('card_draft_v79', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v80', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v79');
+            let saved = localStorage.getItem('card_draft_v80');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -608,10 +610,10 @@
         }
 
         // ==========================================
-        // INSTANT URL PARAMETER LOADER (0 DELAY)
+        // COMPACT LZ-STRING DECODER (0 DELAY)
         // ==========================================
         const urlParams = new URLSearchParams(window.location.search);
-        const cardParam = urlParams.get('card');
+        const cardParam = urlParams.get('c') || urlParams.get('card');
 
         if (cardParam) {
             document.getElementById('versionBadge').style.display = 'none';
@@ -623,7 +625,12 @@
             document.getElementById('landingPage').style.display = 'flex';
 
             try {
-                let jsonString = decodeURIComponent(escape(atob(cardParam)));
+                // Coba dekompresi dengan LZString (format baru yang jauh lebih pendek)
+                let jsonString = LZString.decompressFromEncodedURIComponent(cardParam);
+                if (!jsonString) {
+                    // Fallback ke format lama jika link lama
+                    jsonString = decodeURIComponent(escape(atob(cardParam)));
+                }
                 let data = JSON.parse(jsonString);
 
                 document.getElementById('displayTargetName').innerText = data.n;
@@ -1073,7 +1080,7 @@
         }
 
         // ==========================================
-        // GENERATE LINK INSTAN (0 DETIK / TANPA SERVER)
+        // GENERATE LINK COMPRESSED (SUPER CEPAT & RAPI)
         // ==========================================
         function generateLink() {
             const nama = document.getElementById('inputName').value.trim();
@@ -1138,17 +1145,18 @@
             
             try {
                 let jsonStr = JSON.stringify(cardData);
-                let encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+                // Kompres string JSON menggunakan LZ-String agar jauh lebih pendek & rapi
+                let compressed = LZString.compressToEncodedURIComponent(jsonStr);
                 
                 let baseUrl = window.location.href.split('?')[0].split('#')[0];
-                generatedCardUrl = baseUrl + '?card=' + encoded;
+                generatedCardUrl = baseUrl + '?c=' + compressed;
 
                 document.getElementById('resultLink').style.display = 'block';
                 document.getElementById('shareableUrl').href = generatedCardUrl;
                 document.getElementById('shareableUrl').innerText = generatedCardUrl;
                 document.getElementById('whatsappDirectBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + generatedCardUrl)}`;
 
-                alert("🚀 Link berhasil dibuat dengan super cepat!");
+                alert("🚀 Link rapi & super cepat berhasil dibuat!");
             } catch (error) {
                 alert("Gagal membuat link. Periksa kembali input Anda.");
             }
@@ -1174,11 +1182,11 @@
             if (action === 'home' || action === 'edit') { window.location.href = window.location.href.split('?')[0]; } 
             else if (action === 'effects') { document.getElementById('effectModal').style.display = 'flex'; } 
             else if (action === 'share') {
-                let shareUrl = window.location.search.includes('card=') ? window.location.href : generatedCardUrl;
+                let shareUrl = window.location.search.includes('c=') ? window.location.href : generatedCardUrl;
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 7.9 Instant Link Edition\nFitur: 0-Second Instant Load, Top-Slide Text Animation, Universal BG Motion.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 8.0 Compact Edition\nFitur: Compressed Short-Link, Instant Load, Top-Slide Animation.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
