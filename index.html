@@ -155,9 +155,9 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v6.3 TopConfetti</div>
+    <div class="version-badge" id="versionBadge">v6.4 Custom Loading</div>
 
-    <div id="loadingPage">Memuat data kartu... ✨</div>
+    <div id="loadingPage">Ada kejutan buatmu ✨</div>
 
     <div id="editorPage">
         <h2 class="editor-title">🎬 Studio Pembuat Kartu</h2>
@@ -219,7 +219,11 @@
 
         <!-- BAGIAN 3: HALAMAN DEPAN (AMPLOP) -->
         <div class="settings-card">
-            <div class="settings-header">✉️ Halaman Depan (Amplop)</div>
+            <div class="settings-header">✉️ Halaman Depan & Teks Loading</div>
+            <div class="form-group">
+                <label>Teks Loading Awal (Saat Dibuka):</label>
+                <input type="text" id="inputLoadingText" value="Ada kejutan buatmu ✨">
+            </div>
             <div class="form-group">
                 <label>Pilih Ikon Animasi Tengah:</label>
                 <select id="inputLandingGif" onchange="updateIconPreview()">
@@ -431,6 +435,7 @@
                     let lTitle = "ADA UCAPAN UNTUKMU";
                     let lBtn = "✨ BUKA KARTU";
                     let lGifFull = "🎁|bounce"; 
+                    let lTxt = "Ada kejutan buatmu ✨";
 
                     if (msgText.startsWith("||OPTS:")) {
                         let parts = msgText.split("||MSG:");
@@ -439,6 +444,7 @@
                             let parsedOpts = JSON.parse(optsStr);
                             isTypewriterGlobal = parsedOpts.tw || false;
                             if(parsedOpts.twSpeed) typewriterSpeedGlobal = parsedOpts.twSpeed;
+                            if(parsedOpts.lTxt) lTxt = parsedOpts.lTxt;
                             if (parsedOpts.fFam) fFam = parsedOpts.fFam;
                             if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
                             if (parsedOpts.wa) waMsg = parsedOpts.wa;
@@ -461,6 +467,7 @@
                     
                     finalMessageRaw = msgText;
                     
+                    document.getElementById('loadingPage').innerText = lTxt;
                     document.getElementById('displayLandingTitle').innerText = lTitle;
                     document.getElementById('displayLandingBtn').innerText = lBtn;
                     let gifArr = lGifFull.split('|');
@@ -504,7 +511,6 @@
             type();
         }
 
-        // KONFETI DARI ATAS MENYEBAR RATA (HUJAN KONFETI)
         function triggerTopConfettiRain() {
             let duration = 3.5 * 1000;
             let animationEnd = Date.now() + duration;
@@ -515,10 +521,9 @@
                     return clearInterval(interval);
                 }
 
-                // Tembakan partikel menyebar rata dari sisi kiri atas, tengah atas, dan kanan atas
                 confetti({
                     particleCount: 15,
-                    angle: 270, // Jatuh ke bawah
+                    angle: 270,
                     spread: 90,
                     origin: { x: Math.random(), y: 0 },
                     colors: ['#ff0055', '#ffb8c6', '#22c55e', '#3b82f6', '#eab308', '#ffffff'],
@@ -540,7 +545,6 @@
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
             
-            // Picu hujan konfeti dari atas menyebar rata
             triggerTopConfettiRain();
 
             let galContainer = document.getElementById('mainGalleryContainer');
@@ -688,6 +692,7 @@
             
             const typewriter = document.getElementById('inputTypewriter').checked;
             const twSpeed = typewriterSpeedGlobal;
+            const loadingText = document.getElementById('inputLoadingText').value.trim() || "Ada kejutan buatmu ✨";
             const fontFam = document.getElementById('inputFontFamily').value;
             const fontOpa = document.getElementById('inputTextOpacity').value;
             const landingTitle = document.getElementById('inputLandingTitle').value;
@@ -703,6 +708,7 @@
             let payloadData = { 
                 tw: typewriter, 
                 twSpeed: twSpeed,
+                lTxt: loadingText,
                 pos: posData,
                 fFam: fontFam,
                 fOpa: fontOpa,
@@ -761,7 +767,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 6.3 TopConfetti Edition\nFitur: Top Confetti Rain, Soft Bright Photo Filter, Fullscreen Image Sync, Butterfly Animation.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 6.4 Custom Loading Edition\nFitur: Custom Loading Text, Top Confetti Rain, Soft Bright Photo Filter, Fullscreen Sync.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
