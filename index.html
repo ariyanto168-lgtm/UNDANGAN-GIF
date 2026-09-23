@@ -45,14 +45,28 @@
             filter: brightness(1.2) contrast(0.92) saturate(1.05);
         }
 
-        /* CONTAINER BINGKAI FOTO DINAMIS */
+        /* BINGKAI FOTO DRAGGABLE & RESIZABLE */
         .photo-frame-wrapper {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 5; pointer-events: none; transition: all 0.3s ease;
+            width: 260px; height: 380px; z-index: 5; touch-action: none;
+            border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            border: 4px solid rgba(255, 255, 255, 0.9); background: #000;
         }
         .photo-frame-wrapper img {
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
+
+        /* Garis dan handler ubah ukuran hanya muncul saat mode drag */
+        .drag-mode .photo-frame-wrapper {
+            border: 2px dashed #ff0055;
+            cursor: move;
+        }
+        .resize-handle {
+            display: none; position: absolute; right: 0; bottom: 0; width: 30px; height: 30px;
+            background: #ff0055; z-index: 20; border-top-left-radius: 12px; cursor: nwse-resize;
+            align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold;
+        }
+        .drag-mode .resize-handle { display: flex; }
 
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -77,7 +91,6 @@
         .greeting-msg::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
         .greeting-msg::-webkit-scrollbar-thumb { background: #ffb8c6; border-radius: 10px; }
 
-        /* GARIS & KOTAK HANYA MUNCUL SAAT DI MODE DRAG */
         .drag-mode .text-element { 
             border: 1px dashed rgba(255, 184, 198, 0.8); 
             cursor: move; 
@@ -181,7 +194,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v7.1 Frame Edition</div>
+    <div class="version-badge" id="versionBadge">v7.2 FrameResize</div>
 
     <div id="loadingPage">Ada kejutan buatmu ✨</div>
 
@@ -230,14 +243,20 @@
             </div>
         </div>
 
-        <!-- BAGIAN 2: PENGATURAN BINGKAI FOTO -->
+        <!-- BAGIAN 2: PENGATURAN BINGKAI & FOTO DALAM BINGKAI -->
         <div class="settings-card">
-            <div class="settings-header">🖼️ Pengaturan Bingkai Foto Dinamis</div>
+            <div class="settings-header">🖼️ Pengaturan Bingkai & Foto Dalam Bingkai</div>
             <div class="checkbox-group" style="margin-bottom: 12px;">
                 <input type="checkbox" id="showFrame" checked onchange="autoSaveDraft()">
                 <label for="showFrame">Tampilkan Bingkai Foto di Kartu</label>
             </div>
             
+            <div class="form-group">
+                <label>Link URL Foto (Untuk di dalam Bingkai):</label>
+                <input type="text" id="inputFramePhotoUrl" placeholder="Contoh: https://i.imgur.com/foto-anda.jpg" oninput="previewFramePhotoUrl(this.value); autoSaveDraft();">
+                <div id="previewFrameContainer"></div>
+            </div>
+
             <div class="form-group">
                 <label>Pilih Model Bingkai:</label>
                 <select id="inputFrameStyle" onchange="autoSaveDraft()">
@@ -252,11 +271,6 @@
                     <option value="frame-pastel">🎨 Pastel Ceria Warna-Warni</option>
                     <option value="frame-royal">👑 Kerajaan Mewah (Royal Crown)</option>
                 </select>
-            </div>
-
-            <div class="form-group">
-                <label>Ukuran Bingkai: <span id="frameSizeVal" class="range-value">85%</span></label>
-                <input type="range" id="inputFrameSize" min="50" max="100" step="1" value="85" oninput="updateFrameSizeLabel(this.value); autoSaveDraft();">
             </div>
         </div>
 
@@ -319,9 +333,9 @@
             </div>
         </div>
 
-        <!-- BAGIAN 5: MEDIA (URL FOTO) & SHARE WA -->
+        <!-- BAGIAN 5: MEDIA (URL FOTO LATAR BELAKANG) & SHARE WA -->
         <div class="settings-card">
-            <div class="settings-header">🎵 Media & WhatsApp</div>
+            <div class="settings-header">🎵 Media Latar Belakang & WhatsApp</div>
             
             <div class="form-group">
                 <label>Link / URL Foto (Background Full Screen):</label>
@@ -369,10 +383,13 @@
         <!-- BACKGROUND FOTO / WARNA SOLID / TESTUR KAIN -->
         <div class="gallery-container" id="mainGalleryContainer"></div>
 
-        <!-- BINGKAI FOTO DINAMIS DI ATAS BACKGROUND -->
-        <div class="photo-frame-wrapper" id="photoFrameContainer"></div>
+        <!-- BINGKAI FOTO DINAMIS YANG BISA DI-DRAG & RESIZE -->
+        <div class="photo-frame-wrapper" id="photoFrameContainer" style="left: 50%; top: 50%;">
+            <img id="displayFramePhoto" src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop" alt="Foto Bingkai">
+            <div class="resize-handle" id="resizeHandleBtn">⤢</div>
+        </div>
 
-        <div class="drag-instruction" id="dragHint" style="display: none;">👆 Sentuh & Geser Teks untuk Pindah Posisi</div>
+        <div class="drag-instruction" id="dragHint" style="display: none;">👆 Geser teks/bingkai • Tarik sudut kanan bawah bingkai untuk ubah ukuran</div>
 
         <!-- 3 TEKS MANDIRI -->
         <h2 class="text-element greeting-title" id="displayTheme" style="top: 25%; left: 50%;">Selamat</h2>
@@ -394,7 +411,7 @@
             </svg>
         </a>
 
-        <button id="closeDragBtn" class="modal-close-drag" style="display: none;" onclick="closeDragPreview()">✅ Simpan Posisi</button>
+        <button id="closeDragBtn" class="modal-close-drag" style="display: none;" onclick="closeDragPreview()">✅ Simpan Posisi & Ukuran</button>
     </div>
 
     <!-- MODAL EFEK & BACKGROUND -->
@@ -409,10 +426,8 @@
             <button class="effect-option-btn" onclick="applyEffect('none')">🎯 Diam Saja</button>
 
             <h3 style="color: #ffb8c6; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem;">🎨 Warna / Tekstur Background</h3>
-            <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">Pilih warna cerah/tekstur jika tidak memakai foto URL:</p>
-            
             <div class="color-grid">
-                <button class="color-option-btn" style="background:#e8dfd8; color:#333;" onclick="applyBgColor('texture-fabric', 'Tekstur Kain Klasik')">🧵 Tekstur Kain Klasik</button>
+                <button class="color-option-btn" style="background:#e8dfd8; color:#333;" onclick="applyBgColor('texture-fabric', 'Tekstur Kain Klasik')">🧵 Tekstur Kain</button>
                 <button class="color-option-btn" style="background:#ffffff; color:#333;" onclick="applyBgColor('#ffffff', 'Putih Bersih')">⬜ Putih Bersih</button>
                 <button class="color-option-btn" style="background:#fff3e0; color:#333;" onclick="applyBgColor('#fff3e0', 'Cream Hangat')">🥞 Cream Hangat</button>
                 <button class="color-option-btn" style="background:#ffe4e6; color:#333;" onclick="applyBgColor('#ffe4e6', 'Soft Pink')">🌸 Soft Pink</button>
@@ -453,21 +468,8 @@
         let posData = { 
             tema: { x: 50, y: 25 }, 
             nama: { x: 50, y: 35 }, 
-            pesan: { x: 50, y: 60 } 
-        };
-
-        // KUMPULAN URL BINGKAI FOTO ESTETIK (10 MACAM MODEL)
-        const frameSvgList = {
-            'frame-gold': 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=800&auto=format&fit=crop', // Placeholder dekoratif mewah
-            'frame-love': 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop',
-            'frame-floral': 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=800&auto=format&fit=crop',
-            'frame-white': 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&auto=format&fit=crop',
-            'frame-cyber': 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop',
-            'frame-vintage': 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop',
-            'frame-silver': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
-            'frame-diamond': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop',
-            'frame-pastel': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop',
-            'frame-royal': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop'
+            pesan: { x: 50, y: 60 },
+            frame: { x: 50, y: 50, w: 260, h: 380 } 
         };
 
         function hexToRgba(hex, alpha) {
@@ -498,15 +500,6 @@
             document.getElementById('fontSizeVal').innerText = val + "px";
         }
 
-        function updateFrameSizeLabel(val) {
-            document.getElementById('frameSizeVal').innerText = val + "%";
-            let frameWrapper = document.getElementById('photoFrameContainer');
-            if(frameWrapper) {
-                frameWrapper.style.width = val + "vw";
-                frameWrapper.style.height = (val * 1.3) + "vh";
-            }
-        }
-
         function previewPhotoUrl(url) {
             const container = document.getElementById('previewContainer');
             container.innerHTML = '';
@@ -514,7 +507,19 @@
                 let img = document.createElement('img');
                 img.src = url.trim();
                 img.className = 'preview-thumb';
-                img.onerror = function() { container.innerHTML = '<span style="color:#ef4444;font-size:0.8rem;">⚠️ Link gambar tidak valid/gagal dimuat</span>'; };
+                img.onerror = function() { container.innerHTML = '<span style="color:#ef4444;font-size:0.8rem;">⚠️ Link gambar tidak valid</span>'; };
+                container.appendChild(img);
+            }
+        }
+
+        function previewFramePhotoUrl(url) {
+            const container = document.getElementById('previewFrameContainer');
+            container.innerHTML = '';
+            if(url.trim() !== '') {
+                let img = document.createElement('img');
+                img.src = url.trim();
+                img.className = 'preview-thumb';
+                img.onerror = function() { container.innerHTML = '<span style="color:#ef4444;font-size:0.8rem;">⚠️ Link gambar bingkai tidak valid</span>'; };
                 container.appendChild(img);
             }
         }
@@ -538,6 +543,7 @@
                 theme: document.getElementById('inputTheme').value,
                 msg: document.getElementById('inputMessage').value,
                 foto: document.getElementById('inputPhotoUrl').value,
+                frameFoto: document.getElementById('inputFramePhotoUrl').value,
                 music: document.getElementById('inputMusic').value,
                 fSize: document.getElementById('inputFontSize').value,
                 fColor: document.getElementById('inputFontColor').value,
@@ -553,18 +559,17 @@
                 showM: document.getElementById('showMessage').checked,
                 showFr: document.getElementById('showFrame').checked,
                 frStyle: document.getElementById('inputFrameStyle').value,
-                frSize: document.getElementById('inputFrameSize').value,
                 tw: document.getElementById('inputTypewriter').checked,
                 twSpeed: typewriterSpeedGlobal,
                 anim: selectedAnimationType,
                 bgCustom: selectedBgColorOrTexture,
                 pos: posData
             };
-            localStorage.setItem('card_draft_v71', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v72', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v71');
+            let saved = localStorage.getItem('card_draft_v72');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -572,6 +577,7 @@
                     if(d.theme) document.getElementById('inputTheme').value = d.theme;
                     if(d.msg) document.getElementById('inputMessage').value = d.msg;
                     if(d.foto) { document.getElementById('inputPhotoUrl').value = d.foto; previewPhotoUrl(d.foto); }
+                    if(d.frameFoto) { document.getElementById('inputFramePhotoUrl').value = d.frameFoto; previewFramePhotoUrl(d.frameFoto); }
                     if(d.music) document.getElementById('inputMusic').value = d.music;
                     if(d.fSize) { document.getElementById('inputFontSize').value = d.fSize; updateFontSizeLabel(d.fSize); }
                     if(d.fColor) document.getElementById('inputFontColor').value = d.fColor;
@@ -587,7 +593,6 @@
                     if(d.showM !== undefined) document.getElementById('showMessage').checked = d.showM;
                     if(d.showFr !== undefined) document.getElementById('showFrame').checked = d.showFr;
                     if(d.frStyle) document.getElementById('inputFrameStyle').value = d.frStyle;
-                    if(d.frSize) { document.getElementById('inputFrameSize').value = d.frSize; updateFrameSizeLabel(d.frSize); }
                     if(d.tw !== undefined) { document.getElementById('inputTypewriter').checked = d.tw; toggleTypewriterSpeedSetting(d.tw); }
                     if(d.twSpeed) { typewriterSpeedGlobal = d.twSpeed; document.getElementById('inputTwSpeed').value = d.twSpeed; updateTwSpeedLabel(d.twSpeed); }
                     if(d.anim) selectedAnimationType = d.anim;
@@ -632,8 +637,8 @@
                     let lTxt = "Ada kejutan buatmu ✨";
                     let vis = { t: true, n: true, m: true };
                     let showFr = true;
+                    let framePhotoUrl = "";
                     let frStyle = 'frame-gold';
-                    let frSize = 85;
 
                     if (msgText.startsWith("||OPTS:")) {
                         let parts = msgText.split("||MSG:");
@@ -645,8 +650,8 @@
                             if(parsedOpts.lTxt) lTxt = parsedOpts.lTxt;
                             if(parsedOpts.vis) vis = parsedOpts.vis;
                             if(parsedOpts.showFr !== undefined) showFr = parsedOpts.showFr;
+                            if(parsedOpts.frameFoto) framePhotoUrl = parsedOpts.frameFoto;
                             if(parsedOpts.frStyle) frStyle = parsedOpts.frStyle;
-                            if(parsedOpts.frSize) frSize = parsedOpts.frSize;
                             if (parsedOpts.fFam) fFam = parsedOpts.fFam;
                             if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
                             if (parsedOpts.wa) waMsg = parsedOpts.wa;
@@ -694,7 +699,7 @@
                     }
 
                     renderCardBackground(data.foto, selectedBgColorOrTexture);
-                    renderPhotoFrame(showFr, frStyle, frSize);
+                    renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, posData.frame);
 
                     const currentUrl = window.location.href;
                     document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg + "\n\n" + currentUrl)}`;
@@ -805,30 +810,45 @@
             }
         }
 
-        function renderPhotoFrame(showFr, frStyle, frSize) {
-            const frameContainer = document.getElementById('photoFrameContainer');
-            frameContainer.innerHTML = '';
-            
+        function renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, fPos) {
+            const frameWrapper = document.getElementById('photoFrameContainer');
+            const frameImg = document.getElementById('displayFramePhoto');
+
             if (!showFr) {
-                frameContainer.style.display = 'none';
+                frameWrapper.style.display = 'none';
                 return;
             }
 
-            frameContainer.style.display = 'block';
-            frameContainer.style.width = frSize + "vw";
-            frameContainer.style.height = (frSize * 1.3) + "vh";
+            frameWrapper.style.display = 'block';
+            frameWrapper.style.left = fPos.x + "%";
+            frameWrapper.style.top = fPos.y + "%";
+            frameWrapper.style.width = fPos.w + "px";
+            frameWrapper.style.height = fPos.h + "px";
 
-            let frameImgUrl = frameSvgList[frStyle] || frameSvgList['frame-gold'];
-            let frameImg = document.createElement('img');
-            frameImg.src = frameImgUrl;
-            frameImg.style.borderRadius = "12px";
-            frameImg.style.boxShadow = "0 10px 30px rgba(0,0,0,0.6)";
-            frameImg.style.border = "4px solid rgba(255,255,255,0.8)";
-            frameContainer.appendChild(frameImg);
+            if (framePhotoUrl && framePhotoUrl.trim() !== "") {
+                frameImg.src = framePhotoUrl.trim();
+            }
+
+            // Terapkan border gaya bingkai
+            if (frStyle === 'frame-gold') {
+                frameWrapper.style.border = "6px solid #d4af37";
+                frameWrapper.style.boxShadow = "0 0 20px rgba(212,175,55,0.6)";
+            } else if (frStyle === 'frame-love') {
+                frameWrapper.style.border = "6px solid #ff0055";
+                frameWrapper.style.boxShadow = "0 0 20px rgba(255,0,85,0.6)";
+            } else if (frStyle === 'frame-floral') {
+                frameWrapper.style.border = "6px solid #f472b6";
+                frameWrapper.style.borderRadius = "24px";
+            } else if (frStyle === 'frame-cyber') {
+                frameWrapper.style.border = "4px solid #38bdf8";
+                frameWrapper.style.boxShadow = "0 0 25px rgba(56,189,248,0.8)";
+            } else {
+                frameWrapper.style.border = "4px solid rgba(255,255,255,0.9)";
+            }
         }
 
         // ==========================================
-        // FITUR DRAG & DROP & CLEAN VIEW
+        // FITUR DRAG & RESIZE BINGKAI & TEKS
         // ==========================================
         function openDragPreview() {
             document.getElementById('editorPage').style.display = 'none';
@@ -878,13 +898,14 @@
             renderCardBackground(photoUrl, selectedBgColorOrTexture);
 
             let showFr = document.getElementById('showFrame').checked;
+            let framePhotoUrl = document.getElementById('inputFramePhotoUrl').value.trim();
             let frStyle = document.getElementById('inputFrameStyle').value;
-            let frSize = document.getElementById('inputFrameSize').value;
-            renderPhotoFrame(showFr, frStyle, frSize);
+            renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, posData.frame);
 
             makeDraggable(elT, 'tema');
             makeDraggable(elN, 'nama');
             makeDraggable(elM, 'pesan');
+            makeFrameDraggableAndResizable();
         }
 
         function closeDragPreview() {
@@ -899,7 +920,7 @@
             document.getElementById('closeDragBtn').style.display = 'none';
             
             autoSaveDraft(); 
-            alert("✅ Posisi teks berhasil dikunci & disimpan!");
+            alert("✅ Posisi & Ukuran berhasil dikunci & disimpan!");
         }
 
         function makeDraggable(elmnt, key) {
@@ -948,6 +969,97 @@
             }
         }
 
+        function makeFrameDraggableAndResizable() {
+            const frameEl = document.getElementById('photoFrameContainer');
+            const resizeBtn = document.getElementById('resizeHandleBtn');
+
+            let isResizing = false;
+            let isDragging = false;
+            let startX, startY, startW, startH, initX, initY;
+
+            // Resize Handler
+            resizeBtn.onmousedown = (e) => { startResize(e); };
+            resizeBtn.ontouchstart = (e) => { startResize(e); };
+
+            function startResize(e) {
+                e.stopPropagation();
+                isResizing = true;
+                startX = e.clientX || e.touches[0].clientX;
+                startY = e.clientY || e.touches[0].clientY;
+                startW = frameEl.offsetWidth;
+                startH = frameEl.offsetHeight;
+
+                document.onmouseup = stopResize;
+                document.onmousemove = resizing;
+                document.ontouchend = stopResize;
+                document.ontouchmove = resizing;
+            }
+
+            function resizing(e) {
+                if(!isResizing) return;
+                let cx = e.clientX || e.touches[0].clientX;
+                let cy = e.clientY || e.touches[0].clientY;
+                let newW = Math.max(120, startW + (cx - startX));
+                let newH = Math.max(150, startH + (cy - startY));
+
+                frameEl.style.width = newW + "px";
+                frameEl.style.height = newH + "px";
+                posData.frame.w = newW;
+                posData.frame.h = newH;
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.onmouseup = null; document.onmousemove = null;
+                document.ontouchend = null; document.ontouchmove = null;
+            }
+
+            // Drag Handler Bingkai
+            frameEl.onmousedown = (e) => { if(e.target === resizeBtn) return; startDrag(e); };
+            frameEl.ontouchstart = (e) => { if(e.target === resizeBtn) return; startDrag(e); };
+
+            function startDrag(e) {
+                if (!document.getElementById('openedCard').classList.contains('drag-mode')) return;
+                e.preventDefault();
+                isDragging = true;
+                startX = e.clientX || e.touches[0].clientX;
+                startY = e.clientY || e.touches[0].clientY;
+                
+                let rect = frameEl.getBoundingClientRect();
+                initX = rect.left + (rect.width/2);
+                initY = rect.top + (rect.height/2);
+
+                document.onmouseup = stopDrag;
+                document.onmousemove = dragging;
+                document.ontouchend = stopDrag;
+                document.ontouchmove = dragging;
+            }
+
+            function dragging(e) {
+                if(!isDragging) return;
+                e.preventDefault();
+                let cx = e.clientX || e.touches[0].clientX;
+                let cy = e.clientY || e.touches[0].clientY;
+                
+                let newX = initX + (cx - startX);
+                let newY = initY + (cy - startY);
+
+                let pctX = (newX / window.innerWidth) * 100;
+                let pctY = (newY / window.innerHeight) * 100;
+
+                frameEl.style.left = pctX + "%";
+                frameEl.style.top = pctY + "%";
+                posData.frame.x = pctX;
+                posData.frame.y = pctY;
+            }
+
+            function stopDrag() {
+                isDragging = false;
+                document.onmouseup = null; document.onmousemove = null;
+                document.ontouchend = null; document.ontouchmove = null;
+            }
+        }
+
         async function generateLink() {
             const nama = document.getElementById('inputName').value.trim();
             const tema = document.getElementById('inputTheme').value;
@@ -968,8 +1080,8 @@
             };
 
             const showFr = document.getElementById('showFrame').checked;
+            const frameFoto = document.getElementById('inputFramePhotoUrl').value.trim();
             const frStyle = document.getElementById('inputFrameStyle').value;
-            const frSize = document.getElementById('inputFrameSize').value;
 
             const fontFam = document.getElementById('inputFontFamily').value;
             const fontOpa = document.getElementById('inputTextOpacity').value;
@@ -989,8 +1101,8 @@
                 lTxt: loadingText,
                 vis: visState,
                 showFr: showFr,
+                frameFoto: frameFoto,
                 frStyle: frStyle,
-                frSize: frSize,
                 pos: posData,
                 fFam: fontFam,
                 fOpa: fontOpa,
@@ -1059,7 +1171,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 7.1 Frame Edition\nFitur: Dynamic Photo Frames (10 Models), Frame Size Slider, Show/Hide Frame, 10 BG Textures & Colors, Dual Confetti.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 7.2 FrameResize Edition\nFitur: Custom Frame Photo URL, Drag & Resize Frame Dinamis, Auto-Save Draft.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
