@@ -16,7 +16,7 @@
         .version-badge { position: fixed; top: 10px; right: 15px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; color: #94a3b8; z-index: 1000; backdrop-filter: blur(5px); }
         .powered-footer { text-align: center; padding: 20px 0; font-size: 0.8rem; color: #64748b; letter-spacing: 1px; }
 
-        #loadingPage { display: none; text-align: center; padding-top: 40vh; font-size: 1.2rem; color: #ffb8c6; letter-spacing: 2px; }
+        #loadingPage { display: none; text-align: center; padding-top: 40vh; font-size: 1.1rem; color: #ffb8c6; letter-spacing: 1px; padding-left: 20px; padding-right: 20px; }
 
         /* LANDING PAGE (FULL SCREEN) */
         #landingPage { display: none; justify-content: center; align-items: center; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background: radial-gradient(circle, #1a2238 0%, #080b12 100%); padding: 20px; z-index: 500; }
@@ -81,9 +81,9 @@
 </head>
 <body>
 
-    <div class="version-badge">v4.5 Cinematic</div>
+    <div class="version-badge">v4.7 Cinematic</div>
 
-    <div id="loadingPage">Mempersiapkan Pengalaman Sinematik... ✨</div>
+    <div id="loadingPage">Menghubungkan ke server database... ✨</div>
 
     <div id="editorPage">
         <h2 class="editor-title">🎬 Studio Pembuat Kartu</h2>
@@ -119,9 +119,9 @@
         </div>
 
         <div class="form-group">
-            <label>Upload Foto Galeri (Maks 2 foto):</label>
+            <label>Upload Foto Galeri (1 Foto Kilat):</label>
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                📁 Pilih Foto dari HP (Ultra-Compressed)
+                📁 Pilih Foto dari HP (Super Light)
                 <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
             </div>
             <div id="previewContainer"></div>
@@ -194,12 +194,13 @@
         let currentRecipientName = "";
         let currentTheme = "";
 
+        // Kompresi super ringan (lebar max 200px) agar kilat
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.innerHTML = '';
             compressedPhotoArray = [];
 
-            const maxFiles = Math.min(files.length, 2);
+            const maxFiles = Math.min(files.length, 1);
             for (let i = 0; i < maxFiles; i++) {
                 let file = files[i];
                 let reader = new FileReader();
@@ -210,14 +211,14 @@
                     img.onload = function () {
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
-                        let maxWidth = 300;
+                        let maxWidth = 200; // Sangat kecil & ringan
                         let scaleSize = maxWidth / img.width;
                         
                         canvas.width = maxWidth;
                         canvas.height = img.height * scaleSize;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3);
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.25);
                         compressedPhotoArray.push(compressedDataUrl);
 
                         let thumb = document.createElement('img');
@@ -236,12 +237,18 @@
         const cardId = urlParams.get('id');
 
         if (cardId) {
-            document.getElementById('loadingPage').style.display = 'block';
+            const loadingEl = document.getElementById('loadingPage');
+            loadingEl.style.display = 'block';
+            loadingEl.innerText = "Memuat data kartu dari database... ✨";
 
-            fetch(`${SCRIPT_URL}?action=read&id=${cardId}`)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // Batas waktu 8 detik
+
+            fetch(`${SCRIPT_URL}?action=read&id=${cardId}`, { signal: controller.signal })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('loadingPage').style.display = 'none';
+                    clearTimeout(timeoutId);
+                    loadingEl.style.display = 'none';
                     document.getElementById('landingPage').style.display = 'flex';
                     
                     document.getElementById('displayTargetName').innerText = data.nama;
@@ -256,8 +263,9 @@
                     loadGallery(data.foto);
                 })
                 .catch(err => {
-                    alert("Gagal memuat kartu! Pastikan ID link benar.");
-                    document.getElementById('loadingPage').style.display = 'none';
+                    clearTimeout(timeoutId);
+                    loadingEl.style.display = 'none';
+                    alert("Koneksi server lambat atau ID tidak ditemukan. Dialihkan ke menu editor.");
                     document.getElementById('editorPage').style.display = 'block';
                 });
         } else {
@@ -272,7 +280,7 @@
         function loadGallery(photoString) {
             const galleryContainer = document.getElementById('mainGalleryContainer');
             if(!photoString || photoString.trim() === "") {
-                galleryContainer.style.display = 'none'; // Sembunyikan jika foto kosong
+                galleryContainer.style.display = 'none';
                 return;
             }
             galleryContainer.style.display = 'flex';
@@ -342,7 +350,7 @@
                 btn.innerText = "Buat Kartu";
                 btn.disabled = false;
             } catch (error) {
-                alert("Gagal menyimpan data! Pastikan jumlah foto maksimal 2 dan ukuran tidak terlalu besar.");
+                alert("Gagal menyimpan data! Periksa koneksi internet Anda.");
                 btn.innerText = "Coba Lagi";
                 btn.disabled = false;
             }
@@ -408,7 +416,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.5\nFitur: Smart Fallback Gallery, Auto Version Tag, WhatsApp Direct.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.7\nFitur: Fast Fetch Timeout, Ultra-Light 1 Photo, WhatsApp Direct.\n\nPowered by Ari GPM");
             }
         }
     </script>
