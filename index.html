@@ -82,7 +82,7 @@
 </head>
 <body>
 
-    <div class="version-badge">v4.9 Cinematic</div>
+    <div class="version-badge">v5.0 Cinematic</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -177,7 +177,8 @@
         <button class="nav-item active" onclick="navAction('home')">
             <span>🏠</span>Beranda
         </button>
-        <button class="nav-item" onclick="navAction('edit')">
+        <!-- Tombol Edit Kartu disembunyikan otomatis di laman penerima -->
+        <button class="nav-item" id="editNavItem" onclick="navAction('edit')">
             <span>✏️</span>Edit Kartu
         </button>
         <button class="nav-item" onclick="navAction('share')">
@@ -244,6 +245,9 @@
         const cardId = urlParams.get('id');
 
         if (cardId) {
+            // Sembunyikan ikon edit di navigasi bawah untuk laman penerima
+            document.getElementById('editNavItem').style.display = 'none';
+
             const loadingEl = document.getElementById('loadingPage');
             loadingEl.style.display = 'block';
 
@@ -323,7 +327,6 @@
                 return; 
             }
 
-            // Pastikan jika ada file yang dipilih tapi proses kompresi belum selesai, beri peringatan
             const fileInput = document.getElementById('fileInput');
             if (fileInput.files.length > 0 && foto === "") {
                 alert("Foto sedang diproses, mohon tunggu sebentar hingga muncul tulisan 'Foto siap dikirim!'");
@@ -428,7 +431,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.9\nFitur: Async Upload Guard Status, Fast Load, WhatsApp Direct.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.0\nFitur: Hidden Editor Nav on Recipient View, Async Upload Guard, WhatsApp Direct.\n\nPowered by Ari GPM");
             }
         }
     </script>
