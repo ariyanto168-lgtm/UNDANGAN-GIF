@@ -36,14 +36,16 @@
         
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
-            display: flex; gap: 8px; overflow: hidden; z-index: 1; opacity: 0.45; 
+            display: flex; gap: 8px; overflow: hidden; z-index: 1; 
+            opacity: 0.65; /* FOTO LEBIH TERANG & SEIMBANG */
         }
         #openedCard .gallery-col { display: flex; flex-direction: column; gap: 8px; width: 50%; height: 100%; }
         #openedCard .gallery-col img { width: 100%; height: 220px; object-fit: cover; border-radius: 0; border: none; }
 
+        /* Gradasi Lebih Soft agar foto cerah namun teks tetap terbaca */
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(8,11,18,0.5) 0%, rgba(8,11,18,0.92) 100%);
+            background: radial-gradient(circle, rgba(8,11,18,0.2) 0%, rgba(8,11,18,0.85) 100%);
             z-index: 2; pointer-events: none;
         }
 
@@ -52,17 +54,31 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             width: 90%; max-width: 450px; z-index: 10; padding: 0; margin: 0; text-align: center; 
         }
-        .greeting-title { color: #ffb8c6; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-weight: bold; }
-        .greeting-subtitle { color: #fff; font-size: 1.2rem; margin-bottom: 15px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-        .greeting-msg { line-height: 1.6; word-break: break-word; text-shadow: 0 2px 8px rgba(0,0,0,0.8); margin-bottom: 20px; }
+        .greeting-title { color: #ffb8c6; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 2px 15px rgba(0,0,0,0.9); font-weight: bold; }
+        .greeting-subtitle { color: #fff; font-size: 1.2rem; margin-bottom: 15px; font-weight: 600; text-shadow: 0 2px 12px rgba(0,0,0,0.9); }
+        .greeting-msg { line-height: 1.6; word-break: break-word; text-shadow: 0 2px 12px rgba(0,0,0,0.9); margin-bottom: 20px; }
 
-        .btn-recipient-wa {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            background: #25d366; color: white; border: none; padding: 12px 24px;
-            border-radius: 30px; font-weight: bold; font-size: 0.95rem; text-decoration: none;
-            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); transition: transform 0.2s;
+        /* TOMBOL WA BULAT KECIL (RECIPIENT) */
+        .wa-circle-btn {
+            position: fixed; bottom: 25px; right: 20px; width: 50px; height: 50px; 
+            background: #25d366; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            color: white; z-index: 2000; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.5); 
+            transition: transform 0.2s; animation: bounce 3s infinite;
         }
-        .btn-recipient-wa:active { transform: scale(0.95); }
+        .wa-circle-btn:active { transform: scale(0.9); }
+        .wa-circle-btn svg { width: 26px; height: 26px; fill: currentColor; }
+
+        /* ANIMASI EQUALIZER MUSIK */
+        .equalizer {
+            display: none; position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
+            gap: 5px; z-index: 2000; align-items: flex-end; height: 30px;
+        }
+        .eq-bar { width: 6px; border-radius: 3px; animation: eqBounce 0.5s alternate infinite ease; }
+        .eq-1 { background: #ff0055; height: 15px; animation-delay: 0.1s; }
+        .eq-2 { background: #22c55e; height: 28px; animation-delay: 0.3s; }
+        .eq-3 { background: #3b82f6; height: 12px; animation-delay: 0.0s; }
+        .eq-4 { background: #eab308; height: 22px; animation-delay: 0.2s; }
+        @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
 
         /* EFEK ANIMASI PILIHAN */
         .effect-scroll-up { animation: scrollUp 28s linear infinite; }
@@ -117,7 +133,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v5.2 Cinematic</div>
+    <div class="version-badge" id="versionBadge">v5.3 Cinematic</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -152,6 +168,12 @@
                 <label>Warna Teks Ucapan:</label>
                 <input type="color" id="inputFontColor" value="#d0d5dd" style="height: 45px; padding: 5px; cursor: pointer;">
             </div>
+        </div>
+        
+        <!-- KOLOM INPUT MUSIK BARU -->
+        <div class="form-group">
+            <label>🎵 BGM Musik (URL MP3) - Opsional:</label>
+            <input type="text" id="inputMusic" placeholder="Contoh: https://link-ke-lagu.mp3">
         </div>
 
         <div class="form-group">
@@ -193,11 +215,22 @@
             <h2 class="greeting-title" id="displayTheme">Selamat</h2>
             <div class="greeting-subtitle" id="displayName2">Untuk: Nama</div>
             <p class="greeting-msg" id="displayMessage">Pesan...</p>
-            <!-- Tombol Kirim WA untuk Penerima -->
-            <a id="recipientWaBtn" href="#" target="_blank" class="btn-recipient-wa">
-                <span>💬</span> Bagikan ke WhatsApp
-            </a>
         </div>
+
+        <!-- ANIMASI EQUALIZER MUSIK -->
+        <div class="equalizer" id="musicEqualizer">
+            <span class="eq-bar eq-1"></span>
+            <span class="eq-bar eq-2"></span>
+            <span class="eq-bar eq-3"></span>
+            <span class="eq-bar eq-4"></span>
+        </div>
+
+        <!-- TOMBOL WA BULAT KECIL UNTUK PENERIMA -->
+        <a id="recipientWaBtn" href="#" target="_blank" class="wa-circle-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+              <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+            </svg>
+        </a>
 
         <div class="gallery-container" id="mainGalleryContainer">
             <div class="gallery-col effect-scroll-up" id="colLeft"></div>
@@ -225,7 +258,8 @@
 
     <div class="powered-footer">Powered by Ari GPM</div>
 
-    <nav class="bottom-nav">
+    <!-- NAVBAR (Otomatis Sembunyi di Halaman Penerima) -->
+    <nav class="bottom-nav" id="editorNavBar">
         <button class="nav-item active" onclick="navAction('home')">
             <span>🏠</span>Beranda
         </button>
@@ -250,6 +284,7 @@
         let generatedCardUrl = "";
         let currentRecipientName = "";
         let currentTheme = "";
+        let currentMusicUrl = ""; // Simpan URL Musik Global
 
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
@@ -299,8 +334,9 @@
         const cardId = urlParams.get('id');
 
         if (cardId) {
-            // Sembunyikan badge versi di halaman penerima
+            // SEMBUNYIKAN BADGE VERSI DAN NAVBAR DI HALAMAN PENERIMA
             document.getElementById('versionBadge').style.display = 'none';
+            document.getElementById('editorNavBar').style.display = 'none';
 
             const loadingEl = document.getElementById('loadingPage');
             loadingEl.style.display = 'block';
@@ -319,6 +355,8 @@
                     msgEl.innerText = data.pesan;
                     if(data.fontsize) msgEl.style.fontSize = data.fontsize + 'px';
                     if(data.fontcolor) msgEl.style.color = data.fontcolor;
+                    
+                    if(data.musik) currentMusicUrl = data.musik; // Set link musik jika ada
 
                     // Set URL tombol WhatsApp penerima
                     const currentUrl = window.location.href;
@@ -330,6 +368,7 @@
                 .catch(err => {
                     loadingEl.style.display = 'none';
                     alert("Gagal memuat data kartu.");
+                    document.getElementById('editorNavBar').style.display = 'flex';
                     document.getElementById('editorPage').style.display = 'block';
                 });
         } else {
@@ -339,6 +378,16 @@
         function bukaKartu() {
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
+
+            // MAINKAN MUSIK JIKA ADA URL MUSIK
+            if (currentMusicUrl && currentMusicUrl.trim() !== "") {
+                let audioPlayer = new Audio(currentMusicUrl);
+                audioPlayer.loop = true;
+                audioPlayer.play().catch(e => console.log("Audio autoplay diblokir browser"));
+                
+                // Tampilkan animasi equalizer
+                document.getElementById('musicEqualizer').style.display = 'flex';
+            }
         }
 
         function loadGallery(photoString) {
@@ -379,6 +428,7 @@
             const pesan = document.getElementById('inputMessage').value.trim();
             const fontsize = document.getElementById('inputFontSize').value;
             const fontcolor = document.getElementById('inputFontColor').value;
+            const musik = document.getElementById('inputMusic').value.trim(); // Ambil nilai musik
             const foto = document.getElementById('inputPhotosBase64').value.trim();
 
             if(!nama || !pesan) { 
@@ -400,10 +450,11 @@
             btn.disabled = true;
 
             try {
+                // Kirm payload dengan tambahan "musik"
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ nama, tema, pesan, fontsize, fontcolor, foto })
+                    body: JSON.stringify({ nama, tema, pesan, fontsize, fontcolor, foto, musik }) 
                 });
                 const data = await response.json();
 
@@ -424,7 +475,7 @@
                 btn.innerText = "Buat Kartu";
                 btn.disabled = false;
             } catch (error) {
-                alert("Gagal menyimpan data! Periksa koneksi internet Anda.");
+                alert("Gagal menyimpan data! Pastikan kolom 'musik' sudah ditambahkan di baris 1 G1 Google Sheet Anda.");
                 btn.innerText = "Coba Lagi";
                 btn.disabled = false;
             }
@@ -441,9 +492,9 @@
                 <div style="padding-top: 40px;">
                     <h2 style="color: #ffb8c6; margin-bottom: 20px;">👁️ Pratinjau Teks & Tema</h2>
                     <div style="text-align: center; padding: 20px;">
-                        <h2 style="color: #ffb8c6; font-size: 1.8rem; margin-bottom: 5px;">Selamat ${tema}!</h2>
-                        <div style="color: #fff; font-size: 1.1rem; margin-bottom: 12px; font-weight: 600;">Untuk: ${nama}</div>
-                        <p style="font-size: ${fontsize}px; color: ${fontcolor}; line-height: 1.5;">${pesan}</p>
+                        <h2 style="color: #ffb8c6; font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Selamat ${tema}!</h2>
+                        <div style="color: #fff; font-size: 1.1rem; margin-bottom: 12px; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Untuk: ${nama}</div>
+                        <p style="font-size: ${fontsize}px; color: ${fontcolor}; line-height: 1.5; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">${pesan}</p>
                     </div>
                 </div>
             `;
@@ -502,7 +553,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.2\nFitur: Clean Recipient View (No Version Badge), Recipient WhatsApp Share Button.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.3\nFitur: Hidden Nav/Badge on Recipient, Equalizer Music, WhatsApp Circle Icon, Bright Photo Balance.\n\nPowered by Ari GPM");
             }
         }
     </script>
