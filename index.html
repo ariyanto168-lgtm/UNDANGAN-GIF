@@ -59,13 +59,18 @@
         <p class="text-slate-400 text-xs mt-2 text-center px-6 max-w-xs">Menyimpan data kartu secara permanen agar aman dibagikan.</p>
     </div>
 
+    <!-- TOMBOL MELAYANG KEMBALI KE EDIT (SAAT PREVIEW FULL AKTIF) -->
+    <button id="btn-back-edit" onclick="backToEditor()" class="fixed top-4 right-4 z-[70] bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-2xl hidden interactive-scale flex items-center gap-2 border border-white/20">
+        <span>✏️</span> <span>Kembali Edit</span>
+    </button>
+
     <!-- ERROR SCREEN -->
     <div id="error-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
             <div class="text-5xl mb-4">⚠️</div>
             <h1 class="text-2xl font-bold mb-2 text-rose-400">Kartu Tidak Ditemukan</h1>
-            <p class="text-slate-400 text-sm mb-6">ID Kartu pada link tidak terdaftar di database Google.</p>
-            <a href="index.html" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl text-sm transition">
+            <p class="text-slate-400 text-sm mb-6">ID Kartu pada link tidak terdaftar di database Google atau koneksi Google Apps Script bermasalah.</p>
+            <a href="index.html" class="inline-block bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-3 px-6 rounded-xl text-sm transition interactive-scale shadow-lg">
                 Buat Kartu Baru
             </a>
         </div>
@@ -88,9 +93,9 @@
         <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24">
             
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
-                <button onclick="location.reload()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Beranda</button>
+                <button onclick="location.href='index.html'" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Beranda</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.48 (GAS)</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.50 (GAS)</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -102,8 +107,11 @@
         <!-- MODAL EDITOR LENGKAP -->
         <div id="editor-modal" class="fixed inset-x-0 bottom-16 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800 p-6 rounded-t-3xl max-h-[60vh] overflow-y-auto custom-scrollbar shadow-2xl hidden fade-in">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu Lengkap (v1.1.48)</h3>
-                <button onclick="closeEditorModal()" class="text-slate-400 hover:text-slate-200 text-lg px-2 py-0.5 rounded-lg cursor-pointer">✕</button>
+                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu (v1.1.50)</h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleFullPreview()" class="bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-xl interactive-scale">👁️ Preview Full</button>
+                    <button onclick="closeEditorModal()" class="text-slate-400 hover:text-slate-200 text-lg px-2 py-0.5 rounded-lg cursor-pointer">✕</button>
+                </div>
             </div>
 
             <!-- TAB 1: TEKS & KONTEN -->
@@ -288,7 +296,7 @@
                     </div>
                     <input type="range" id="input-typespeed" min="10" max="150" step="5" value="40" oninput="triggerPreview()" class="w-full accent-rose-500 bg-slate-950 cursor-pointer">
                 </div>
-                <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-sm transition border border-slate-700">🔄 Reset Semua Pengaturan</button>
+                <button onclick="location.href='index.html'" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-sm transition border border-slate-700">🔄 Buat Kartu Baru / Reset</button>
             </div>
 
             <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
@@ -297,7 +305,7 @@
         </div>
 
         <!-- Bottom Navigation Bar Lengkap -->
-        <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
+        <div id="bottom-nav-bar" class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
             <button onclick="openEditorModal('text')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">✏️</span>Teks</button>
             <button onclick="openEditorModal('design')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">🎨</span>Desain</button>
             <button onclick="openEditorModal('running')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">🏃‍♂️</span>Running</button>
@@ -348,6 +356,7 @@
 
         let activeDragItem = null;
         let isReceiverView = false;
+        let lastActiveTab = 'text';
 
         function compressImage(file, isGallery, callback) {
             const reader = new FileReader();
@@ -505,7 +514,7 @@
                 });
 
                 loadingEl.classList.add('hidden');
-                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.48)!');
+                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.50)!');
                 closeEditorModal();
                 return true;
             } catch (err) {
@@ -587,7 +596,7 @@
             isReceiverView = true;
             document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
             document.getElementById('receiver-opening-title').innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
-            const bottomNav = document.querySelector('.fixed.bottom-0');
+            const bottomNav = document.getElementById('bottom-nav-bar');
             if (bottomNav) bottomNav.style.display = 'none';
             document.getElementById('top-action-bar').style.display = 'none';
             document.getElementById('opening-screen').classList.remove('hidden');
@@ -596,13 +605,30 @@
         }
 
         function openEditorModal(tabName) {
+            lastActiveTab = tabName;
             const modal = document.getElementById('editor-modal');
             document.querySelectorAll('.editor-tab-pane').forEach(p => p.classList.add('hidden'));
             document.getElementById('tab-content-' + tabName).classList.remove('hidden');
             modal.classList.remove('hidden');
+            document.getElementById('btn-back-edit').classList.add('hidden');
+            document.getElementById('bottom-nav-bar').style.display = 'flex';
         }
 
-        function closeEditorModal() { document.getElementById('editor-modal').classList.add('hidden'); }
+        function closeEditorModal() { 
+            document.getElementById('editor-modal').classList.add('hidden'); 
+        }
+
+        function toggleFullPreview() {
+            document.getElementById('editor-modal').classList.add('hidden');
+            document.getElementById('bottom-nav-bar').style.display = 'none';
+            document.getElementById('btn-back-edit').classList.remove('hidden');
+        }
+
+        function backToEditor() {
+            document.getElementById('btn-back-edit').classList.add('hidden');
+            document.getElementById('bottom-nav-bar').style.display = 'flex';
+            openEditorModal(lastActiveTab);
+        }
 
         function getShareableLink() {
             if (!cardState.id) cardState.id = 'card_' + Date.now();
@@ -708,7 +734,6 @@
             else if (cardState.bgEffect === 'right') animClass = " bg-anim-right";
             else if (cardState.bgEffect === 'up') animClass = " bg-anim-up";
 
-            // Jika ada foto background kustom, gunakan itu sebagai background-image
             if (cardState.bgCustomImage) {
                 bgWrapper.style.backgroundImage = `url('${cardState.bgCustomImage}')`;
                 bgWrapper.className = "w-full h-full relative p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
