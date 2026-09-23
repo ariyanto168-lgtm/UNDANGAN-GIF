@@ -2,866 +2,232 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Undangan & Kartu Digital Interaktif</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Confetti JS -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Sacramento&family=Cinzel:wght@500;700&family=Alex+Brush&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Ucapan Digital</title>
     <style>
-        body { background-color: #020617; color: #f8fafc; overflow-x: hidden; font-family: 'Poppins', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- GLOBAL STYLES --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f131f; color: white; overflow-x: hidden; }
         
-        @keyframes musicBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-        .animate-beat { animation: musicBeat 2s ease-in-out infinite; will-change: transform; }
-        @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-        .animate-float { animation: floatCard 4s ease-in-out infinite; }
-        button, a, select, input, textarea { -webkit-tap-highlight-color: transparent; }
-        .interactive-scale:active { transform: scale(0.97); transition: transform 0.1s ease; }
+        /* --- VIEWER: LANDING PAGE (Mirip Screenshot) --- */
+        #landingPage {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #0f131f;
+        }
+        .card-container {
+            background-color: #1c2235; border-radius: 20px; padding: 40px 20px; width: 90%; max-width: 400px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .gift-icon { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        .title-text { color: #ff6b81; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
+        .recipient-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 30px; }
+        .btn-buka {
+            background: linear-gradient(90deg, #ff0055, #ff0088); color: white; border: none;
+            padding: 15px 30px; border-radius: 30px; font-size: 1rem; font-weight: bold; width: 100%;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); transition: transform 0.2s;
+        }
+        .btn-buka:active { transform: scale(0.95); }
 
-        @keyframes bgSlomo { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes bgPanRight { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-        @keyframes bgPanUp { 0% { background-position: 50% 100%; } 100% { background-position: 50% 0%; } }
-        .bg-anim-slomo { animation: bgSlomo 12s ease infinite; background-size: 200% 200%; }
-        .bg-anim-right { animation: bgPanRight 15s linear infinite; background-size: 200% 200%; }
-        .bg-anim-up { animation: bgPanUp 15s linear infinite; background-size: 200% 200%; }
+        /* --- VIEWER: OPENED CARD (Galeri & Ucapan) --- */
+        #openedCard {
+            display: none; min-height: 100vh; padding: 20px; background-color: #0f131f; text-align: center;
+        }
+        .greeting-box {
+            background: rgba(28, 34, 53, 0.8); padding: 20px; border-radius: 15px; margin-bottom: 20px;
+            border: 1px solid #ff6b81; backdrop-filter: blur(5px); z-index: 10; position: relative;
+        }
+        .greeting-title { color: #ff6b81; font-size: 1.8rem; margin-bottom: 10px; }
+        
+        /* Galeri Foto Slowmo Naik Turun */
+        .gallery-container {
+            display: flex; gap: 10px; height: 60vh; overflow: hidden; position: relative;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        .gallery-col { display: flex; flex-direction: column; gap: 10px; width: 50%; }
+        .gallery-col img { width: 100%; border-radius: 10px; object-fit: cover; border: 2px solid #333; }
+        
+        .scroll-up { animation: scrollUp 20s linear infinite; }
+        .scroll-down { animation: scrollDown 20s linear infinite; }
 
-        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .marquee-container { overflow: hidden; white-space: nowrap; width: 100%; }
-        .marquee-text { display: inline-block; animation: marquee 12s linear infinite; }
+        /* --- EDITOR STYLES --- */
+        #editorPage {
+            display: none; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #1c2235; min-height: 100vh;
+        }
+        .editor-title { text-align: center; color: #ff6b81; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #aaa; }
+        input, select, textarea {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444;
+            background-color: #0f131f; color: white;
+        }
+        .btn-generate {
+            background-color: #4CAF50; color: white; border: none; padding: 15px; width: 100%;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .result-box {
+            margin-top: 20px; padding: 15px; background-color: #0f131f; border-radius: 8px; display: none; word-break: break-all;
+        }
 
-        .typewriter-cursor::after { content: '|'; animation: blink 0.8s infinite; margin-left: 2px; color: #fb7185; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.5); border-radius: 8px; }
-
-        .draggable-element { touch-action: none; user-select: none; }
-        .is-editable { cursor: grab; transition: outline 0.2s; }
-        .is-editable:active { cursor: grabbing; outline: 2px dashed rgba(244, 63, 94, 0.6); }
-
-        .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #38bdf8; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- ANIMATIONS --- */
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+        @keyframes scrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
+<body>
 
-    <audio id="bgm" loop preload="auto"></audio>
+    <div id="editorPage">
+        <h2 class="editor-title">🛠️ Buat Kartu Ucapan</h2>
+        
+        <div class="form-group">
+            <label>Nama Penerima:</label>
+            <input type="text" id="inputName" placeholder="Contoh: Audylia Salsabilla">
+        </div>
+        
+        <div class="form-group">
+            <label>Tema Acara:</label>
+            <select id="inputTheme">
+                <option value="Ulang Tahun">Ulang Tahun 🎂</option>
+                <option value="Pernikahan">Pernikahan 💍</option>
+                <option value="Khitanan">Khitanan ✂️</option>
+            </select>
+        </div>
 
-    <!-- LOADING GOOGLE CLOUD -->
-    <div id="cloud-loading" class="fixed inset-0 bg-slate-950/90 z-[60] flex flex-col items-center justify-center hidden backdrop-blur-md">
-        <div class="loader mb-4"></div>
-        <p id="cloud-loading-text" class="text-sky-400 font-bold text-sm">Menghubungkan ke Google Database...</p>
-        <p class="text-slate-400 text-xs mt-2 text-center px-6 max-w-xs">Menyimpan data kartu secara permanen agar aman dibagikan.</p>
-    </div>
+        <div class="form-group">
+            <label>Pesan/Ucapan:</label>
+            <textarea id="inputMessage" rows="4" placeholder="Tulis doa dan harapanmu di sini..."></textarea>
+        </div>
 
-    <!-- TOMBOL MELAYANG KEMBALI KE EDIT (SAAT PREVIEW FULL AKTIF) -->
-    <button id="btn-back-edit" onclick="backToEditor()" class="fixed top-4 right-4 z-[70] bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-2xl hidden interactive-scale flex items-center gap-2 border border-white/20">
-        <span>✏️</span> <span>Kembali Edit</span>
-    </button>
+        <div class="form-group">
+            <label>Link Foto (Pisahkan dengan koma, maksimal 10):</label>
+            <textarea id="inputPhotos" rows="4" placeholder="https://linkfoto1.jpg, https://linkfoto2.jpg... (Gunakan link gambar dari imgur, fb, dll)"></textarea>
+            <small style="color: #888;">*Karena ini web statis, upload foto harus via link internet (URL).</small>
+        </div>
 
-    <!-- ERROR SCREEN -->
-    <div id="error-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
-        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
-            <div class="text-5xl mb-4">⚠️</div>
-            <h1 class="text-2xl font-bold mb-2 text-rose-400">Kartu Tidak Ditemukan</h1>
-            <p class="text-slate-400 text-sm mb-6">ID Kartu pada link tidak terdaftar di database Google atau koneksi Google Apps Script bermasalah.</p>
-            <a href="index.html" class="inline-block bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-3 px-6 rounded-xl text-sm transition interactive-scale shadow-lg">
-                Buat Kartu Baru
-            </a>
+        <button class="btn-generate" onclick="generateLink()">Buat Link & Copy!</button>
+
+        <div id="resultLink" class="result-box">
+            <p style="color: #4CAF50; margin-bottom: 10px;">✅ Link berhasil dibuat & disalin!</p>
+            <a id="shareableUrl" href="#" target="_blank" style="color: #66b3ff;">Klik di sini untuk melihat</a>
         </div>
     </div>
 
-    <!-- OPENING SCREEN (PENERIMA) -->
-    <div id="opening-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center backdrop-blur-md hidden">
-        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl fade-in animate-float">
-            <div class="text-5xl mb-4">🎁</div>
-            <h1 id="receiver-opening-title" class="text-2xl font-bold mb-2 tracking-wide text-rose-400">ADA UCAPAN UNTUKMU</h1>
-            <p id="receiver-recipient-name" class="text-slate-300 text-lg mb-6 font-medium">Seseorang</p>
-            <button onclick="openReceiverCard()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer interactive-scale">
-                <span>🎵</span> <span id="receiver-opening-btn">BUKA KARTU</span>
-            </button>
+    <div id="landingPage">
+        <div class="card-container">
+            <div class="gift-icon">🎁</div>
+            <div class="title-text">ADA UCAPAN UNTUKMU</div>
+            <div class="recipient-name" id="displayTargetName">Nama Penerima</div>
+            <button class="btn-buka" onclick="bukaKartu()">🎵 BUKA KARTU</button>
         </div>
     </div>
 
-    <!-- MAIN FULLSCREEN CONTAINER -->
-    <div id="main-container" class="fixed inset-0 bg-slate-950 z-30 flex flex-col hidden fade-in">
-        <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24">
-            
-            <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
-                <button onclick="location.href='index.html'" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Beranda</button>
-                <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.50 (GAS)</span>
-                    <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
-                    <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
-                </div>
-            </div>
-
-            <div id="free-canvas" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
+    <div id="openedCard">
+        <div class="greeting-box">
+            <h2 class="greeting-title" id="displayTheme">Selamat Ulang Tahun</h2>
+            <h3 style="margin-bottom: 10px;" id="displayName2">Nama</h3>
+            <p id="displayMessage">Pesan ucapan akan muncul di sini.</p>
         </div>
 
-        <!-- MODAL EDITOR LENGKAP -->
-        <div id="editor-modal" class="fixed inset-x-0 bottom-16 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800 p-6 rounded-t-3xl max-h-[60vh] overflow-y-auto custom-scrollbar shadow-2xl hidden fade-in">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu (v1.1.50)</h3>
-                <div class="flex items-center gap-2">
-                    <button onclick="toggleFullPreview()" class="bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-xl interactive-scale">👁️ Preview Full</button>
-                    <button onclick="closeEditorModal()" class="text-slate-400 hover:text-slate-200 text-lg px-2 py-0.5 rounded-lg cursor-pointer">✕</button>
-                </div>
-            </div>
-
-            <!-- TAB 1: TEKS & KONTEN -->
-            <div id="tab-content-text" class="space-y-4 editor-tab-pane hidden">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Nama Penerima / Target</label>
-                    <input type="text" id="input-nama" value="Audylia Salsabilla" oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Judul Kartu</label>
-                    <input type="text" id="input-judul" value="Happy Birthday" oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Isi Ucapan</label>
-                    <textarea id="input-ucapan" rows="3" oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">"Selamat ulang tahun, moga selalu beruntung."</textarea>
-                </div>
-
-                <div class="pt-3 border-t border-slate-800 space-y-2">
-                    <label class="block text-xs font-medium text-rose-400 font-semibold">🎛️ Saklar Sembunyikan Elemen</label>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800"><input type="checkbox" id="input-hidejudul" onchange="triggerPreview()" class="accent-rose-500 rounded"> Sembunyikan Judul</label>
-                        <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800"><input type="checkbox" id="input-hidefoto" onchange="triggerPreview()" class="accent-rose-500 rounded"> Sembunyikan Foto</label>
-                        <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800"><input type="checkbox" id="input-hidenama" onchange="triggerPreview()" class="accent-rose-500 rounded"> Sembunyikan Nama</label>
-                        <label class="flex items-center gap-2 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-xl border border-slate-800"><input type="checkbox" id="input-hideucapan" onchange="triggerPreview()" class="accent-rose-500 rounded"> Sembunyikan Ucapan</label>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Judul Layar Pembuka</label>
-                        <input type="text" id="input-openingtitle" value="ADA UCAPAN UNTUKMU" oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Teks Tombol Buka</label>
-                        <input type="text" id="input-openingbtn" value="BUKA KARTU" oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs">
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: DESAIN & BACKGROUND -->
-            <div id="tab-content-design" class="space-y-4 editor-tab-pane hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">🌌 Tema Latar Belakang</label>
-                        <select id="input-bgstyle" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs">
-                            <option value="gradient-rose">Rose Dark Gradient (Default)</option>
-                            <option value="gradient-dark">Midnight Slate Gradient</option>
-                            <option value="solid-black">Solid Black Minimalis</option>
-                            <option value="gradient-purple">Purple Neon Glow</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">🎬 Efek Animasi Background</label>
-                        <select id="input-bgeffect" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs">
-                            <option value="none">🚫 Diam (Static)</option>
-                            <option value="slomo">🌊 Slomo (Smooth Pulse)</option>
-                            <option value="right">➡️ Berjalan ke Kanan</option>
-                            <option value="up">⬆️ Gerak ke Atas</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2">
-                    <label class="block text-xs font-medium text-sky-400 font-semibold">🖼️ Unggah Foto Background Kustom (Opsional)</label>
-                    <input type="file" accept="image/*" onchange="handleBgFileSelect(event)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white cursor-pointer">
-                    <button onclick="removeBgCustomImage()" class="text-[10px] text-rose-400 hover:underline">Hapus Foto Background Kustom</button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto Utama</label>
-                        <select id="input-framestyle" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs">
-                            <option value="rounded-full">Lingkaran Sempurna (Circle)</option>
-                            <option value="rounded-2xl">Kotak Sudut Melengkung</option>
-                            <option value="rounded-none border-4 border-white shadow-xl">Kotak Polaroid</option>
-                            <option value="none">🚫 Tanpa Bingkai</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Kotak Ucapan</label>
-                        <select id="input-greetingframe" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs">
-                            <option value="glass-blur">Glassmorphism Blur Transparan</option>
-                            <option value="solid-dark">Solid Dark Minimalis</option>
-                            <option value="neon-glow">Neon Glow Border</option>
-                            <option value="none">🚫 Tanpa Kotak</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">🎨 Warna Teks</label>
-                        <input type="color" id="input-textcolor" value="#f8fafc" oninput="triggerPreview()" class="w-full h-9 bg-slate-950 border border-slate-800 rounded-xl px-1 cursor-pointer">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">🔤 Model Huruf</label>
-                        <select id="input-fontfamily" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-200 text-xs">
-                            <option value="'Poppins', sans-serif">Poppins</option>
-                            <option value="'Playfair Display', serif">Playfair Display</option>
-                            <option value="'Great Vibes', cursive">Great Vibes</option>
-                            <option value="'Dancing Script', cursive">Dancing Script</option>
-                            <option value="'Montserrat', sans-serif">Montserrat</option>
-                            <option value="'Cinzel', serif">Cinzel</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">📏 Ukuran Teks</label>
-                        <select id="input-fontsize" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-200 text-xs">
-                            <option value="normal">Normal</option>
-                            <option value="large">Besar</option>
-                            <option value="xlarge">Sangat Besar</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: RUNNING TEXT -->
-            <div id="tab-content-running" class="space-y-4 editor-tab-pane hidden">
-                <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-rose-400">🏃‍♂️ Teks Berjalan (Running Text)</label>
-                        <label class="flex items-center gap-1.5 text-[10px] text-rose-300 cursor-pointer">
-                            <input type="checkbox" id="input-hiderunningtext" onchange="triggerPreview()" class="accent-rose-500 rounded"> Sembunyikan
-                        </label>
-                    </div>
-                    <input type="text" id="input-runningtext" value="✨ Selamat Datang di Undangan Spesial Kami ✨" oninput="triggerPreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs">
-                </div>
-            </div>
-
-            <!-- TAB 4: STIKER & DEKORASI -->
-            <div id="tab-content-decor" class="space-y-4 editor-tab-pane hidden">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="applyGenZPreset('genz-birthday')" class="bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">🎂 Gen Z Birthday</button>
-                        <button onclick="applyGenZPreset('cute-genz')" class="bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs py-2 px-2 rounded-xl font-medium interactive-scale">🧸 Cute Gen Z</button>
-                    </div>
-                </div>
-                <div class="space-y-3 pt-2 border-t border-slate-800">
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-medium text-slate-300">✋ Stiker Teks Tambahan</label>
-                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-semibold">+ Tambah</button>
-                    </div>
-                    <div id="dynamic-decor-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar"></div>
-                </div>
-            </div>
-
-            <!-- TAB 5: MEDIA & 10 FOTO DARI HP -->
-            <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
-                <div class="bg-sky-950/20 border border-sky-900 p-3 rounded-xl mb-2">
-                    <p class="text-xs text-sky-300 font-medium">✅ Anda dapat mengunggah Foto Utama dan hingga **10 Foto Galeri** langsung dari HP.</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">🖼️ Foto Utama (Pilih dari HP)</label>
-                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white cursor-pointer">
-                </div>
-
-                <div class="pt-3 border-t border-slate-800 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-rose-400">📸 Galeri Foto (Maks. 10 Foto)</label>
-                        <label class="bg-sky-600 hover:bg-sky-700 text-white text-[10px] px-3 py-2 rounded-xl font-semibold cursor-pointer interactive-scale">
-                            + Pilih Foto HP
-                            <input type="file" accept="image/*" multiple onchange="handleGalleryFilesSelect(event)" class="hidden">
-                        </label>
-                    </div>
-                    <div id="gallery-editor-list" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar flex flex-wrap gap-2"></div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Musik MP3</label>
-                    <input type="text" id="input-musikurl" placeholder="https://..." oninput="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs">
-                </div>
-            </div>
-
-            <!-- TAB 6: PENGATURAN -->
-            <div id="tab-content-settings" class="space-y-4 editor-tab-pane hidden">
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-medium text-slate-400">⚡ Kecepatan Mesin Tik (Typewriter)</label>
-                        <span id="speed-label" class="text-xs font-mono text-rose-400 font-semibold">40 ms</span>
-                    </div>
-                    <input type="range" id="input-typespeed" min="10" max="150" step="5" value="40" oninput="triggerPreview()" class="w-full accent-rose-500 bg-slate-950 cursor-pointer">
-                </div>
-                <button onclick="location.href='index.html'" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-sm transition border border-slate-700">🔄 Buat Kartu Baru / Reset</button>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
-                <button onclick="saveCardToGoogleCloud(true)" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-xl text-sm shadow-lg interactive-scale cursor-pointer">💾 Simpan ke Google Cloud</button>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation Bar Lengkap -->
-        <div id="bottom-nav-bar" class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-2 flex justify-around items-center z-50">
-            <button onclick="openEditorModal('text')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">✏️</span>Teks</button>
-            <button onclick="openEditorModal('design')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">🎨</span>Desain</button>
-            <button onclick="openEditorModal('running')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">🏃‍♂️</span>Running</button>
-            <button onclick="openEditorModal('decor')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">✨</span>Stiker</button>
-            <button onclick="openEditorModal('media')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">📸</span>Media</button>
-            <button onclick="openEditorModal('settings')" class="flex flex-col items-center gap-0.5 text-slate-300 text-[10px] py-1 px-2"><span class="text-base">⚙️</span>Aksi</button>
+        <div class="gallery-container">
+            <div class="gallery-col scroll-up" id="colLeft"></div>
+            <div class="gallery-col scroll-down" id="colRight"></div>
         </div>
     </div>
 
-    <!-- SCRIPT UTAMA -->
     <script>
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwptJ_5r87qvV0XLuVJxDZLiuAGIVxcB6vuSUrV9dHbftnMNxbJwLdnAzWRSTWLDnJEQA/exec';
+        // Fungsi membaca URL Parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlName = urlParams.get('to');
+        const urlTheme = urlParams.get('theme');
+        const urlMsg = urlParams.get('msg');
+        const urlPhotos = urlParams.get('imgs');
 
-        let cardState = {
-            id: "",
-            nama: "Audylia Salsabilla",
-            judul: "Happy Birthday",
-            ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
-            runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
-            fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
-            galleryPhotos: [],
-            bgCustomImage: "",
-            musikUrl: "",
-            textColor: "#f8fafc",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: "normal",
-            bgStyle: "gradient-rose",
-            bgEffect: "none",
-            frameStyle: "rounded-full",
-            greetingFrameStyle: "glass-blur",
-            typewriterSpeed: 40,
-            openingTitle: "ADA UCAPAN UNTUKMU",
-            openingButtonText: "BUKA KARTU",
-            hideJudul: false,
-            hideFoto: false,
-            hideNama: false,
-            hideUcapan: false,
-            hideRunningText: false,
-            posJudul: { x: 50, y: 25 },
-            posFoto: { x: 50, y: 42 },
-            posNama: { x: 50, y: 60 },
-            posUcapan: { x: 50, y: 76 },
-            posRunningText: { x: 50, y: 93 },
-            decorations: [
-                { id: 'dec_1', text: '✨ HBD BESTIE 🎉', x: 20, y: 8, size: 'text-xl', font: "'Poppins', sans-serif", color: '#ff758c' }
-            ]
-        };
+        // Router: Tentukan apakah menampilkan Editor atau Viewer
+        if (urlName) {
+            // Mode Viewer (Ada Link)
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('landingPage').style.display = 'flex';
+            
+            // Isi data ke Viewer
+            document.getElementById('displayTargetName').innerText = urlName;
+            document.getElementById('displayName2').innerText = "Untuk: " + urlName;
+            document.getElementById('displayTheme').innerText = "Selamat " + urlTheme + "!";
+            document.getElementById('displayMessage').innerText = urlMsg;
 
-        let activeDragItem = null;
-        let isReceiverView = false;
-        let lastActiveTab = 'text';
-
-        function compressImage(file, isGallery, callback) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width; let height = img.height;
-                    let maxWidth = isGallery ? 400 : 600; 
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    callback(canvas.toDataURL('image/jpeg', 0.65));
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            // Load Gambar
+            loadGallery(urlPhotos);
+        } else {
+            // Mode Editor (Tidak ada Link)
+            document.getElementById('editorPage').style.display = 'block';
+            document.getElementById('landingPage').style.display = 'none';
         }
 
-        function handleFileSelect(event, type) {
-            const file = event.target.files[0];
-            if (!file) return;
-            compressImage(file, false, function(base64) {
-                cardState.fotoUrl = base64;
-                triggerPreview();
-                alert('Foto utama berhasil dimuat! ✨');
-            });
+        // Fungsi Buka Kartu (Animasi Transisi)
+        function bukaKartu() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('openedCard').style.display = 'block';
+            // Disini bisa ditambahkan script untuk play musik otomatis jika punya file mp3
         }
 
-        function handleBgFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            compressImage(file, false, function(base64) {
-                cardState.bgCustomImage = base64;
-                triggerPreview();
-                alert('Foto background kustom berhasil dipasang! 🌌');
-            });
-        }
+        // Fungsi Load Galeri Foto Slowmo
+        function loadGallery(photoString) {
+            if(!photoString) return;
+            const photos = photoString.split(',');
+            const colLeft = document.getElementById('colLeft');
+            const colRight = document.getElementById('colRight');
+            
+            // Duplikasi array agar animasi infinite scroll terlihat mulus
+            let displayPhotos = [...photos, ...photos]; 
 
-        function removeBgCustomImage() {
-            cardState.bgCustomImage = "";
-            triggerPreview();
-            alert('Foto background kustom dihapus.');
-        }
-
-        async function handleGalleryFilesSelect(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-            if (!cardState.galleryPhotos) cardState.galleryPhotos = [];
-
-            if (cardState.galleryPhotos.length + files.length > 10) {
-                alert('Maksimal galeri adalah 10 foto!'); return;
-            }
-
-            for (let i = 0; i < files.length; i++) {
-                if (cardState.galleryPhotos.length >= 10) break;
-                await new Promise(resolve => {
-                    compressImage(files[i], true, function(base64) {
-                        cardState.galleryPhotos.push(base64);
-                        renderGalleryEditorList();
-                        triggerPreview();
-                        resolve();
-                    });
-                });
-            }
-            event.target.value = '';
-            alert('Foto galeri berhasil ditambahkan! 📸');
-        }
-
-        function renderGalleryEditorList() {
-            const container = document.getElementById('gallery-editor-list');
-            if (!container) return;
-            container.innerHTML = '';
-            if (!cardState.galleryPhotos) cardState.galleryPhotos = [];
-            cardState.galleryPhotos.forEach((url, idx) => {
-                let div = document.createElement('div');
-                div.className = 'relative group w-14 h-14 rounded-xl border border-slate-700 overflow-hidden';
-                div.innerHTML = `
-                    <img src="${url}" class="w-full h-full object-cover">
-                    <button onclick="removeGalleryPhoto(${idx})" class="absolute inset-0 bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition">Del</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function removeGalleryPhoto(index) {
-            cardState.galleryPhotos.splice(index, 1);
-            renderGalleryEditorList(); triggerPreview();
-        }
-
-        function applyGenZPreset(presetName) {
-            if (presetName === 'genz-birthday') {
-                cardState.decorations = [{ id: 'p1', text: '🎂 LEVEL UNLOCKED 🎂', x: 50, y: 10, size: 'text-2xl', font: "'Poppins', sans-serif", color: '#ff3366' }];
-            } else if (presetName === 'cute-genz') {
-                cardState.decorations = [{ id: 'p1', text: '🧸 SO CUTE & COZY ☁️', x: 50, y: 10, size: 'text-xl', font: "'Sacramento', cursive", color: '#ffb3ba' }];
-            }
-            triggerPreview();
-            renderDecorEditorList();
-        }
-
-        function addNewDecorationText() {
-            if (!cardState.decorations) cardState.decorations = [];
-            cardState.decorations.push({ id: 'dec_' + Date.now(), text: '✨ TEKS BARU ✨', x: 50, y: 50, size: 'text-lg', font: "'Poppins', sans-serif", color: '#ffffff' });
-            triggerPreview();
-            renderDecorEditorList();
-        }
-
-        function renderDecorEditorList() {
-            const listEl = document.getElementById('dynamic-decor-list');
-            if (!listEl) return;
-            listEl.innerHTML = '';
-            if (!cardState.decorations) cardState.decorations = [];
-            cardState.decorations.forEach((item) => {
-                let div = document.createElement('div');
-                div.className = 'bg-slate-950 border border-slate-800 p-2.5 rounded-xl space-y-2 text-xs';
-                div.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <input type="text" value="${item.text}" oninput="updateDecorText('${item.id}', this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200 focus:outline-none">
-                        <button onclick="removeDecorItem('${item.id}')" class="text-slate-400 hover:text-red-400 p-1 cursor-pointer">🗑️</button>
-                    </div>
-                `;
-                listEl.appendChild(div);
-            });
-        }
-
-        function updateDecorText(id, val) {
-            let item = cardState.decorations.find(d => d.id === id);
-            if (item) { item.text = val; triggerPreview(); }
-        }
-
-        function removeDecorItem(id) {
-            cardState.decorations = cardState.decorations.filter(d => d.id !== id);
-            triggerPreview();
-            renderDecorEditorList();
-        }
-
-        async function saveCardToGoogleCloud(showAlert = false) {
-            triggerPreview();
-            if (!cardState.id) cardState.id = 'card_' + Date.now();
-
-            const loadingEl = document.getElementById('cloud-loading');
-            document.getElementById('cloud-loading-text').innerText = "Menyimpan ke Google Database...";
-            loadingEl.classList.remove('hidden');
-
-            try {
-                await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(cardState)
-                });
-
-                loadingEl.classList.add('hidden');
-                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.50)!');
-                closeEditorModal();
-                return true;
-            } catch (err) {
-                loadingEl.classList.add('hidden');
-                alert('Gagal menyimpan ke Google Cloud. Periksa koneksi internet Anda.');
-                return false;
-            }
-        }
-
-        async function loadCardFromGoogleCloud(cardId) {
-            const loadingEl = document.getElementById('cloud-loading');
-            document.getElementById('cloud-loading-text').innerText = "Memuat Undangan dari Google...";
-            loadingEl.classList.remove('hidden');
-
-            try {
-                const res = await fetch(`${GAS_URL}?id=${cardId}`);
-                const data = await res.json();
-                loadingEl.classList.add('hidden');
-
-                if (data && (data.id || data.nama)) {
-                    cardState = {
-                        id: data.id || cardId,
-                        nama: data.nama || "Audylia Salsabilla",
-                        judul: data.judul || "Happy Birthday",
-                        ucapan: data.ucapan || '"Selamat ulang tahun..."',
-                        runningText: data.runningText || "✨ Selamat Datang ✨",
-                        fotoUrl: data.fotoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
-                        galleryPhotos: data.galleryPhotos || [],
-                        bgCustomImage: data.bgCustomImage || "",
-                        musikUrl: data.musikUrl || "",
-                        textColor: data.textColor || "#f8fafc",
-                        fontFamily: data.fontFamily || "'Poppins', sans-serif",
-                        fontSize: data.fontSize || "normal",
-                        bgStyle: data.bgStyle || "gradient-rose",
-                        bgEffect: data.bgEffect || "none",
-                        frameStyle: data.frameStyle || "rounded-full",
-                        greetingFrameStyle: data.greetingFrameStyle || "glass-blur",
-                        typewriterSpeed: data.typewriterSpeed || 40,
-                        openingTitle: data.openingTitle || "ADA UCAPAN UNTUKMU",
-                        openingButtonText: data.openingButtonText || "BUKA KARTU",
-                        hideJudul: !!data.hideJudul,
-                        hideFoto: !!data.hideFoto,
-                        hideNama: !!data.hideNama,
-                        hideUcapan: !!data.hideUcapan,
-                        hideRunningText: !!data.hideRunningText,
-                        posJudul: data.posJudul || { x: 50, y: 25 },
-                        posFoto: data.posFoto || { x: 50, y: 42 },
-                        posNama: data.posNama || { x: 50, y: 60 },
-                        posUcapan: data.posUcapan || { x: 50, y: 76 },
-                        posRunningText: data.posRunningText || { x: 50, y: 93 },
-                        decorations: data.decorations || []
-                    };
-                    setupReceiverMode();
+            displayPhotos.forEach((url, index) => {
+                let img = document.createElement('img');
+                img.src = url.trim();
+                img.onerror = function() { this.src = 'https://via.placeholder.com/150?text=Foto+Error'; };
+                
+                if (index % 2 === 0) {
+                    colLeft.appendChild(img);
                 } else {
-                    document.getElementById('error-screen').classList.remove('hidden');
+                    colRight.appendChild(img);
                 }
-            } catch (e) {
-                loadingEl.classList.add('hidden');
-                document.getElementById('error-screen').classList.remove('hidden');
-            }
+            });
         }
 
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const cardId = urlParams.get('id');
+        // Fungsi Generate Link (Editor Mode)
+        function generateLink() {
+            const name = document.getElementById('inputName').value;
+            const theme = document.getElementById('inputTheme').value;
+            const msg = document.getElementById('inputMessage').value;
+            const photos = document.getElementById('inputPhotos').value;
 
-            if (cardId) {
-                loadCardFromGoogleCloud(cardId);
+            if(!name || !msg) {
+                alert("Nama dan Pesan wajib diisi!");
                 return;
             }
 
-            renderGalleryEditorList();
-            renderDecorEditorList();
-            triggerPreview();
-            document.getElementById('main-container').classList.remove('hidden');
-        };
-
-        function setupReceiverMode() {
-            isReceiverView = true;
-            document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
-            document.getElementById('receiver-opening-title').innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
-            const bottomNav = document.getElementById('bottom-nav-bar');
-            if (bottomNav) bottomNav.style.display = 'none';
-            document.getElementById('top-action-bar').style.display = 'none';
-            document.getElementById('opening-screen').classList.remove('hidden');
-            syncFormWithState(); 
-            triggerPreview();
-        }
-
-        function openEditorModal(tabName) {
-            lastActiveTab = tabName;
-            const modal = document.getElementById('editor-modal');
-            document.querySelectorAll('.editor-tab-pane').forEach(p => p.classList.add('hidden'));
-            document.getElementById('tab-content-' + tabName).classList.remove('hidden');
-            modal.classList.remove('hidden');
-            document.getElementById('btn-back-edit').classList.add('hidden');
-            document.getElementById('bottom-nav-bar').style.display = 'flex';
-        }
-
-        function closeEditorModal() { 
-            document.getElementById('editor-modal').classList.add('hidden'); 
-        }
-
-        function toggleFullPreview() {
-            document.getElementById('editor-modal').classList.add('hidden');
-            document.getElementById('bottom-nav-bar').style.display = 'none';
-            document.getElementById('btn-back-edit').classList.remove('hidden');
-        }
-
-        function backToEditor() {
-            document.getElementById('btn-back-edit').classList.add('hidden');
-            document.getElementById('bottom-nav-bar').style.display = 'flex';
-            openEditorModal(lastActiveTab);
-        }
-
-        function getShareableLink() {
-            if (!cardState.id) cardState.id = 'card_' + Date.now();
-            return window.location.href.split('?')[0] + '?id=' + cardState.id;
-        }
-
-        async function shareWhatsApp() {
-            const success = await saveCardToGoogleCloud(false);
-            if (success) {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('🎉 Ada undangan spesial untukmu:\n\n' + getShareableLink())}`, '_blank');
-            }
-        }
-
-        async function copyLink() {
-            const success = await saveCardToGoogleCloud(false);
-            if (success) {
-                navigator.clipboard.writeText(getShareableLink());
-                alert('Link Standar Berhasil Disalin! 📋 (Contoh: ...?id=...)');
-            }
-        }
-
-        function syncFormWithState() {
-            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-            setVal('input-nama', cardState.nama); setVal('input-judul', cardState.judul);
-            setVal('input-ucapan', cardState.ucapan); setVal('input-runningtext', cardState.runningText);
-            setVal('input-openingtitle', cardState.openingTitle); setVal('input-openingbtn', cardState.openingButtonText);
-            setVal('input-textcolor', cardState.textColor); setVal('input-fontfamily', cardState.fontFamily);
-            setVal('input-fontsize', cardState.fontSize); setVal('input-bgstyle', cardState.bgStyle);
-            setVal('input-bgeffect', cardState.bgEffect); setVal('input-framestyle', cardState.frameStyle);
-            setVal('input-greetingframe', cardState.greetingFrameStyle); setVal('input-typespeed', cardState.typewriterSpeed || 40);
-            setVal('input-musikurl', cardState.musikUrl);
-
-            const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
-            setChk('input-hidejudul', cardState.hideJudul); setChk('input-hidefoto', cardState.hideFoto);
-            setChk('input-hidenama', cardState.hideNama); setChk('input-hideucapan', cardState.hideUcapan);
-            setChk('input-hiderunningtext', cardState.hideRunningText);
-        }
-
-        function triggerPreview() {
-            try {
-                const getVal = (id, def) => { const el = document.getElementById(id); return el ? el.value : def; };
-                cardState.nama = getVal('input-nama', cardState.nama);
-                cardState.judul = getVal('input-judul', cardState.judul);
-                cardState.ucapan = getVal('input-ucapan', cardState.ucapan);
-                cardState.runningText = getVal('input-runningtext', cardState.runningText);
-                cardState.openingTitle = getVal('input-openingtitle', cardState.openingTitle);
-                cardState.openingButtonText = getVal('input-openingbtn', cardState.openingButtonText);
-                cardState.textColor = getVal('input-textcolor', cardState.textColor);
-                cardState.fontFamily = getVal('input-fontfamily', cardState.fontFamily);
-                cardState.fontSize = getVal('input-fontsize', cardState.fontSize);
-                cardState.bgStyle = getVal('input-bgstyle', cardState.bgStyle);
-                cardState.bgEffect = getVal('input-bgeffect', cardState.bgEffect);
-                cardState.frameStyle = getVal('input-framestyle', cardState.frameStyle);
-                cardState.greetingFrameStyle = getVal('input-greetingframe', cardState.greetingFrameStyle);
-                cardState.typewriterSpeed = parseInt(getVal('input-typespeed', 40));
-                cardState.musikUrl = getVal('input-musikurl', cardState.musikUrl);
-                
-                const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
-                cardState.hideJudul = getChk('input-hidejudul');
-                cardState.hideFoto = getChk('input-hidefoto');
-                cardState.hideNama = getChk('input-hidenama');
-                cardState.hideUcapan = getChk('input-hideucapan');
-                cardState.hideRunningText = getChk('input-hiderunningtext');
-
-                const speedEl = document.getElementById('speed-label');
-                if (speedEl) speedEl.innerText = cardState.typewriterSpeed + ' ms';
-                
-                updateLivePreview();
-            } catch (error) {}
-        }
-
-        function runTypewriterEffect(elementId, text, speed) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            if (el.dataset.timer) clearTimeout(parseInt(el.dataset.timer));
-            el.innerText = "";
-            let i = 0;
-            function typeChar() {
-                if (i < text.length) { el.innerText += text.charAt(i); i++; el.dataset.timer = setTimeout(typeChar, speed); }
-            }
-            typeChar();
-        }
-
-        function attachDragEvent(el, posObj) {
-            if (isReceiverView) return;
-            el.addEventListener('pointerdown', (e) => {
-                activeDragItem = posObj; el.setPointerCapture(e.pointerId); e.stopPropagation();
+            // Buat parameter URL yang di-encode
+            const params = new URLSearchParams({
+                to: name,
+                theme: theme,
+                msg: msg,
+                imgs: photos
             });
-            el.addEventListener('pointermove', (e) => {
-                if (activeDragItem !== posObj) return;
-                const rect = document.getElementById('card-bg-wrapper').getBoundingClientRect();
-                posObj.x = Math.max(5, Math.min(95, ((e.clientX - rect.left) / rect.width) * 100));
-                posObj.y = Math.max(5, Math.min(95, ((e.clientY - rect.top) / rect.height) * 100));
-                triggerPreview();
+
+            // Buat Link Final
+            const baseUrl = window.location.href.split('?')[0];
+            const finalUrl = baseUrl + '?' + params.toString();
+
+            // Tampilkan hasil
+            const resultBox = document.getElementById('resultLink');
+            const shareableUrl = document.getElementById('shareableUrl');
+            
+            resultBox.style.display = 'block';
+            shareableUrl.href = finalUrl;
+            shareableUrl.innerText = finalUrl;
+
+            // Copy ke Clipboard
+            navigator.clipboard.writeText(finalUrl).then(() => {
+                // Berhasil copy
             });
-            el.addEventListener('pointerup', (e) => { activeDragItem = null; });
-        }
-
-        function updateLivePreview() {
-            const bgWrapper = document.getElementById('card-bg-wrapper');
-            let animClass = "";
-            if (cardState.bgEffect === 'slomo') animClass = " bg-anim-slomo";
-            else if (cardState.bgEffect === 'right') animClass = " bg-anim-right";
-            else if (cardState.bgEffect === 'up') animClass = " bg-anim-up";
-
-            if (cardState.bgCustomImage) {
-                bgWrapper.style.backgroundImage = `url('${cardState.bgCustomImage}')`;
-                bgWrapper.className = "w-full h-full relative p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
-            } else {
-                bgWrapper.style.backgroundImage = "";
-                if (cardState.bgStyle === 'gradient-rose') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
-                else if (cardState.bgStyle === 'gradient-dark') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
-                else if (cardState.bgStyle === 'solid-black') bgWrapper.className = "w-full h-full relative bg-black p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
-                else if (cardState.bgStyle === 'gradient-purple') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
-            }
-
-            let judulSize = "text-2xl md:text-4xl";
-            let namaSize = "text-xl md:text-3xl";
-            let ucapanSize = "text-xs md:text-sm";
-            if (cardState.fontSize === 'large') { judulSize = "text-3xl md:text-5xl"; namaSize = "text-2xl md:text-4xl"; ucapanSize = "text-sm md:text-base"; }
-            else if (cardState.fontSize === 'xlarge') { judulSize = "text-4xl md:text-6xl"; namaSize = "text-3xl md:text-5xl"; ucapanSize = "text-base md:text-lg"; }
-
-            const canvas = document.getElementById('free-canvas');
-            if (!canvas) return;
-            canvas.innerHTML = '';
-
-            if (!cardState.hideJudul) {
-                let h2 = document.createElement('h2');
-                h2.id = 'display-judul';
-                h2.className = `draggable-element absolute font-bold text-center whitespace-nowrap ${judulSize} typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
-                h2.style.left = (cardState.posJudul?.x || 50) + '%'; h2.style.top = (cardState.posJudul?.y || 25) + '%'; h2.style.transform = 'translate(-50%, -50%)';
-                h2.style.color = cardState.textColor || '#f8fafc'; h2.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
-                runTypewriterEffect('display-judul', cardState.judul || '', cardState.typewriterSpeed || 40);
-                attachDragEvent(h2, cardState.posJudul); canvas.appendChild(h2);
-            }
-
-            if (!cardState.hideFoto && (cardState.fotoUrl || (cardState.galleryPhotos && cardState.galleryPhotos.length > 0))) {
-                let wrap = document.createElement('div');
-                wrap.className = 'draggable-element absolute flex flex-col items-center gap-2' + (!isReceiverView ? ' is-editable' : '');
-                wrap.style.left = (cardState.posFoto?.x || 50) + '%'; wrap.style.top = (cardState.posFoto?.y || 42) + '%'; wrap.style.transform = 'translate(-50%, -50%)';
-                
-                if (cardState.fotoUrl && cardState.frameStyle !== 'none') {
-                    let mainImg = document.createElement('img');
-                    mainImg.src = cardState.fotoUrl;
-                    mainImg.className = `w-28 h-28 md:w-36 md:h-36 object-cover border-4 border-rose-500/40 shadow-xl animate-beat pointer-events-none ${cardState.frameStyle || 'rounded-full'}`;
-                    wrap.appendChild(mainImg);
-                }
-
-                if (cardState.galleryPhotos && cardState.galleryPhotos.length > 0) {
-                    let galWrap = document.createElement('div');
-                    galWrap.className = 'flex gap-1.5 max-w-[280px] overflow-x-auto p-1.5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 custom-scrollbar';
-                    cardState.galleryPhotos.forEach(url => {
-                        let img = document.createElement('img');
-                        img.src = url;
-                        img.className = 'w-10 h-10 md:w-12 md:h-12 object-cover rounded-xl border border-white/20 shrink-0 pointer-events-none shadow-md';
-                        galWrap.appendChild(img);
-                    });
-                    wrap.appendChild(galWrap);
-                }
-                attachDragEvent(wrap, cardState.posFoto); canvas.appendChild(wrap);
-            }
-
-            if (!cardState.hideNama) {
-                let p = document.createElement('p');
-                p.id = 'display-nama';
-                p.className = `draggable-element absolute font-semibold text-center whitespace-nowrap ${namaSize} drop-shadow typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
-                p.style.left = (cardState.posNama?.x || 50) + '%'; p.style.top = (cardState.posNama?.y || 60) + '%'; p.style.transform = 'translate(-50%, -50%)';
-                p.style.color = cardState.textColor || '#f8fafc'; p.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
-                runTypewriterEffect('display-nama', cardState.nama || '', cardState.typewriterSpeed || 40);
-                attachDragEvent(p, cardState.posNama); canvas.appendChild(p);
-            }
-
-            if (!cardState.hideUcapan) {
-                let box = document.createElement('div');
-                box.style.left = (cardState.posUcapan?.x || 50) + '%'; box.style.top = (cardState.posUcapan?.y || 76) + '%'; box.style.transform = 'translate(-50%, -50%)';
-                
-                let boxClass = "draggable-element absolute p-4 rounded-3xl shadow-2xl transition-all duration-300 max-w-sm w-[90%] ";
-                if (!isReceiverView) boxClass += "is-editable ";
-                if (cardState.greetingFrameStyle === 'glass-blur') boxClass += "bg-black/25 backdrop-blur-md border border-white/25 text-slate-100";
-                else if (cardState.greetingFrameStyle === 'solid-dark') boxClass += "bg-slate-950/90 border border-slate-800 text-slate-100";
-                else if (cardState.greetingFrameStyle === 'neon-glow') boxClass += "bg-slate-950/80 border-2 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.4)] text-slate-100";
-                else boxClass += "bg-transparent border-none shadow-none";
-                box.className = boxClass;
-
-                let ucapanP = document.createElement('p');
-                ucapanP.id = 'display-ucapan';
-                ucapanP.style.color = cardState.textColor || '#f8fafc'; ucapanP.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
-                ucapanP.className = "italic leading-relaxed typewriter-cursor text-center " + ucapanSize;
-                runTypewriterEffect('display-ucapan', cardState.ucapan || '', cardState.typewriterSpeed || 40);
-                box.appendChild(ucapanP);
-                attachDragEvent(box, cardState.posUcapan); canvas.appendChild(box);
-            }
-
-            if (!cardState.hideRunningText && cardState.runningText) {
-                let marqueeWrap = document.createElement('div');
-                marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]' + (!isReceiverView ? ' is-editable' : '');
-                marqueeWrap.style.left = (cardState.posRunningText?.x || 50) + '%'; marqueeWrap.style.top = (cardState.posRunningText?.y || 93) + '%'; marqueeWrap.style.transform = 'translate(-50%, -50%)';
-                
-                let span = document.createElement('span');
-                span.style.color = cardState.textColor || '#f8fafc'; span.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
-                span.className = 'marquee-text text-xs font-semibold px-4 pointer-events-none';
-                span.innerText = cardState.runningText;
-                marqueeWrap.appendChild(span);
-                attachDragEvent(marqueeWrap, cardState.posRunningText);
-                canvas.appendChild(marqueeWrap);
-            }
-
-            if (cardState.decorations && Array.isArray(cardState.decorations)) {
-                cardState.decorations.forEach(item => {
-                    let el = document.createElement('div');
-                    el.className = `draggable-element absolute font-bold ${item.size || 'text-lg'} p-2` + (!isReceiverView ? ' is-editable' : '');
-                    el.style.left = (item.x || 50) + '%'; el.style.top = (item.y || 50) + '%'; el.style.transform = 'translate(-50%, -50%)';
-                    el.style.color = item.color || '#ffffff'; el.style.fontFamily = item.font || "'Poppins', sans-serif";
-                    el.innerText = item.text || '';
-                    attachDragEvent(el, item);
-                    canvas.appendChild(el);
-                });
-            }
-
-            const openingTitleEl = document.getElementById('receiver-opening-title');
-            if (openingTitleEl) openingTitleEl.innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
-            const openingBtn = document.getElementById('receiver-opening-btn');
-            if (openingBtn) openingBtn.innerText = cardState.openingButtonText || 'BUKA KARTU';
-            const recipientEl = document.getElementById('receiver-recipient-name');
-            if (recipientEl) recipientEl.innerText = cardState.nama || 'Seseorang';
-        }
-
-        function openReceiverCard() {
-            document.getElementById('opening-screen').style.display = 'none';
-            document.getElementById('main-container').classList.remove('hidden');
-            if (cardState.musikUrl) { const audio = document.getElementById('bgm'); audio.src = cardState.musikUrl; audio.play().catch(()=>{}); }
-            if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
-            updateLivePreview();
         }
     </script>
 </body>
