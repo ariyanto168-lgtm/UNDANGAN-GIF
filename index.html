@@ -22,7 +22,6 @@
         button, a, select, input, textarea { -webkit-tap-highlight-color: transparent; }
         .interactive-scale:active { transform: scale(0.97); transition: transform 0.1s ease; }
 
-        /* Animasi Background */
         @keyframes bgSlomo { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         @keyframes bgPanRight { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         @keyframes bgPanUp { 0% { background-position: 50% 100%; } 100% { background-position: 50% 0%; } }
@@ -30,7 +29,6 @@
         .bg-anim-right { animation: bgPanRight 15s linear infinite; background-size: 200% 200%; }
         .bg-anim-up { animation: bgPanUp 15s linear infinite; background-size: 200% 200%; }
 
-        /* Running Text */
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         .marquee-container { overflow: hidden; white-space: nowrap; width: 100%; }
         .marquee-text { display: inline-block; animation: marquee 12s linear infinite; }
@@ -92,20 +90,19 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="location.reload()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Beranda</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.44 (GAS)</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.46 (GAS)</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
             </div>
 
-            <!-- Free Canvas Container -->
             <div id="free-canvas" class="absolute inset-0 pointer-events-auto z-20 overflow-hidden"></div>
         </div>
 
         <!-- MODAL EDITOR LENGKAP -->
         <div id="editor-modal" class="fixed inset-x-0 bottom-16 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800 p-6 rounded-t-3xl max-h-[60vh] overflow-y-auto custom-scrollbar shadow-2xl hidden fade-in">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu</h3>
+                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu (v1.1.46)</h3>
                 <button onclick="closeEditorModal()" class="text-slate-400 hover:text-slate-200 text-lg px-2 py-0.5 rounded-lg cursor-pointer">✕</button>
             </div>
 
@@ -289,7 +286,7 @@
             </div>
 
             <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
-                <button onclick="saveCardToGoogleCloud()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-xl text-sm shadow-lg interactive-scale cursor-pointer">💾 Simpan ke Google Cloud & Dapatkan Link</button>
+                <button onclick="saveCardToGoogleCloud(true)" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-xl text-sm shadow-lg interactive-scale cursor-pointer">💾 Simpan ke Google Cloud</button>
             </div>
         </div>
 
@@ -467,7 +464,7 @@
             renderDecorEditorList();
         }
 
-        async function saveCardToGoogleCloud() {
+        async function saveCardToGoogleCloud(showAlert = false) {
             triggerPreview();
             if (!cardState.id) cardState.id = 'card_' + Date.now();
 
@@ -484,11 +481,13 @@
                 });
 
                 loadingEl.classList.add('hidden');
-                alert('🎉 Berhasil Disimpan ke Google Database! Link siap dibagikan.');
+                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.46)!');
                 closeEditorModal();
+                return true;
             } catch (err) {
                 loadingEl.classList.add('hidden');
                 alert('Gagal menyimpan ke Google Cloud. Periksa koneksi internet Anda.');
+                return false;
             }
         }
 
@@ -555,19 +554,19 @@
             return window.location.href.split('?')[0] + '?id=' + cardState.id;
         }
 
-        function shareWhatsApp() {
-            saveCardToGoogleCloud();
-            setTimeout(() => {
+        async function shareWhatsApp() {
+            const success = await saveCardToGoogleCloud(false);
+            if (success) {
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('🎉 Ada undangan spesial untukmu:\n\n' + getShareableLink())}`, '_blank');
-            }, 1000);
+            }
         }
 
-        function copyLink() {
-            saveCardToGoogleCloud();
-            setTimeout(() => {
+        async function copyLink() {
+            const success = await saveCardToGoogleCloud(false);
+            if (success) {
                 navigator.clipboard.writeText(getShareableLink());
                 alert('Link Standar Berhasil Disalin! 📋 (Contoh: ...?id=...)');
-            }, 1000);
+            }
         }
 
         function syncFormWithState() {
@@ -668,7 +667,6 @@
             const canvas = document.getElementById('free-canvas');
             canvas.innerHTML = '';
 
-            // 1. Judul
             if (!cardState.hideJudul) {
                 let h2 = document.createElement('h2');
                 h2.id = 'display-judul';
@@ -679,7 +677,6 @@
                 attachDragEvent(h2, cardState.posJudul); canvas.appendChild(h2);
             }
 
-            // 2. Foto & Galeri
             if (!cardState.hideFoto && (cardState.fotoUrl || (cardState.galleryPhotos && cardState.galleryPhotos.length > 0))) {
                 let wrap = document.createElement('div');
                 wrap.className = 'draggable-element absolute flex flex-col items-center gap-2' + (!isReceiverView ? ' is-editable' : '');
@@ -706,7 +703,6 @@
                 attachDragEvent(wrap, cardState.posFoto); canvas.appendChild(wrap);
             }
 
-            // 3. Nama
             if (!cardState.hideNama) {
                 let p = document.createElement('p');
                 p.id = 'display-nama';
@@ -717,10 +713,8 @@
                 attachDragEvent(p, cardState.posNama); canvas.appendChild(p);
             }
 
-            // 4. Ucapan
             if (!cardState.hideUcapan) {
                 let box = document.createElement('div');
-                box.id = 'greeting-box-container';
                 box.style.left = cardState.posUcapan.x + '%'; box.style.top = cardState.posUcapan.y + '%'; box.style.transform = 'translate(-50%, -50%)';
                 
                 let boxClass = "draggable-element absolute p-4 rounded-3xl shadow-2xl transition-all duration-300 max-w-sm w-[90%] ";
@@ -740,7 +734,6 @@
                 attachDragEvent(box, cardState.posUcapan); canvas.appendChild(box);
             }
 
-            // 5. Running Text
             if (!cardState.hideRunningText && cardState.runningText) {
                 let marqueeWrap = document.createElement('div');
                 marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]' + (!isReceiverView ? ' is-editable' : '');
@@ -755,7 +748,6 @@
                 canvas.appendChild(marqueeWrap);
             }
 
-            // 6. Stiker Dekorasi
             if (cardState.decorations) {
                 cardState.decorations.forEach(item => {
                     let el = document.createElement('div');
