@@ -87,7 +87,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.16</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.17</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -121,13 +121,13 @@
     <div id="main-container" class="fixed inset-0 bg-slate-950 z-30 flex flex-col hidden fade-in">
         
         <!-- Fullscreen Preview Area (Layar Penuh 100%) -->
-        <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 p-6 md:p-12 flex flex-col justify-between bg-cover bg-center overflow-y-auto custom-scrollbar pb-28">
+        <div id="card-bg-wrapper" class="w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between bg-cover bg-center overflow-y-auto custom-scrollbar pb-28">
             
             <!-- Top Bar Navigasi & Aksi Bagikan -->
             <div id="top-action-bar" class="flex justify-between items-center z-20 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.16</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.17</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -384,7 +384,7 @@
             { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
         ];
 
-        // Auto-Compress Gambar via HTML5 Canvas (Max width 500px, Quality 0.65)
+        // Auto-Compress Gambar via HTML5 Canvas (Max width 400px, Quality 0.5)
         function compressAndConvertImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -393,7 +393,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxWidth = 500;
+                    const maxWidth = 400;
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
                         width = maxWidth;
@@ -402,7 +402,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
                     callback(compressedDataUrl);
                 };
                 img.src = e.target.result;
@@ -426,14 +426,58 @@
             });
         }
 
+        // Minifikasi Kunci Data agar Link Sangat Singkat & Ringkas
         function encodeCardToShortLink(obj) {
-            const jsonStr = JSON.stringify(obj);
+            const compactObj = {
+                n: obj.nama,
+                j: obj.judul,
+                u: obj.ucapan,
+                f: obj.fotoUrl,
+                g: obj.gifUrl,
+                m: obj.musikUrl,
+                tc: obj.textColor,
+                ff: obj.fontFamily,
+                fs: obj.fontSize,
+                bs: obj.bgStyle,
+                bi: obj.bgImgUrl,
+                fr: obj.frameStyle,
+                ts: obj.typewriterSpeed,
+                td: obj.textDecoration,
+                ot: obj.openingTitle,
+                ob: obj.openingButtonText,
+                gf: obj.greetingFrameStyle,
+                hn: obj.hideNama ? 1 : 0,
+                dec: obj.decorations ? obj.decorations.map(d => ({t: d.text, x: d.x, y: d.y, s: d.size, c: d.color, fn: d.font})) : []
+            };
+            const jsonStr = JSON.stringify(compactObj);
             return LZString.compressToEncodedURIComponent(jsonStr);
         }
 
         function decodeShortLinkToCard(compressedStr) {
             const jsonStr = LZString.decompressFromEncodedURIComponent(compressedStr);
-            return JSON.parse(jsonStr);
+            const c = JSON.parse(jsonStr);
+            return {
+                id: 'card_' + Date.now(),
+                nama: c.n,
+                judul: c.j,
+                ucapan: c.u,
+                fotoUrl: c.f,
+                gifUrl: c.g,
+                musikUrl: c.m,
+                textColor: c.tc,
+                fontFamily: c.ff,
+                fontSize: c.fs,
+                bgStyle: c.bs,
+                bgImgUrl: c.bi,
+                frameStyle: c.fr,
+                typewriterSpeed: c.ts,
+                textDecoration: c.td,
+                openingTitle: c.ot,
+                openingButtonText: c.ob,
+                greetingFrameStyle: c.gf,
+                hideNama: c.hn === 1,
+                decorations: c.dec ? c.dec.map(d => ({id: 'dec_' + Math.random(), text: d.t, x: d.x, y: d.y, size: d.s, color: d.c, font: d.fn})) : []
+            };
         }
 
         window.onload = function() {
@@ -759,7 +803,7 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.16)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.17)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
         }
@@ -777,7 +821,7 @@
 
         function copyLink() {
             navigator.clipboard.writeText(getShareableLink());
-            alert('Link Ringkas Berhasil Disalin! 📋 (Siap dikirim ke WhatsApp)');
+            alert('Link Sangat Ringkas Berhasil Disalin! 📋 (Siap dikirim ke WhatsApp)');
         }
 
         function applyTextDecorationStyle(element, decoStyle) {
@@ -870,7 +914,6 @@
 
             document.getElementById('speed-label').innerText = cardState.typewriterSpeed + ' ms';
 
-            // Mengatur Background Full Screen
             const bgWrapper = document.getElementById('card-bg-wrapper');
             const customBgBox = document.getElementById('custom-bg-url-box');
             if (cardState.bgStyle === 'custom-image') {
