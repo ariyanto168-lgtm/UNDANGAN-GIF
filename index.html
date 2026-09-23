@@ -49,7 +49,6 @@
             50% { opacity: 0; }
         }
 
-        /* Kustomisasi Scrollbar Dinamis & Smooth */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -75,36 +74,26 @@
         <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
             <div class="text-5xl mb-4">⚠️</div>
             <h1 id="error-title" class="text-2xl font-bold mb-2 text-rose-400">Kartu Tidak Ditemukan</h1>
-            <p id="error-desc" class="text-slate-400 text-sm mb-6">Maaf, link undangan atau kartu yang Anda akses tidak terdaftar di database.</p>
-            <a href="<?= webAppUrl ?>" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl text-sm transition">
+            <p id="error-desc" class="text-slate-400 text-sm mb-6">Maaf, link undangan atau kartu yang Anda akses tidak terdaftar.</p>
+            <a href="index.html" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl text-sm transition">
                 Buat Kartu Baru
             </a>
         </div>
     </div>
 
-    <!-- AUTHENTICATION SCREEN -->
+    <!-- AUTHENTICATION SCREEN (LOCAL STORAGE MODE) -->
     <div id="auth-screen" class="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 text-center backdrop-blur-md hidden">
         <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl fade-in text-left">
             <div class="text-center mb-6">
                 <div class="text-4xl mb-2">🔐</div>
-                <h2 class="text-xl font-bold text-rose-400">Keamanan Editor</h2>
-                <p class="text-xs text-slate-400">Masukkan Email & PIN atau Verifikasi OTP untuk masuk.</p>
+                <h2 class="text-xl font-bold text-rose-400">Masuk Aplikasi</h2>
+                <p class="text-xs text-slate-400">Masukkan Email Anda untuk mulai membuat kartu.</p>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">📧 Email Asli</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">📧 Email Anda</label>
                     <input type="email" id="auth-email" placeholder="contoh@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔑 PIN 6 Digit (Default: 123456)</label>
-                    <input type="password" id="auth-pin" maxlength="6" placeholder="******" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500 tracking-widest">
-                </div>
-
-                <div id="otp-group" class="hidden">
-                    <label class="block text-xs font-medium text-slate-400 mb-1">📩 Kode OTP dari Email</label>
-                    <input type="text" id="auth-otp" maxlength="6" placeholder="Masukkan 6 digit OTP" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500 tracking-widest">
                 </div>
 
                 <div id="auth-status" class="text-xs text-center text-rose-400 font-medium h-5"></div>
@@ -112,11 +101,6 @@
                 <button onclick="submitLogin()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg cursor-pointer interactive-scale">
                     Masuk Dashboard
                 </button>
-
-                <div class="flex justify-between items-center text-xs pt-2">
-                    <button onclick="requestEmailOtp()" class="text-rose-400 hover:underline cursor-pointer">Minta Kode OTP Email</button>
-                    <button onclick="openForgotPinModal()" class="text-slate-400 hover:underline cursor-pointer">Lupa PIN?</button>
-                </div>
             </div>
         </div>
     </div>
@@ -127,19 +111,17 @@
             <div>
                 <div class="flex items-center gap-2 flex-wrap">
                     <h2 class="text-xl font-bold text-rose-400 flex items-center gap-2">📋 Dashboard Kartu Saya</h2>
-                    <span id="app-version-badge" class="text-[10px] bg-slate-800 text-rose-400 px-2 py-0.5 rounded-full border border-slate-700 font-mono">v1.1.7</span>
-                    <span class="text-[10px] bg-slate-800/80 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700/80 font-sans">Master Lock Active</span>
+                    <span class="text-[10px] bg-slate-800 text-rose-400 px-2 py-0.5 rounded-full border border-slate-700 font-mono">v1.1.7-GitHub</span>
                 </div>
                 <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
             </div>
             <div class="flex gap-2">
-                <button onclick="openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-700 text-slate-300 font-medium transition cursor-pointer interactive-scale">⚙️ Akun</button>
                 <button onclick="logoutSession()" class="bg-rose-950/60 hover:bg-rose-900 text-xs px-3 py-2 rounded-xl border border-rose-800 text-rose-300 font-medium transition cursor-pointer interactive-scale">🚪 Keluar</button>
             </div>
         </div>
 
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-sm font-semibold text-slate-200">Daftar Kartu Tersimpan di Database</h3>
+            <h3 class="text-sm font-semibold text-slate-200">Daftar Kartu Tersimpan</h3>
             <button onclick="createNewCard()" class="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs px-4 py-2.5 rounded-xl font-semibold shadow-lg transition cursor-pointer interactive-scale">
                 ✨ Buat Kartu Baru
             </button>
@@ -162,127 +144,323 @@
         </div>
     </div>
 
-    <!-- MAIN CONTAINER (EDITOR DENGAN SCROLL DINAMIS) -->
+    <!-- MAIN CONTAINER (EDITOR) -->
     <div id="main-container" class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden hidden fade-in my-6 max-h-[92vh] flex flex-col">
-        
-        <!-- Preview Area -->
         <div id="card-bg-wrapper" class="relative bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 p-6 md:p-8 border-b border-slate-800 bg-cover bg-center overflow-y-auto max-h-[45vh] custom-scrollbar">
-            
             <div class="flex justify-between items-center mb-6">
                 <div id="editor-top-buttons" class="flex gap-2 flex-wrap">
-                    <button onclick="backToDashboard()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition flex items-center gap-1.5 cursor-pointer text-slate-300 font-medium interactive-scale">
-                        🏠 Menu Utama
-                    </button>
-                    <button onclick="openMediaManager()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition flex items-center gap-1.5 cursor-pointer text-rose-300 font-medium interactive-scale">
-                        📁 Media Manager
-                    </button>
-                    <button onclick="loadDummyLocalPreview()" class="bg-amber-600/40 hover:bg-amber-600/60 text-amber-300 border border-amber-500/50 text-xs px-3 py-1.5 rounded-full transition font-semibold cursor-pointer interactive-scale" title="Coba Dummy & Preview Lokal Seketika">
-                        ⚡ Dummy & Preview
-                    </button>
+                    <button onclick="backToDashboard()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition flex items-center gap-1.5 cursor-pointer text-slate-300 font-medium interactive-scale">🏠 Menu Utama</button>
                 </div>
             </div>
 
             <div id="card-preview-box" class="text-center py-6 animate-float">
-                <div id="gif-container" class="my-2 flex justify-center hidden">
-                    <img id="display-gif" class="w-24 h-24 object-contain rounded-xl shadow-md" alt="GIF Dekorasi" loading="lazy">
-                </div>
-
                 <h2 id="display-judul" class="font-bold mb-4 text-white drop-shadow-md typewriter-cursor">Happy Birthday</h2>
-                
                 <div id="foto-preview-container" class="my-4 flex justify-center">
-                    <img id="display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-44 md:h-44 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat transition-all duration-300" alt="Foto Kartu" loading="lazy">
+                    <img id="display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-44 md:h-44 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat transition-all duration-300" alt="Foto Kartu">
                 </div>
-
-                <div id="video-container" class="my-4 flex justify-center hidden">
-                    <video id="display-video" class="w-full max-h-48 rounded-2xl border border-slate-700 shadow-lg" controls playsinline preload="metadata" onerror="handleVideoError(this)"></video>
-                </div>
-
                 <p id="display-nama" class="font-semibold text-rose-300 mb-3 drop-shadow">Audylia Salsabilla</p>
-                
-                <div id="greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-5 rounded-2xl mt-4 shadow-xl transition-all duration-300">
+                <div id="greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-5 rounded-2xl mt-4 shadow-xl">
                     <p id="display-ucapan" class="text-slate-100 italic leading-relaxed typewriter-cursor">"Selamat ulang tahun, moga selalu beruntung."</p>
                 </div>
             </div>
         </div>
 
-        <!-- FORM EDITOR SECTION (SCROLLABLE & DINAMIS) -->
+        <!-- FORM EDITOR SECTION -->
         <div id="editor-section" class="p-6 md:p-8 space-y-4 bg-slate-900 overflow-y-auto max-h-[50vh] custom-scrollbar flex-1">
-            <h3 class="text-lg font-semibold text-slate-200 border-b border-slate-800 pb-2 flex items-center justify-between">
-                <span class="flex items-center gap-2">✏️ Editor Kartu & Modular Frame</span>
-            </h3>
+            <h3 class="text-lg font-semibold text-slate-200 border-b border-slate-800 pb-2">✏️ Editor Kartu & Tampilan</h3>
 
-            <!-- PENGATURAN TEKS PEMBUKA (OPENING SCREEN EDITABLE) -->
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <label class="block text-xs font-bold text-rose-400">🎁 Teks Layar Pembuka (Opening Screen)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Judul Pembuka</label>
-                        <input type="text" id="input-openingtitle" value="ADA UCAPAN UNTUKMU" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Teks Tombol Buka</label>
-                        <input type="text" id="input-openingbtn" value="BUKA KARTU" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                    </div>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Nama Penerima / Target</label>
+                <input type="text" id="input-nama" value="Audylia Salsabilla" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 focus:outline-none focus:border-rose-500 text-sm">
             </div>
 
-            <!-- MODULAR FRAME & REMOVE/HIDE OPTIONS -->
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <label class="block text-xs font-bold text-rose-400">🖼️ Pilihan Bingkai & Hapus/Sembunyikan Manual</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto (Photo Frame)</label>
-                        <select id="input-framestyle" onchange="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                            <option value="rounded-full">Lingkaran Sempurna (Circle)</option>
-                            <option value="rounded-2xl">Kotak Sudut Melengkung</option>
-                            <option value="rounded-[50%_20%_50%_20%]">Oval Unik / Telur</option>
-                            <option value="rounded-[40px_10px_40px_10px]">Geometris Modern</option>
-                            <option value="rounded-none border-8 border-white shadow-2xl">Bingkai Kotak Klasik</option>
-                            <option value="rounded-3xl border-4 border-rose-400 shadow-lg">Bingkai Rose Border</option>
-                            <option value="none">🚫 Tanpa Bingkai / Sembunyikan Foto</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Kotak Ucapan (Greeting Box)</label>
-                        <select id="input-greetingframe" onchange="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                            <option value="glass-blur">Glassmorphism Blur Transparan</option>
-                            <option value="solid-dark">Solid Dark Minimalis</option>
-                            <option value="neon-glow">Neon Glow Border (Bercahaya)</option>
-                            <option value="gradient-border">Gradient Border Mewah</option>
-                            <option value="polaroid-box">Paper / Polaroid Style Box</option>
-                            <option value="none">🚫 Tanpa Kotak / Sembunyikan Kotak Ucapan</option>
-                        </select>
-                    </div>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Judul Kartu</label>
+                <input type="text" id="input-judul" value="Happy Birthday" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 focus:outline-none focus:border-rose-500 text-sm">
             </div>
 
-            <!-- GEN Z DYNAMIC DECORATIONS PANEL -->
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <label class="block text-xs font-bold text-rose-400">✨ Editor Dekorasi Dinamis & Gen Z</label>
-                    <select id="input-layout-mode" onchange="toggleLayoutMode()" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-lg focus:outline-none">
-                        <option value="single">Mode 1 — Single Screen</option>
-                        <option value="scroll">Mode 2 — Scroll (Multi-Section)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <button onclick="applyGenZPreset('genz-birthday')" class="bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🎂 Gen Z Birthday</button>
-                        <button onclick="applyGenZPreset('cute-genz')" class="bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🧸 Cute Gen Z</button>
-                        <button onclick="applyGenZPreset('neon-party')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🔥 Neon Party</button>
-                        <button onclick="applyGenZPreset('pastel-love')" class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">💖 Pastel Love</button>
-                    </div>
-                </div>
-
-                <div class="space-y-3 pt-2 border-t border-slate-800/80">
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-medium text-slate-300">✏️ Teks Dekorasi Dinamis</label>
-                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1 rounded-lg font-semibold interactive-scale">+ Tambah Teks</button>
-                    </div>
-                    <div id="dynamic-decor-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar"></div>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Ucapan</label>
+                <textarea id="input-ucapan" rows="2" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 focus:outline-none focus:border-rose-500 text-sm">"Selamat ulang tahun, moga selalu beruntung."</textarea>
             </div>
 
-            <!-- PRESET T
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Foto (URL Gambar)</label>
+                <input type="text" id="input-fotourl" placeholder="https://example.com/foto.jpg" oninput="updateFotoFromInput()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Musik (URL MP3 opsional)</label>
+                <input type="text" id="input-musikurl" placeholder="https://example.com/audio.mp3" oninput="updateMusikFromInput()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div id="upload-status" class="text-xs text-center text-rose-400 font-medium h-5"></div>
+
+            <div class="pt-2 space-y-2">
+                <div class="flex gap-2">
+                    <button onclick="previewCard()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-3 rounded-xl text-xs transition cursor-pointer interactive-scale">👁️ Preview</button>
+                    <button onclick="saveCardData()" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs transition shadow-lg cursor-pointer interactive-scale">💾 Simpan Kartu</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="shareWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-2 rounded-xl text-xs transition flex items-center justify-center gap-1">💬 WhatsApp</button>
+                    <button onclick="copyLink()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-2 rounded-xl text-xs transition flex items-center justify-center gap-1">📋 Salin Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW CONTAINER -->
+    <div id="preview-container" class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden hidden fade-in my-6">
+        <div id="prev-card-bg-wrapper" class="relative bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 p-6 md:p-8 border-b border-slate-800 bg-cover bg-center">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="backToEditor()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-4 py-2 rounded-full font-semibold transition cursor-pointer">← Kembali ke Editor</button>
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold bg-rose-950/60 px-3 py-1 rounded-full border border-rose-800/50">✨ Mode Preview</span>
+            </div>
+            <div class="text-center py-6">
+                <h2 id="prev-display-judul" class="font-bold mb-4 text-white typewriter-cursor">Happy Birthday</h2>
+                <div id="prev-foto-container" class="my-4 flex justify-center">
+                    <img id="prev-display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-44 md:h-44 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat" alt="Foto">
+                </div>
+                <p id="prev-display-nama" class="font-semibold text-rose-300 mb-3">Audylia Salsabilla</p>
+                <div id="prev-greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-5 rounded-2xl mt-4 shadow-xl">
+                    <p id="prev-display-ucapan" class="text-slate-100 italic leading-relaxed typewriter-cursor">"Selamat ulang tahun, moga selalu beruntung."</p>
+                </div>
+            </div>
+        </div>
+        <div class="p-4 bg-slate-950 text-center">
+            <button onclick="backToEditor()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 rounded-xl text-sm transition">← Kembali ke Editor</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FRONTEND MANDIRI (LOCAL STORAGE & URL HASH/PARAMS) -->
+    <script>
+        let cardState = {
+            id: "",
+            nama: "Audylia Salsabilla",
+            judul: "Happy Birthday",
+            ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+            fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+            musikUrl: "",
+            openingTitle: "ADA UCAPAN UNTUKMU",
+            openingButtonText: "BUKA KARTU"
+        };
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const cardId = urlParams.get('id');
+
+            // Jika ada parameter ID di URL, cari data kartu di LocalStorage browser
+            if (cardId) {
+                const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+                const found = allCards.find(c => c.id === cardId);
+                if (found) {
+                    cardState = found;
+                    document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
+                    document.getElementById('opening-screen').classList.remove('hidden');
+                    applyCardStateToUI();
+                } else {
+                    showErrorScreen("Kartu Tidak Ditemukan", "Link kartu yang Anda akses tidak ditemukan di perangkat ini.");
+                }
+                return;
+            }
+
+            // Mode Editor / Dashboard
+            const activeEmail = localStorage.getItem('auth_email');
+            if (!activeEmail) {
+                document.getElementById('auth-screen').classList.remove('hidden');
+            } else {
+                openDashboardMenu();
+            }
+        };
+
+        function submitLogin() {
+            const email = document.getElementById('auth-email').value.trim();
+            const statusEl = document.getElementById('auth-status');
+            if (!email || !email.includes('@')) {
+                statusEl.innerText = 'Masukkan email yang valid!';
+                return;
+            }
+            localStorage.setItem('auth_email', email);
+            document.getElementById('auth-screen').classList.add('hidden');
+            openDashboardMenu();
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('auth_email');
+            location.reload();
+        }
+
+        function openDashboardMenu() {
+            const email = localStorage.getItem('auth_email') || 'User';
+            document.getElementById('dashboard-user-email').innerText = 'Akun: ' + email;
+            document.getElementById('main-container').classList.add('hidden');
+            document.getElementById('preview-container').classList.add('hidden');
+            document.getElementById('dashboard-menu-screen').classList.remove('hidden');
+
+            const container = document.getElementById('user-cards-list');
+            const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            
+            if (allCards.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-500 text-xs py-8">Belum ada kartu tersimpan. Silakan buat baru!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            allCards.forEach(card => {
+                let itemDiv = document.createElement('div');
+                itemDiv.className = 'bg-slate-950 border border-slate-800 rounded-2xl p-4 flex justify-between items-center gap-3';
+                itemDiv.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-slate-200 text-sm">${card.judul || 'Tanpa Judul'}</h4>
+                        <p class="text-xs text-rose-300">Penerima: ${card.nama || '-'}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editCard('${card.id}')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-xl cursor-pointer">✏️ Edit</button>
+                        <button onclick="deleteCard('${card.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs px-3 py-1.5 rounded-xl cursor-pointer">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function editCard(cardId) {
+            const allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            const found = allCards.find(c => c.id === cardId);
+            if (found) {
+                cardState = found;
+                applyCardStateToUI();
+                document.getElementById('dashboard-menu-screen').classList.add('hidden');
+                document.getElementById('main-container').classList.remove('hidden');
+            }
+        }
+
+        function deleteCard(cardId) {
+            if (!confirm('Hapus kartu ini?')) return;
+            let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            allCards = allCards.filter(c => c.id !== cardId);
+            localStorage.setItem('my_digital_cards', JSON.stringify(allCards));
+            openDashboardMenu();
+        }
+
+        function createNewCard() {
+            cardState = {
+                id: 'card_' + Date.now(),
+                nama: "Audylia Salsabilla",
+                judul: "Happy Birthday",
+                ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
+                fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+                musikUrl: ""
+            };
+            applyCardStateToUI();
+            document.getElementById('dashboard-menu-screen').classList.add('hidden');
+            document.getElementById('main-container').classList.remove('hidden');
+        }
+
+        function backToDashboard() { openDashboardMenu(); }
+
+        function saveCardData() {
+            if (!cardState.id) {
+                cardState.id = 'card_' + Date.now();
+            }
+            let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
+            const index = allCards.findIndex(c => c.id === cardState.id);
+            if (index >= 0) {
+                allCards[index] = cardState;
+            } else {
+                allCards.push(cardState);
+            }
+            localStorage.setItem('my_digital_cards', JSON.stringify(allCards));
+            
+            const statusEl = document.getElementById('upload-status');
+            statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉';
+            setTimeout(() => { statusEl.innerText = ''; }, 3000);
+        }
+
+        function applyCardStateToUI() {
+            document.getElementById('input-nama').value = cardState.nama || '';
+            document.getElementById('input-judul').value = cardState.judul || '';
+            document.getElementById('input-ucapan').value = cardState.ucapan || '';
+            document.getElementById('input-fotourl').value = cardState.fotoUrl || '';
+            document.getElementById('input-musikurl').value = cardState.musikUrl || '';
+
+            document.getElementById('display-judul').innerText = cardState.judul || '';
+            document.getElementById('display-nama').innerText = cardState.nama || '';
+            document.getElementById('display-ucapan').innerText = cardState.ucapan || '';
+            if (cardState.fotoUrl) {
+                document.getElementById('display-foto').src = cardState.fotoUrl;
+                document.getElementById('prev-display-foto').src = cardState.fotoUrl;
+            }
+        }
+
+        function updateLivePreview() {
+            cardState.nama = document.getElementById('input-nama').value;
+            cardState.judul = document.getElementById('input-judul').value;
+            cardState.ucapan = document.getElementById('input-ucapan').value;
+            
+            document.getElementById('display-judul').innerText = cardState.judul;
+            document.getElementById('display-nama').innerText = cardState.nama;
+            document.getElementById('display-ucapan').innerText = cardState.ucapan;
+            
+            document.getElementById('prev-display-judul').innerText = cardState.judul;
+            document.getElementById('prev-display-nama').innerText = cardState.nama;
+            document.getElementById('prev-display-ucapan').innerText = cardState.ucapan;
+        }
+
+        function updateFotoFromInput() {
+            const url = document.getElementById('input-fotourl').value.trim();
+            cardState.fotoUrl = url;
+            if (url) {
+                document.getElementById('display-foto').src = url;
+                document.getElementById('prev-display-foto').src = url;
+            }
+        }
+
+        function updateMusikFromInput() {
+            cardState.musikUrl = document.getElementById('input-musikurl').value.trim();
+        }
+
+        function openReceiverCard() {
+            document.getElementById('opening-screen').style.display = 'none';
+            document.getElementById('main-container').classList.remove('hidden');
+            if (cardState.musikUrl) {
+                const audio = document.getElementById('bgm');
+                audio.src = cardState.musikUrl;
+                audio.play().catch(() => {});
+            }
+            if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70 });
+        }
+
+        function previewCard() {
+            updateLivePreview();
+            document.getElementById('main-container').classList.add('hidden');
+            document.getElementById('preview-container').classList.remove('hidden');
+        }
+
+        function backToEditor() {
+            document.getElementById('preview-container').classList.add('hidden');
+            document.getElementById('main-container').classList.remove('hidden');
+        }
+
+        function getShareableLink() {
+            return window.location.href.split('?')[0] + '?id=' + cardState.id;
+        }
+
+        function shareWhatsApp() {
+            if (!cardState.id) { alert('Simpan kartu terlebih dahulu!'); return; }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('🎉 Ada undangan untukmu:\n' + getShareableLink())}`, '_blank');
+        }
+
+        function copyLink() {
+            if (!cardState.id) { alert('Simpan kartu terlebih dahulu!'); return; }
+            navigator.clipboard.writeText(getShareableLink());
+            alert('Link berhasil disalin!');
+        }
+
+        function showErrorScreen(title, desc) {
+            document.getElementById('error-title').innerText = title;
+            document.getElementById('error-desc').innerText = desc;
+            document.getElementById('error-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
