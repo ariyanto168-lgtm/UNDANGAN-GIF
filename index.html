@@ -3,81 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu Ucapan Digital</title>
+    <title>Kartu Ucapan Sinematik Digital</title>
     <style>
-        /* --- GLOBAL STYLES --- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f131f; color: white; overflow-x: hidden; }
+        body { background-color: #080b12; color: white; overflow-x: hidden; position: min-height: 100vh; }
         
-        /* --- VIEWER: LANDING PAGE (Mirip Screenshot) --- */
-        #landingPage {
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #0f131f;
+        /* --- EFEK SINEMATIK VIGNETTE & GLOW --- */
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8); pointer-events: none; z-index: 999;
         }
-        .card-container {
-            background-color: #1c2235; border-radius: 20px; padding: 40px 20px; width: 90%; max-width: 400px;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .gift-icon { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; }
-        .title-text { color: #ff6b81; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
-        .recipient-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 30px; }
-        .btn-buka {
-            background: linear-gradient(90deg, #ff0055, #ff0088); color: white; border: none;
-            padding: 15px 30px; border-radius: 30px; font-size: 1rem; font-weight: bold; width: 100%;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); transition: transform 0.2s;
-        }
+
+        #loadingPage { display: none; text-align: center; padding-top: 40vh; font-size: 1.2rem; color: #ffb8c6; letter-spacing: 2px; }
+
+        /* --- VIEWER: LANDING PAGE --- */
+        #landingPage { display: none; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle, #1a2238 0%, #080b12 100%); }
+        .card-container { background: rgba(28, 34, 53, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,107,129,0.3); border-radius: 20px; padding: 40px 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.6); animation: cinematicFadeIn 1.5s ease; }
+        .gift-icon { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; filter: drop-shadow(0 0 10px rgba(255,107,129,0.5)); }
+        .title-text { color: #ffb8c6; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .recipient-name { font-size: 1.6rem; font-weight: 600; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .btn-buka { background: linear-gradient(135deg, #ff0055, #ff5e7e); color: white; border: none; padding: 15px 30px; border-radius: 30px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 5px 20px rgba(255, 0, 85, 0.4); letter-spacing: 1px; }
         .btn-buka:active { transform: scale(0.95); }
 
-        /* --- VIEWER: OPENED CARD (Galeri & Ucapan) --- */
-        #openedCard {
-            display: none; min-height: 100vh; padding: 20px; background-color: #0f131f; text-align: center;
-        }
-        .greeting-box {
-            background: rgba(28, 34, 53, 0.8); padding: 20px; border-radius: 15px; margin-bottom: 20px;
-            border: 1px solid #ff6b81; backdrop-filter: blur(5px); z-index: 10; position: relative;
-        }
-        .greeting-title { color: #ff6b81; font-size: 1.8rem; margin-bottom: 10px; }
+        /* --- VIEWER: OPENED CARD (Sinematik & Galeri Slowmo) --- */
+        #openedCard { display: none; min-height: 100vh; padding: 20px; background-color: #080b12; text-align: center; position: relative; animation: cinematicFadeIn 1.2s ease; }
+        .greeting-box { background: rgba(20, 25, 40, 0.85); backdrop-filter: blur(12px); padding: 25px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,107,129,0.4); z-index: 10; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .greeting-title { color: #ffb8c6; font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,184,198,0.3); }
+        .greeting-subtitle { color: #fff; font-size: 1.1rem; margin-bottom: 12px; font-weight: 600; }
+        .greeting-msg { color: #d0d5dd; font-size: 0.95rem; line-height: 1.5; }
+
+        /* Galeri Foto Slowmo Naik-Turun dengan Efek Cinematic Frame */
+        .gallery-container { display: flex; gap: 12px; height: 50vh; overflow: hidden; position: relative; width: 100%; max-width: 500px; margin: 0 auto; mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); }
+        .gallery-col { display: flex; flex-direction: column; gap: 12px; width: 50%; }
+        .gallery-col img { width: 100%; height: 180px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(255,184,198,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: transform 0.3s; }
         
-        /* Galeri Foto Slowmo Naik Turun */
-        .gallery-container {
-            display: flex; gap: 10px; height: 60vh; overflow: hidden; position: relative;
-            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        }
-        .gallery-col { display: flex; flex-direction: column; gap: 10px; width: 50%; }
-        .gallery-col img { width: 100%; border-radius: 10px; object-fit: cover; border: 2px solid #333; }
-        
-        .scroll-up { animation: scrollUp 20s linear infinite; }
-        .scroll-down { animation: scrollDown 20s linear infinite; }
+        .scroll-up { animation: scrollUp 28s linear infinite; }
+        .scroll-down { animation: scrollDown 28s linear infinite; }
 
         /* --- EDITOR STYLES --- */
-        #editorPage {
-            display: none; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #1c2235; min-height: 100vh;
-        }
-        .editor-title { text-align: center; color: #ff6b81; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #aaa; }
-        input, select, textarea {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444;
-            background-color: #0f131f; color: white;
-        }
-        .btn-generate {
-            background-color: #4CAF50; color: white; border: none; padding: 15px; width: 100%;
-            border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        .result-box {
-            margin-top: 20px; padding: 15px; background-color: #0f131f; border-radius: 8px; display: none; word-break: break-all;
-        }
+        #editorPage { display: none; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #141928; min-height: 100vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .editor-title { text-align: center; color: #ffb8c6; margin-bottom: 20px; font-size: 1.4rem; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #cbd5e1; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background-color: #080b12; color: white; font-size: 0.95rem; }
+        
+        /* Area Upload Foto HP dengan Auto-Compress */
+        .upload-box { border: 2px dashed #475569; padding: 20px; text-align: center; border-radius: 8px; background: rgba(8,11,18,0.5); cursor: pointer; transition: border-color 0.2s; }
+        .upload-box:hover { border-color: #ff0055; }
+        #previewContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto; }
+        .preview-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #ffb8c6; }
+
+        .btn-generate { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; letter-spacing: 0.5px; }
+        .result-box { margin-top: 20px; padding: 15px; background-color: #080b12; border-radius: 8px; display: none; word-break: break-all; border: 1px dashed #22c55e; text-align: left; }
 
         /* --- ANIMATIONS --- */
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
         @keyframes scrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0); } }
+        @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
+    <div id="loadingPage">Mempersiapkan Pengalaman Sinematik... ✨</div>
+
+    <!-- 1. HALAMAN EDITOR -->
     <div id="editorPage">
-        <h2 class="editor-title">🛠️ Buat Kartu Ucapan</h2>
+        <h2 class="editor-title">🎬 Studio Pembuat Kartu Sinematik</h2>
         
         <div class="form-group">
             <label>Nama Penerima:</label>
@@ -85,7 +77,7 @@
         </div>
         
         <div class="form-group">
-            <label>Tema Acara:</label>
+            <label>Pilih Tema Acara:</label>
             <select id="inputTheme">
                 <option value="Ulang Tahun">Ulang Tahun 🎂</option>
                 <option value="Pernikahan">Pernikahan 💍</option>
@@ -94,38 +86,46 @@
         </div>
 
         <div class="form-group">
-            <label>Pesan/Ucapan:</label>
-            <textarea id="inputMessage" rows="4" placeholder="Tulis doa dan harapanmu di sini..."></textarea>
+            <label>Pesan / Doa Ucapan:</label>
+            <textarea id="inputMessage" rows="4" placeholder="Tuliskan pesan indahmu..."></textarea>
         </div>
 
+        <!-- UPLOAD FOTO LANGSUNG DARI HP DENGAN AUTO-COMPRESS -->
         <div class="form-group">
-            <label>Link Foto (Pisahkan dengan koma, maksimal 10):</label>
-            <textarea id="inputPhotos" rows="4" placeholder="https://linkfoto1.jpg, https://linkfoto2.jpg... (Gunakan link gambar dari imgur, fb, dll)"></textarea>
-            <small style="color: #888;">*Karena ini web statis, upload foto harus via link internet (URL).</small>
+            <label>Upload Foto Galeri (Bisa pilih banyak foto dari HP, maks 10):</label>
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                📁 Sentuh untuk Pilih Foto dari HP
+                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
+            </div>
+            <div id="previewContainer"></div>
+            <!-- Menyimpan string base64 terkompresi secara otomatis -->
+            <input type="hidden" id="inputPhotosBase64">
         </div>
 
-        <button class="btn-generate" onclick="generateLink()">Buat Link & Copy!</button>
+        <button class="btn-generate" id="btnGen" onclick="generateLink()">Buat Link & Salin Otomatis!</button>
 
         <div id="resultLink" class="result-box">
-            <p style="color: #4CAF50; margin-bottom: 10px;">✅ Link berhasil dibuat & disalin!</p>
-            <a id="shareableUrl" href="#" target="_blank" style="color: #66b3ff;">Klik di sini untuk melihat</a>
+            <p style="color: #22c55e; margin-bottom: 8px; font-weight: bold;">✅ Link Berhasil Dibuat & Disalin!</p>
+            <a id="shareableUrl" href="#" target="_blank" style="color: #66b3ff; font-size: 0.9rem;">Link</a>
         </div>
     </div>
 
+    <!-- 2. HALAMAN LANDING (Tampilan Awal) -->
     <div id="landingPage">
         <div class="card-container">
             <div class="gift-icon">🎁</div>
             <div class="title-text">ADA UCAPAN UNTUKMU</div>
             <div class="recipient-name" id="displayTargetName">Nama Penerima</div>
-            <button class="btn-buka" onclick="bukaKartu()">🎵 BUKA KARTU</button>
+            <button class="btn-buka" onclick="bukaKartu()">✨ BUKA KARTU</button>
         </div>
     </div>
 
+    <!-- 3. HALAMAN KARTU DIBUKA -->
     <div id="openedCard">
         <div class="greeting-box">
-            <h2 class="greeting-title" id="displayTheme">Selamat Ulang Tahun</h2>
-            <h3 style="margin-bottom: 10px;" id="displayName2">Nama</h3>
-            <p id="displayMessage">Pesan ucapan akan muncul di sini.</p>
+            <h2 class="greeting-title" id="displayTheme">Selamat</h2>
+            <div class="greeting-subtitle" id="displayName2">Untuk: Nama</div>
+            <p class="greeting-msg" id="displayMessage">Pesan...</p>
         </div>
 
         <div class="gallery-container">
@@ -135,54 +135,104 @@
     </div>
 
     <script>
-        // Fungsi membaca URL Parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlName = urlParams.get('to');
-        const urlTheme = urlParams.get('theme');
-        const urlMsg = urlParams.get('msg');
-        const urlPhotos = urlParams.get('imgs');
+        // MASUKKAN URL WEB APP GOOGLE SCRIPT ANDA DI SINI SETELAH SELESAI DEPLOY
+        const SCRIPT_URL = 'PASTE_URL_WEB_APP_DISINI_YANG_BERAKHIRAN_EXEC';
 
-        // Router: Tentukan apakah menampilkan Editor atau Viewer
-        if (urlName) {
-            // Mode Viewer (Ada Link)
-            document.getElementById('editorPage').style.display = 'none';
-            document.getElementById('landingPage').style.display = 'flex';
-            
-            // Isi data ke Viewer
-            document.getElementById('displayTargetName').innerText = urlName;
-            document.getElementById('displayName2').innerText = "Untuk: " + urlName;
-            document.getElementById('displayTheme').innerText = "Selamat " + urlTheme + "!";
-            document.getElementById('displayMessage').innerText = urlMsg;
+        let compressedPhotoArray = [];
 
-            // Load Gambar
-            loadGallery(urlPhotos);
-        } else {
-            // Mode Editor (Tidak ada Link)
-            document.getElementById('editorPage').style.display = 'block';
-            document.getElementById('landingPage').style.display = 'none';
+        // SISTEM AUTO-COMPRESS FOTO DARI HP
+        function handleFiles(files) {
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = '';
+            compressedPhotoArray = [];
+
+            const maxFiles = Math.min(files.length, 10);
+            for (let i = 0; i < maxFiles; i++) {
+                let file = files[i];
+                let reader = new FileReader();
+                
+                reader.onload = function (event) {
+                    let img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function () {
+                        // Canvas untuk kompresi ukuran resolusi (Maks lebar 800px agar ringan)
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+                        let maxWidth = 800;
+                        let scaleSize = maxWidth / img.width;
+                        
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scaleSize;
+
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Kompres kualitas ke 0.7 (70%) format JPEG agar ukuran file sangat kecil
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        compressedPhotoArray.push(compressedDataUrl);
+
+                        // Tampilkan thumbnail preview di HP
+                        let thumb = document.createElement('img');
+                        thumb.src = compressedDataUrl;
+                        thumb.className = 'preview-thumb';
+                        previewContainer.appendChild(thumb);
+
+                        // Simpan gabungan string ke input tersembunyi
+                        document.getElementById('inputPhotosBase64').value = compressedPhotoArray.join('|||');
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
-        // Fungsi Buka Kartu (Animasi Transisi)
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardId = urlParams.get('id');
+
+        if (cardId) {
+            document.getElementById('loadingPage').style.display = 'block';
+
+            fetch(`${SCRIPT_URL}?action=read&id=${cardId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingPage').style.display = 'none';
+                    document.getElementById('landingPage').style.display = 'flex';
+                    
+                    document.getElementById('displayTargetName').innerText = data.nama;
+                    document.getElementById('displayName2').innerText = "Untuk: " + data.nama;
+                    document.getElementById('displayTheme').innerText = "Selamat " + data.tema + "!";
+                    document.getElementById('displayMessage').innerText = data.pesan;
+
+                    loadGallery(data.foto);
+                })
+                .catch(err => {
+                    alert("Gagal memuat kartu! Pastikan ID link benar.");
+                    document.getElementById('loadingPage').style.display = 'none';
+                    document.getElementById('editorPage').style.display = 'block';
+                });
+        } else {
+            document.getElementById('editorPage').style.display = 'block';
+        }
+
         function bukaKartu() {
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
-            // Disini bisa ditambahkan script untuk play musik otomatis jika punya file mp3
         }
 
-        // Fungsi Load Galeri Foto Slowmo
         function loadGallery(photoString) {
             if(!photoString) return;
-            const photos = photoString.split(',');
+            // Memisahkan foto berdasarkan pemisah khusus '|||' atau koma (jika pakai link luar)
+            const separator = photoString.includes('|||') ? '|||' : ',';
+            const photos = photoString.split(separator).map(item => item.trim()).filter(item => item.length > 0);
+            
             const colLeft = document.getElementById('colLeft');
             const colRight = document.getElementById('colRight');
             
-            // Duplikasi array agar animasi infinite scroll terlihat mulus
             let displayPhotos = [...photos, ...photos]; 
 
             displayPhotos.forEach((url, index) => {
                 let img = document.createElement('img');
-                img.src = url.trim();
-                img.onerror = function() { this.src = 'https://via.placeholder.com/150?text=Foto+Error'; };
+                img.src = url;
+                img.onerror = function() { this.style.display = 'none'; };
                 
                 if (index % 2 === 0) {
                     colLeft.appendChild(img);
@@ -192,42 +242,47 @@
             });
         }
 
-        // Fungsi Generate Link (Editor Mode)
-        function generateLink() {
-            const name = document.getElementById('inputName').value;
+        async function generateLink() {
+            const name = document.getElementById('inputName').value.trim();
             const theme = document.getElementById('inputTheme').value;
-            const msg = document.getElementById('inputMessage').value;
-            const photos = document.getElementById('inputPhotos').value;
+            const msg = document.getElementById('inputMessage').value.trim();
+            const photos = document.getElementById('inputPhotosBase64').value.trim();
 
-            if(!name || !msg) {
-                alert("Nama dan Pesan wajib diisi!");
-                return;
+            if(!name || !msg) { 
+                alert("Nama Penerima dan Pesan wajib diisi!"); 
+                return; 
             }
 
-            // Buat parameter URL yang di-encode
-            const params = new URLSearchParams({
-                to: name,
-                theme: theme,
-                msg: msg,
-                imgs: photos
-            });
+            const btn = document.getElementById('btnGen');
+            btn.innerText = "Mengompres & Menyimpan Data... ⏳";
+            btn.disabled = true;
 
-            // Buat Link Final
-            const baseUrl = window.location.href.split('?')[0];
-            const finalUrl = baseUrl + '?' + params.toString();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ nama: name, tema: theme, pesan: msg, foto: photos })
+                });
+                const data = await response.json();
 
-            // Tampilkan hasil
-            const resultBox = document.getElementById('resultLink');
-            const shareableUrl = document.getElementById('shareableUrl');
-            
-            resultBox.style.display = 'block';
-            shareableUrl.href = finalUrl;
-            shareableUrl.innerText = finalUrl;
+                const baseUrl = window.location.href.split('?')[0];
+                const finalUrl = baseUrl + '?id=' + data.id;
 
-            // Copy ke Clipboard
-            navigator.clipboard.writeText(finalUrl).then(() => {
-                // Berhasil copy
-            });
+                const resultBox = document.getElementById('resultLink');
+                const shareableUrl = document.getElementById('shareableUrl');
+                
+                resultBox.style.display = 'block';
+                shareableUrl.href = finalUrl;
+                shareableUrl.innerText = finalUrl;
+
+                navigator.clipboard.writeText(finalUrl);
+                btn.innerText = "Buat Link & Salin Otomatis!";
+                btn.disabled = false;
+            } catch (error) {
+                alert("Gagal menyimpan data! Periksa kembali SCRIPT_URL Google Apps Script Anda.");
+                btn.innerText = "Coba Lagi";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
