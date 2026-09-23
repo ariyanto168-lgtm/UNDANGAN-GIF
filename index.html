@@ -34,15 +34,17 @@
             animation: cinematicFadeIn 1.2s ease; overflow: hidden; 
         }
         
+        /* CONTAINER FOTO FULL SCREEN 100% */
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
-            display: flex; gap: 8px; overflow: hidden; z-index: 1; 
-            opacity: 0.65; /* FOTO LEBIH TERANG & SEIMBANG */
+            overflow: hidden; z-index: 1; opacity: 0.65; display: flex; flex-direction: column;
         }
-        #openedCard .gallery-col { display: flex; flex-direction: column; gap: 8px; width: 50%; height: 100%; }
-        #openedCard .gallery-col img { width: 100%; height: 220px; object-fit: cover; border-radius: 0; border: none; }
+        
+        /* Gambar membentang penuh (cover) kiri ke kanan */
+        #openedCard .gallery-container img { 
+            width: 100vw; height: 100vh; object-fit: cover; object-position: center; border: none; display: block;
+        }
 
-        /* Gradasi Lebih Soft agar foto cerah namun teks tetap terbaca */
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, rgba(8,11,18,0.2) 0%, rgba(8,11,18,0.85) 100%);
@@ -80,15 +82,20 @@
         .eq-4 { background: #eab308; height: 22px; animation-delay: 0.2s; }
         @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
 
-        /* EFEK ANIMASI PILIHAN */
-        .effect-scroll-up { animation: scrollUp 28s linear infinite; }
-        .effect-scroll-down { animation: scrollDown 28s linear infinite; }
-        .effect-slide-side { animation: slideFromSide 15s ease-in-out infinite alternate; }
-        .effect-center-fixed { transform: scale(1.05); transition: transform 0.5s ease; }
+        /* EFEK ANIMASI PILIHAN (Disesuaikan untuk foto Full Screen) */
+        .effect-scroll-up { animation: scrollUpFull 40s linear infinite; }
+        .effect-slide-side { animation: slideSideFull 20s ease-in-out infinite alternate; width: 120vw !important; }
+        .effect-center-fixed img { transform: scale(1.05); transition: transform 0.5s ease; }
+        .effect-zoom-slow { animation: zoomSlow 25s ease-in-out infinite alternate; }
         .effect-balloons { animation: floatBalloons 4s ease-in-out infinite alternate; }
 
-        @keyframes slideFromSide { 0% { transform: translateX(-15px); } 100% { transform: translateX(15px); } }
+        /* Keyframes untuk foto full screen */
+        @keyframes scrollUpFull { 0% { transform: translateY(0); } 100% { transform: translateY(-100vh); } }
+        @keyframes slideSideFull { 0% { transform: translateX(0); } 100% { transform: translateX(-20vw); } }
+        @keyframes zoomSlow { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         @keyframes floatBalloons { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-12px) rotate(1deg); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         /* EDITOR STYLES */
         #editorPage { display: none; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #141928; min-height: 85vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; z-index: 10; }
@@ -125,15 +132,11 @@
         .nav-item span { font-size: 16px; }
         .nav-item:hover, .nav-item.active { color: #ffb8c6; transform: translateY(-2px); }
 
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        @keyframes scrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0); } }
-        @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v5.3 Cinematic</div>
+    <div class="version-badge" id="versionBadge">v5.4 Cinematic</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -170,7 +173,6 @@
             </div>
         </div>
         
-        <!-- KOLOM INPUT MUSIK BARU -->
         <div class="form-group">
             <label>🎵 BGM Musik (URL MP3) - Opsional:</label>
             <input type="text" id="inputMusic" placeholder="Contoh: https://link-ke-lagu.mp3">
@@ -211,6 +213,12 @@
     </div>
 
     <div id="openedCard">
+        <!-- BACKGROUND FOTO FULL SCREEN -->
+        <div class="gallery-container effect-scroll-up" id="mainGalleryContainer">
+            <!-- Foto akan di-inject ke sini oleh JS -->
+        </div>
+
+        <!-- TEKS UCAPAN DI TENGAH -->
         <div class="greeting-box" id="mainGreetingBox">
             <h2 class="greeting-title" id="displayTheme">Selamat</h2>
             <div class="greeting-subtitle" id="displayName2">Untuk: Nama</div>
@@ -231,11 +239,6 @@
               <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
             </svg>
         </a>
-
-        <div class="gallery-container" id="mainGalleryContainer">
-            <div class="gallery-col effect-scroll-up" id="colLeft"></div>
-            <div class="gallery-col effect-scroll-down" id="colRight"></div>
-        </div>
     </div>
 
     <!-- MODAL PILIHAN EFEK ANIMASI -->
@@ -244,10 +247,11 @@
         <div class="modal-full-content">
             <h3 style="color: #ffb8c6; margin-bottom: 15px;">✨ Pilih Efek & Transisi</h3>
             <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">Ubah gaya gerakan latar belakang kartu sinematikmu:</p>
-            <button class="effect-option-btn" onclick="applyEffect('scroll-up')">🎞️ Gulir Sinematik Naik (Default)</button>
-            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser dari Samping (Smooth)</button>
-            <button class="effect-option-btn" onclick="applyEffect('center-fixed')">🎯 Tengah Layar Elegan (Fixed)</button>
-            <button class="effect-option-btn" onclick="applyEffect('balloons')">🎈 Efek Balon Melayang Ceria</button>
+            <button class="effect-option-btn" onclick="applyEffect('scroll-up')">🎞️ Gulir Sinematik Naik</button>
+            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser dari Samping Kiri-Kanan</button>
+            <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Pelan (Elegan)</button>
+            <button class="effect-option-btn" onclick="applyEffect('center-fixed')">🎯 Diam di Tengah Layar</button>
+            <button class="effect-option-btn" onclick="applyEffect('balloons')">🎈 Teks Melayang (Balon)</button>
         </div>
     </div>
 
@@ -284,7 +288,7 @@
         let generatedCardUrl = "";
         let currentRecipientName = "";
         let currentTheme = "";
-        let currentMusicUrl = ""; // Simpan URL Musik Global
+        let currentMusicUrl = ""; 
 
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
@@ -307,14 +311,16 @@
                     img.onload = function () {
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
-                        let maxWidth = 250;
+                        // Lebarkan resolusi sedikit agar full-screen tidak terlalu pecah
+                        let maxWidth = 480; 
                         let scaleSize = maxWidth / img.width;
                         
                         canvas.width = maxWidth;
                         canvas.height = img.height * scaleSize;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3);
+                        // Kualitas kompresi diatur ke 0.5 agar lumayan jernih tapi tidak berat
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
                         compressedPhotoArray.push(compressedDataUrl);
 
                         let thumb = document.createElement('img');
@@ -334,7 +340,6 @@
         const cardId = urlParams.get('id');
 
         if (cardId) {
-            // SEMBUNYIKAN BADGE VERSI DAN NAVBAR DI HALAMAN PENERIMA
             document.getElementById('versionBadge').style.display = 'none';
             document.getElementById('editorNavBar').style.display = 'none';
 
@@ -356,14 +361,13 @@
                     if(data.fontsize) msgEl.style.fontSize = data.fontsize + 'px';
                     if(data.fontcolor) msgEl.style.color = data.fontcolor;
                     
-                    if(data.musik) currentMusicUrl = data.musik; // Set link musik jika ada
+                    if(data.musik) currentMusicUrl = data.musik;
 
-                    // Set URL tombol WhatsApp penerima
                     const currentUrl = window.location.href;
                     const recipientWaMsg = `Halo, aku baru saja melihat kartu ucapan ${data.tema} yang sangat indah ini! Kamu juga bisa membuat kartu ucapan digitalmu sendiri di sini:\n\n${currentUrl}`;
                     document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(recipientWaMsg)}`;
 
-                    loadGallery(data.foto);
+                    loadGalleryFullScreen(data.foto);
                 })
                 .catch(err => {
                     loadingEl.style.display = 'none';
@@ -379,46 +383,35 @@
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('openedCard').style.display = 'block';
 
-            // MAINKAN MUSIK JIKA ADA URL MUSIK
             if (currentMusicUrl && currentMusicUrl.trim() !== "") {
                 let audioPlayer = new Audio(currentMusicUrl);
                 audioPlayer.loop = true;
                 audioPlayer.play().catch(e => console.log("Audio autoplay diblokir browser"));
                 
-                // Tampilkan animasi equalizer
                 document.getElementById('musicEqualizer').style.display = 'flex';
             }
         }
 
-        function loadGallery(photoString) {
+        function loadGalleryFullScreen(photoString) {
             const galleryContainer = document.getElementById('mainGalleryContainer');
             
             if(!photoString || photoString.trim() === "" || photoString === "undefined") {
                 galleryContainer.style.display = 'none';
                 return;
             }
-            galleryContainer.style.display = 'flex';
+            galleryContainer.innerHTML = '';
 
             const separator = photoString.includes('|||') ? '|||' : ',';
             const photos = photoString.split(separator).map(item => item.trim()).filter(item => item.length > 0);
             
-            const colLeft = document.getElementById('colLeft');
-            const colRight = document.getElementById('colRight');
-            colLeft.innerHTML = '';
-            colRight.innerHTML = '';
+            // Masukkan gambar 2 kali agar saat di scroll ke atas tidak terputus di tengah jalan
+            let displayPhotos = [...photos, ...photos]; 
 
-            let displayPhotos = [...photos, ...photos, ...photos]; 
-
-            displayPhotos.forEach((url, index) => {
+            displayPhotos.forEach((url) => {
                 let img = document.createElement('img');
                 img.src = url.startsWith('data:image') ? url : 'data:image/jpeg;base64,' + url;
                 img.onerror = function() { this.style.display = 'none'; };
-                
-                if (index % 2 === 0) {
-                    colLeft.appendChild(img);
-                } else {
-                    colRight.appendChild(img);
-                }
+                galleryContainer.appendChild(img);
             });
         }
 
@@ -428,7 +421,7 @@
             const pesan = document.getElementById('inputMessage').value.trim();
             const fontsize = document.getElementById('inputFontSize').value;
             const fontcolor = document.getElementById('inputFontColor').value;
-            const musik = document.getElementById('inputMusic').value.trim(); // Ambil nilai musik
+            const musik = document.getElementById('inputMusic').value.trim();
             const foto = document.getElementById('inputPhotosBase64').value.trim();
 
             if(!nama || !pesan) { 
@@ -450,7 +443,6 @@
             btn.disabled = true;
 
             try {
-                // Kirm payload dengan tambahan "musik"
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
@@ -475,7 +467,7 @@
                 btn.innerText = "Buat Kartu";
                 btn.disabled = false;
             } catch (error) {
-                alert("Gagal menyimpan data! Pastikan kolom 'musik' sudah ditambahkan di baris 1 G1 Google Sheet Anda.");
+                alert("Gagal menyimpan data! Pastikan internet stabil.");
                 btn.innerText = "Coba Lagi";
                 btn.disabled = false;
             }
@@ -512,28 +504,32 @@
         }
 
         function applyEffect(effectType) {
-            const colLeft = document.getElementById('colLeft');
-            const colRight = document.getElementById('colRight');
+            const galleryContainer = document.getElementById('mainGalleryContainer');
             const greetingBox = document.getElementById('mainGreetingBox');
 
-            colLeft.className = "gallery-col";
-            colRight.className = "gallery-col";
+            // Reset classes
+            galleryContainer.className = "gallery-container";
+            greetingBox.classList.remove('effect-balloons');
             greetingBox.style.transform = "translate(-50%, -50%) scale(1)";
 
+            // Animasi pada background gambar
             if (effectType === 'scroll-up') {
-                colLeft.classList.add('effect-scroll-up');
-                colRight.classList.add('effect-scroll-down');
+                galleryContainer.classList.add('effect-scroll-up');
             } else if (effectType === 'slide-side') {
-                colLeft.classList.add('effect-slide-side');
-                colRight.classList.add('effect-slide-side');
+                galleryContainer.classList.add('effect-slide-side');
+            } else if (effectType === 'zoom-slow') {
+                galleryContainer.classList.add('effect-zoom-slow');
             } else if (effectType === 'center-fixed') {
-                greetingBox.style.transform = "translate(-50%, -50%) scale(1.1)";
-            } else if (effectType === 'balloons') {
+                galleryContainer.classList.add('effect-center-fixed');
+            } 
+            
+            // Animasi Khusus Teks
+            if (effectType === 'balloons') {
                 greetingBox.classList.add('effect-balloons');
             }
 
             closeEffectModal();
-            alert("Efek berhasil diterapkan!");
+            alert("Efek animasi berhasil diterapkan!");
         }
 
         function navAction(action) {
@@ -553,7 +549,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.3\nFitur: Hidden Nav/Badge on Recipient, Equalizer Music, WhatsApp Circle Icon, Bright Photo Balance.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.4\nFitur: Immersive Full-Screen Photo Width, New Animation Styles, Music Equalizer.\n\nPowered by Ari GPM");
             }
         }
     </script>
