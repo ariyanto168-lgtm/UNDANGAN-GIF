@@ -90,7 +90,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="location.reload()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Beranda</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.46 (GAS)</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.48 (GAS)</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -102,7 +102,7 @@
         <!-- MODAL EDITOR LENGKAP -->
         <div id="editor-modal" class="fixed inset-x-0 bottom-16 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800 p-6 rounded-t-3xl max-h-[60vh] overflow-y-auto custom-scrollbar shadow-2xl hidden fade-in">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu (v1.1.46)</h3>
+                <h3 id="modal-title-text" class="text-base font-semibold text-rose-400">✏️ Editor Menu Lengkap (v1.1.48)</h3>
                 <button onclick="closeEditorModal()" class="text-slate-400 hover:text-slate-200 text-lg px-2 py-0.5 rounded-lg cursor-pointer">✕</button>
             </div>
 
@@ -143,11 +143,11 @@
                 </div>
             </div>
 
-            <!-- TAB 2: DESAIN & BINGKAI -->
+            <!-- TAB 2: DESAIN & BACKGROUND -->
             <div id="tab-content-design" class="space-y-4 editor-tab-pane hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">🌌 Latar Belakang (Background)</label>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">🌌 Tema Latar Belakang</label>
                         <select id="input-bgstyle" onchange="triggerPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs">
                             <option value="gradient-rose">Rose Dark Gradient (Default)</option>
                             <option value="gradient-dark">Midnight Slate Gradient</option>
@@ -164,6 +164,12 @@
                             <option value="up">⬆️ Gerak ke Atas</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-2">
+                    <label class="block text-xs font-medium text-sky-400 font-semibold">🖼️ Unggah Foto Background Kustom (Opsional)</label>
+                    <input type="file" accept="image/*" onchange="handleBgFileSelect(event)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white cursor-pointer">
+                    <button onclick="removeBgCustomImage()" class="text-[10px] text-rose-400 hover:underline">Hapus Foto Background Kustom</button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -313,6 +319,7 @@
             runningText: "✨ Selamat Datang di Undangan Spesial Kami ✨",
             fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
             galleryPhotos: [],
+            bgCustomImage: "",
             musikUrl: "",
             textColor: "#f8fafc",
             fontFamily: "'Poppins', sans-serif",
@@ -374,6 +381,22 @@
             });
         }
 
+        function handleBgFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressImage(file, false, function(base64) {
+                cardState.bgCustomImage = base64;
+                triggerPreview();
+                alert('Foto background kustom berhasil dipasang! 🌌');
+            });
+        }
+
+        function removeBgCustomImage() {
+            cardState.bgCustomImage = "";
+            triggerPreview();
+            alert('Foto background kustom dihapus.');
+        }
+
         async function handleGalleryFilesSelect(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -402,6 +425,7 @@
             const container = document.getElementById('gallery-editor-list');
             if (!container) return;
             container.innerHTML = '';
+            if (!cardState.galleryPhotos) cardState.galleryPhotos = [];
             cardState.galleryPhotos.forEach((url, idx) => {
                 let div = document.createElement('div');
                 div.className = 'relative group w-14 h-14 rounded-xl border border-slate-700 overflow-hidden';
@@ -481,7 +505,7 @@
                 });
 
                 loadingEl.classList.add('hidden');
-                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.46)!');
+                if (showAlert) alert('🎉 Berhasil Disimpan ke Google Database (v1.1.48)!');
                 closeEditorModal();
                 return true;
             } catch (err) {
@@ -501,8 +525,39 @@
                 const data = await res.json();
                 loadingEl.classList.add('hidden');
 
-                if (data && data.id) {
-                    cardState = data;
+                if (data && (data.id || data.nama)) {
+                    cardState = {
+                        id: data.id || cardId,
+                        nama: data.nama || "Audylia Salsabilla",
+                        judul: data.judul || "Happy Birthday",
+                        ucapan: data.ucapan || '"Selamat ulang tahun..."',
+                        runningText: data.runningText || "✨ Selamat Datang ✨",
+                        fotoUrl: data.fotoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=70",
+                        galleryPhotos: data.galleryPhotos || [],
+                        bgCustomImage: data.bgCustomImage || "",
+                        musikUrl: data.musikUrl || "",
+                        textColor: data.textColor || "#f8fafc",
+                        fontFamily: data.fontFamily || "'Poppins', sans-serif",
+                        fontSize: data.fontSize || "normal",
+                        bgStyle: data.bgStyle || "gradient-rose",
+                        bgEffect: data.bgEffect || "none",
+                        frameStyle: data.frameStyle || "rounded-full",
+                        greetingFrameStyle: data.greetingFrameStyle || "glass-blur",
+                        typewriterSpeed: data.typewriterSpeed || 40,
+                        openingTitle: data.openingTitle || "ADA UCAPAN UNTUKMU",
+                        openingButtonText: data.openingButtonText || "BUKA KARTU",
+                        hideJudul: !!data.hideJudul,
+                        hideFoto: !!data.hideFoto,
+                        hideNama: !!data.hideNama,
+                        hideUcapan: !!data.hideUcapan,
+                        hideRunningText: !!data.hideRunningText,
+                        posJudul: data.posJudul || { x: 50, y: 25 },
+                        posFoto: data.posFoto || { x: 50, y: 42 },
+                        posNama: data.posNama || { x: 50, y: 60 },
+                        posUcapan: data.posUcapan || { x: 50, y: 76 },
+                        posRunningText: data.posRunningText || { x: 50, y: 93 },
+                        decorations: data.decorations || []
+                    };
                     setupReceiverMode();
                 } else {
                     document.getElementById('error-screen').classList.remove('hidden');
@@ -653,10 +708,17 @@
             else if (cardState.bgEffect === 'right') animClass = " bg-anim-right";
             else if (cardState.bgEffect === 'up') animClass = " bg-anim-up";
 
-            if (cardState.bgStyle === 'gradient-rose') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
-            else if (cardState.bgStyle === 'gradient-dark') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
-            else if (cardState.bgStyle === 'solid-black') bgWrapper.className = "w-full h-full relative bg-black p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
-            else if (cardState.bgStyle === 'gradient-purple') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
+            // Jika ada foto background kustom, gunakan itu sebagai background-image
+            if (cardState.bgCustomImage) {
+                bgWrapper.style.backgroundImage = `url('${cardState.bgCustomImage}')`;
+                bgWrapper.className = "w-full h-full relative p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
+            } else {
+                bgWrapper.style.backgroundImage = "";
+                if (cardState.bgStyle === 'gradient-rose') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
+                else if (cardState.bgStyle === 'gradient-dark') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
+                else if (cardState.bgStyle === 'solid-black') bgWrapper.className = "w-full h-full relative bg-black p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
+                else if (cardState.bgStyle === 'gradient-purple') bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-4 md:p-8 flex flex-col justify-between bg-cover bg-center overflow-hidden pb-24" + animClass;
+            }
 
             let judulSize = "text-2xl md:text-4xl";
             let namaSize = "text-xl md:text-3xl";
@@ -665,27 +727,28 @@
             else if (cardState.fontSize === 'xlarge') { judulSize = "text-4xl md:text-6xl"; namaSize = "text-3xl md:text-5xl"; ucapanSize = "text-base md:text-lg"; }
 
             const canvas = document.getElementById('free-canvas');
+            if (!canvas) return;
             canvas.innerHTML = '';
 
             if (!cardState.hideJudul) {
                 let h2 = document.createElement('h2');
                 h2.id = 'display-judul';
                 h2.className = `draggable-element absolute font-bold text-center whitespace-nowrap ${judulSize} typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
-                h2.style.left = cardState.posJudul.x + '%'; h2.style.top = cardState.posJudul.y + '%'; h2.style.transform = 'translate(-50%, -50%)';
-                h2.style.color = cardState.textColor; h2.style.fontFamily = cardState.fontFamily;
-                runTypewriterEffect('display-judul', cardState.judul, cardState.typewriterSpeed);
+                h2.style.left = (cardState.posJudul?.x || 50) + '%'; h2.style.top = (cardState.posJudul?.y || 25) + '%'; h2.style.transform = 'translate(-50%, -50%)';
+                h2.style.color = cardState.textColor || '#f8fafc'; h2.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
+                runTypewriterEffect('display-judul', cardState.judul || '', cardState.typewriterSpeed || 40);
                 attachDragEvent(h2, cardState.posJudul); canvas.appendChild(h2);
             }
 
             if (!cardState.hideFoto && (cardState.fotoUrl || (cardState.galleryPhotos && cardState.galleryPhotos.length > 0))) {
                 let wrap = document.createElement('div');
                 wrap.className = 'draggable-element absolute flex flex-col items-center gap-2' + (!isReceiverView ? ' is-editable' : '');
-                wrap.style.left = cardState.posFoto.x + '%'; wrap.style.top = cardState.posFoto.y + '%'; wrap.style.transform = 'translate(-50%, -50%)';
+                wrap.style.left = (cardState.posFoto?.x || 50) + '%'; wrap.style.top = (cardState.posFoto?.y || 42) + '%'; wrap.style.transform = 'translate(-50%, -50%)';
                 
                 if (cardState.fotoUrl && cardState.frameStyle !== 'none') {
                     let mainImg = document.createElement('img');
                     mainImg.src = cardState.fotoUrl;
-                    mainImg.className = `w-28 h-28 md:w-36 md:h-36 object-cover border-4 border-rose-500/40 shadow-xl animate-beat pointer-events-none ${cardState.frameStyle}`;
+                    mainImg.className = `w-28 h-28 md:w-36 md:h-36 object-cover border-4 border-rose-500/40 shadow-xl animate-beat pointer-events-none ${cardState.frameStyle || 'rounded-full'}`;
                     wrap.appendChild(mainImg);
                 }
 
@@ -707,15 +770,15 @@
                 let p = document.createElement('p');
                 p.id = 'display-nama';
                 p.className = `draggable-element absolute font-semibold text-center whitespace-nowrap ${namaSize} drop-shadow typewriter-cursor` + (!isReceiverView ? ' is-editable' : '');
-                p.style.left = cardState.posNama.x + '%'; p.style.top = cardState.posNama.y + '%'; p.style.transform = 'translate(-50%, -50%)';
-                p.style.color = cardState.textColor; p.style.fontFamily = cardState.fontFamily;
-                runTypewriterEffect('display-nama', cardState.nama, cardState.typewriterSpeed);
+                p.style.left = (cardState.posNama?.x || 50) + '%'; p.style.top = (cardState.posNama?.y || 60) + '%'; p.style.transform = 'translate(-50%, -50%)';
+                p.style.color = cardState.textColor || '#f8fafc'; p.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
+                runTypewriterEffect('display-nama', cardState.nama || '', cardState.typewriterSpeed || 40);
                 attachDragEvent(p, cardState.posNama); canvas.appendChild(p);
             }
 
             if (!cardState.hideUcapan) {
                 let box = document.createElement('div');
-                box.style.left = cardState.posUcapan.x + '%'; box.style.top = cardState.posUcapan.y + '%'; box.style.transform = 'translate(-50%, -50%)';
+                box.style.left = (cardState.posUcapan?.x || 50) + '%'; box.style.top = (cardState.posUcapan?.y || 76) + '%'; box.style.transform = 'translate(-50%, -50%)';
                 
                 let boxClass = "draggable-element absolute p-4 rounded-3xl shadow-2xl transition-all duration-300 max-w-sm w-[90%] ";
                 if (!isReceiverView) boxClass += "is-editable ";
@@ -727,9 +790,9 @@
 
                 let ucapanP = document.createElement('p');
                 ucapanP.id = 'display-ucapan';
-                ucapanP.style.color = cardState.textColor; ucapanP.style.fontFamily = cardState.fontFamily;
+                ucapanP.style.color = cardState.textColor || '#f8fafc'; ucapanP.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
                 ucapanP.className = "italic leading-relaxed typewriter-cursor text-center " + ucapanSize;
-                runTypewriterEffect('display-ucapan', cardState.ucapan, cardState.typewriterSpeed);
+                runTypewriterEffect('display-ucapan', cardState.ucapan || '', cardState.typewriterSpeed || 40);
                 box.appendChild(ucapanP);
                 attachDragEvent(box, cardState.posUcapan); canvas.appendChild(box);
             }
@@ -737,10 +800,10 @@
             if (!cardState.hideRunningText && cardState.runningText) {
                 let marqueeWrap = document.createElement('div');
                 marqueeWrap.className = 'draggable-element absolute marquee-container py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 max-w-sm w-[90%]' + (!isReceiverView ? ' is-editable' : '');
-                marqueeWrap.style.left = cardState.posRunningText.x + '%'; marqueeWrap.style.top = cardState.posRunningText.y + '%'; marqueeWrap.style.transform = 'translate(-50%, -50%)';
+                marqueeWrap.style.left = (cardState.posRunningText?.x || 50) + '%'; marqueeWrap.style.top = (cardState.posRunningText?.y || 93) + '%'; marqueeWrap.style.transform = 'translate(-50%, -50%)';
                 
                 let span = document.createElement('span');
-                span.style.color = cardState.textColor; span.style.fontFamily = cardState.fontFamily;
+                span.style.color = cardState.textColor || '#f8fafc'; span.style.fontFamily = cardState.fontFamily || "'Poppins', sans-serif";
                 span.className = 'marquee-text text-xs font-semibold px-4 pointer-events-none';
                 span.innerText = cardState.runningText;
                 marqueeWrap.appendChild(span);
@@ -748,22 +811,24 @@
                 canvas.appendChild(marqueeWrap);
             }
 
-            if (cardState.decorations) {
+            if (cardState.decorations && Array.isArray(cardState.decorations)) {
                 cardState.decorations.forEach(item => {
                     let el = document.createElement('div');
-                    el.className = `draggable-element absolute font-bold ${item.size} p-2` + (!isReceiverView ? ' is-editable' : '');
-                    el.style.left = item.x + '%'; el.style.top = item.y + '%'; el.style.transform = 'translate(-50%, -50%)';
-                    el.style.color = item.color; el.style.fontFamily = item.font;
-                    el.innerText = item.text;
+                    el.className = `draggable-element absolute font-bold ${item.size || 'text-lg'} p-2` + (!isReceiverView ? ' is-editable' : '');
+                    el.style.left = (item.x || 50) + '%'; el.style.top = (item.y || 50) + '%'; el.style.transform = 'translate(-50%, -50%)';
+                    el.style.color = item.color || '#ffffff'; el.style.fontFamily = item.font || "'Poppins', sans-serif";
+                    el.innerText = item.text || '';
                     attachDragEvent(el, item);
                     canvas.appendChild(el);
                 });
             }
 
-            document.getElementById('receiver-opening-title').innerText = cardState.openingTitle;
+            const openingTitleEl = document.getElementById('receiver-opening-title');
+            if (openingTitleEl) openingTitleEl.innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
             const openingBtn = document.getElementById('receiver-opening-btn');
-            if (openingBtn) openingBtn.innerText = cardState.openingButtonText;
-            document.getElementById('receiver-recipient-name').innerText = cardState.nama;
+            if (openingBtn) openingBtn.innerText = cardState.openingButtonText || 'BUKA KARTU';
+            const recipientEl = document.getElementById('receiver-recipient-name');
+            if (recipientEl) recipientEl.innerText = cardState.nama || 'Seseorang';
         }
 
         function openReceiverCard() {
