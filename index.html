@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Confetti JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- LZ-String untuk Kompresi Link Singkat -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Sacramento&family=Cinzel:wght@500;700&family=Alex+Brush&display=swap" rel="stylesheet">
     <style>
@@ -31,6 +33,8 @@
         .typewriter-cursor::after {
             content: '|';
             animation: blink 0.8s infinite;
+            margin-left: 2px;
+            color: #fb7185;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -83,7 +87,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.13</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.16</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -123,7 +127,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-20 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.13</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.16</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -137,16 +141,16 @@
                 <div id="gif-container" class="my-3 flex justify-center hidden">
                     <img id="display-gif" class="w-24 h-24 object-contain rounded-xl shadow-md" alt="GIF">
                 </div>
-                <h2 id="display-judul" class="font-bold mb-4 text-white drop-shadow-md typewriter-cursor text-3xl md:text-5xl">Happy Birthday</h2>
+                <h2 id="display-judul" class="font-bold mb-4 text-white drop-shadow-md text-3xl md:text-5xl"></h2>
                 <div id="foto-preview-container" class="my-6 flex justify-center">
                     <img id="display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-48 md:h-48 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat transition-all duration-300" alt="Foto">
                 </div>
                 <div id="video-container" class="my-4 flex justify-center hidden">
                     <video id="display-video" class="w-full max-h-56 rounded-2xl border border-slate-700 shadow-lg" controls playsinline></video>
                 </div>
-                <p id="display-nama" class="font-semibold text-rose-300 mb-3 drop-shadow text-2xl md:text-3xl">Audylia Salsabilla</p>
+                <p id="display-nama" class="font-semibold text-rose-300 mb-3 drop-shadow text-2xl md:text-3xl"></p>
                 <div id="greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-6 rounded-3xl mt-4 shadow-2xl transition-all duration-300">
-                    <p id="display-ucapan" class="text-slate-100 italic leading-relaxed typewriter-cursor text-base md:text-lg">"Selamat ulang tahun, moga selalu beruntung."</p>
+                    <p id="display-ucapan" class="text-slate-100 italic leading-relaxed text-base md:text-lg"></p>
                 </div>
             </div>
             <div></div>
@@ -175,7 +179,7 @@
                     <input type="text" id="input-judul" value="Happy Birthday" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Isi Ucapan</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Isi Ucapan (Animasi Mesin Tik)</label>
                     <textarea id="input-ucapan" rows="3" oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">"Selamat ulang tahun, moga selalu beruntung."</textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -192,6 +196,20 @@
 
             <!-- TAB 2: DESAIN & BINGKAI -->
             <div id="tab-content-design" class="space-y-4 editor-tab-pane hidden">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🌌 Latar Belakang Full Screen (Background)</label>
+                    <select id="input-bgstyle" onchange="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                        <option value="gradient-rose">Rose Dark Gradient (Default)</option>
+                        <option value="gradient-dark">Midnight Slate Gradient</option>
+                        <option value="solid-black">Solid Black Minimalis</option>
+                        <option value="gradient-purple">Purple Neon Glow</option>
+                        <option value="custom-image">Gunakan Gambar Latar Kustom (URL)</option>
+                    </select>
+                </div>
+                <div id="custom-bg-url-box" class="hidden">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Gambar Background</label>
+                    <input type="text" id="input-bgimgurl" placeholder="https://..." oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto</label>
@@ -202,7 +220,7 @@
                             <option value="rounded-[40px_10px_40px_10px]">Geometris Modern</option>
                             <option value="rounded-none border-8 border-white shadow-2xl">Bingkai Kotak Klasik</option>
                             <option value="rounded-3xl border-4 border-rose-400 shadow-lg">Bingkai Rose Border</option>
-                            <option value="none">🚫 Tanpa Bingkai</option>
+                            <option value="none">🚫 Sembunyikan / Tanpa Bingkai</option>
                         </select>
                     </div>
                     <div>
@@ -254,15 +272,6 @@
                         <option value="flat">Flat Minimalis</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Preset Tema Warna Cepat</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="applyThemePreset('neapolitan')" class="bg-[#fcf7d9] text-[#604734] font-semibold text-xs py-2 rounded-xl border">🍦 Neapolitan</button>
-                        <button onclick="applyThemePreset('darkslate')" class="bg-[#11212D] text-[#CCDOCF] font-semibold text-xs py-2 rounded-xl border">🌌 Dark Slate</button>
-                        <button onclick="applyThemePreset('rose')" class="bg-rose-950 text-rose-300 font-semibold text-xs py-2 rounded-xl border">🌹 Elegant Rose</button>
-                        <button onclick="applyThemePreset('dark')" class="bg-slate-900 text-slate-200 font-semibold text-xs py-2 rounded-xl border">🌙 Modern Dark</button>
-                    </div>
-                </div>
             </div>
 
             <!-- TAB 3: GEN Z DECORATIONS -->
@@ -285,23 +294,24 @@
                 </div>
             </div>
 
-            <!-- TAB 4: MEDIA -->
+            <!-- TAB 4: MEDIA (UPLOAD DARI HP & AUTO COMPRESS) -->
             <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Foto Utama (URL)</label>
-                    <input type="text" id="input-fotourl" placeholder="https://..." oninput="updateMediaFromInput('foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload Foto Utama (Dari HP)</label>
+                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
+                    <p class="text-[10px] text-slate-500 mt-1">💡 Otomatis dikompres agar link tetap ringkas.</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link GIF Dekorasi</label>
-                    <input type="text" id="input-gifurl" placeholder="https://..." oninput="updateMediaFromInput('gif')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Atau Link URL Foto</label>
+                    <input type="text" id="input-fotourl" placeholder="https://..." oninput="updateMediaFromInput('foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                </div>
+                <div class="pt-2 border-t border-slate-800">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">✨ Upload GIF / Stiker Bergerak (Dari HP)</label>
+                    <input type="file" accept="image/*" onchange="handleFileSelect(event, 'gif')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Video MP4</label>
-                    <input type="text" id="input-videourl" placeholder="https://..." oninput="updateMediaFromInput('video')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Musik MP3</label>
-                    <input type="text" id="input-musikurl" placeholder="https://..." oninput="updateMediaFromInput('musik')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Musik MP3 (URL)</label>
+                    <input type="text" id="input-musikurl" placeholder="https://..." oninput="updateMediaFromInput('musik')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
                 </div>
             </div>
 
@@ -309,7 +319,7 @@
             <div id="tab-content-settings" class="space-y-4 editor-tab-pane hidden">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-medium text-slate-400">⚡ Kecepatan Mesin Tik</label>
+                        <label class="text-xs font-medium text-slate-400">⚡ Kecepatan Mesin Tik (Typewriter)</label>
                         <span id="speed-label" class="text-xs font-mono text-rose-400 font-semibold">40 ms</span>
                     </div>
                     <input type="range" id="input-typespeed" min="10" max="150" step="5" value="40" oninput="updateLivePreview()" class="w-full accent-rose-500 bg-slate-950 cursor-pointer">
@@ -358,9 +368,10 @@
             textColor: "#f8fafc",
             fontFamily: "'Poppins', sans-serif",
             fontSize: "normal",
-            theme: "dark",
+            bgStyle: "gradient-rose",
+            bgImgUrl: "",
             frameStyle: "rounded-full",
-            typewriterSpeed: "40",
+            typewriterSpeed: 40,
             textDecoration: "shadow",
             openingTitle: "ADA UCAPAN UNTUKMU",
             openingButtonText: "BUKA KARTU",
@@ -373,29 +384,68 @@
             { id: 'dec_2', text: '💖 STAY FABULOUS ⭐', x: 50, y: 85, size: 'text-lg', font: "'Dancing Script', cursive", color: '#ff7eb3' }
         ];
 
-        function encodeCardToBase64(obj) {
-            const jsonStr = JSON.stringify(obj);
-            return btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-                return String.fromCharCode('0x' + p1);
-            }));
+        // Auto-Compress Gambar via HTML5 Canvas (Max width 500px, Quality 0.65)
+        function compressAndConvertImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxWidth = 500;
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                    callback(compressedDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
-        function decodeBase64ToCard(base64Str) {
-            const decoded = decodeURIComponent(atob(base64Str).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(decoded);
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressAndConvertImage(file, function(resultUrl) {
+                if (type === 'foto') {
+                    cardState.fotoUrl = resultUrl;
+                    const inputEl = document.getElementById('input-fotourl');
+                    if (inputEl) inputEl.value = '(Foto dari HP terunggah)';
+                } else if (type === 'gif') {
+                    cardState.gifUrl = resultUrl;
+                }
+                updateLivePreview();
+                alert('File berhasil diunggah & dikompres otomatis! ✨');
+            });
+        }
+
+        function encodeCardToShortLink(obj) {
+            const jsonStr = JSON.stringify(obj);
+            return LZString.compressToEncodedURIComponent(jsonStr);
+        }
+
+        function decodeShortLinkToCard(compressedStr) {
+            const jsonStr = LZString.decompressFromEncodedURIComponent(compressedStr);
+            return JSON.parse(jsonStr);
         }
 
         window.onload = function() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                const cardParam = urlParams.get('card');
+                const shortParam = urlParams.get('c');
+                const oldCardParam = urlParams.get('card');
                 const cardId = urlParams.get('id');
 
-                if (cardParam) {
+                if (shortParam) {
                     try {
-                        cardState = decodeBase64ToCard(cardParam);
+                        cardState = decodeShortLinkToCard(shortParam);
                         if (cardState.decorations) dynamicDecorations = cardState.decorations;
                         setupReceiverMode();
                         return;
@@ -403,6 +453,18 @@
                         showErrorScreen("Gagal Memuat", "Data kartu di dalam link rusak atau tidak valid.");
                         return;
                     }
+                }
+
+                if (oldCardParam) {
+                    try {
+                        const decoded = decodeURIComponent(atob(oldCardParam).split('').map(function(c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        cardState = JSON.parse(decoded);
+                        if (cardState.decorations) dynamicDecorations = cardState.decorations;
+                        setupReceiverMode();
+                        return;
+                    } catch (e) {}
                 }
 
                 if (cardId) {
@@ -435,7 +497,6 @@
             document.getElementById('receiver-recipient-name').innerText = cardState.nama || 'Seseorang';
             document.getElementById('receiver-opening-title').innerText = cardState.openingTitle || 'ADA UCAPAN UNTUKMU';
             
-            // Mode Penerima: Sembunyikan Navigasi Bawah & Tombol Dashboard
             const bottomNav = document.querySelector('.fixed.bottom-0');
             if (bottomNav) bottomNav.style.display = 'none';
             const topBar = document.getElementById('top-action-bar');
@@ -523,12 +584,16 @@
                 judul: "Happy Birthday",
                 ucapan: '"Selamat ulang tahun, moga selalu beruntung."',
                 fotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80",
+                gifUrl: "",
+                videoUrl: "",
+                musikUrl: "",
                 textColor: "#f8fafc",
                 fontFamily: "'Poppins', sans-serif",
                 fontSize: "normal",
-                theme: "dark",
+                bgStyle: "gradient-rose",
+                bgImgUrl: "",
                 frameStyle: "rounded-full",
-                typewriterSpeed: "40",
+                typewriterSpeed: 40,
                 textDecoration: "shadow",
                 openingTitle: "ADA UCAPAN UNTUKMU",
                 openingButtonText: "BUKA KARTU",
@@ -548,7 +613,6 @@
 
         function backToDashboard() { openDashboardMenu(); }
 
-        // Fungsi Membuka Modal Editor via Ikon Navigasi Bawah
         function openEditorModal(tabName) {
             const modal = document.getElementById('editor-modal');
             const panes = document.querySelectorAll('.editor-tab-pane');
@@ -559,9 +623,9 @@
 
             const titles = {
                 'text': '✏️ Editor Teks & Ucapan',
-                'design': '🎨 Editor Desain & Bingkai',
+                'design': '🎨 Editor Desain & Latar Belakang',
                 'decor': '✨ Stiker & Dekorasi Gen Z',
-                'media': '📁 Tautan Berkas Media',
+                'media': '📁 Upload Berkas Media (HP)',
                 'settings': '⚙️ Pengaturan & Simpan'
             };
             document.getElementById('modal-title-text').innerText = titles[tabName] || 'Editor';
@@ -570,31 +634,6 @@
 
         function closeEditorModal() {
             document.getElementById('editor-modal').classList.add('hidden');
-        }
-
-        function applyThemePreset(themeName) {
-            if (themeName === 'neapolitan') {
-                cardState.theme = 'neapolitan';
-                cardState.textColor = '#604734';
-                cardState.fontFamily = "'Great Vibes', cursive";
-                document.getElementById('card-bg-wrapper').style.backgroundColor = '#fcf7d9';
-            } else if (themeName === 'darkslate') {
-                cardState.theme = 'darkslate';
-                cardState.textColor = '#CCDOCF';
-                cardState.fontFamily = "'Playfair Display', serif";
-                document.getElementById('card-bg-wrapper').style.backgroundColor = '#06141B';
-            } else if (themeName === 'rose') {
-                cardState.theme = 'rose';
-                cardState.textColor = '#f43f5e';
-                cardState.fontFamily = "'Dancing Script', cursive";
-                document.getElementById('card-bg-wrapper').style.backgroundColor = '#4c0519';
-            } else {
-                cardState.theme = 'dark';
-                cardState.textColor = '#f8fafc';
-                cardState.fontFamily = "'Poppins', sans-serif";
-                document.getElementById('card-bg-wrapper').style.backgroundColor = '#0f172a';
-            }
-            applyCardStateToUI();
         }
 
         function applyGenZPreset(presetName) {
@@ -720,7 +759,7 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.13)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.16)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
         }
@@ -728,8 +767,8 @@
         function getShareableLink() {
             if (!cardState.id) cardState.id = 'card_' + Date.now();
             cardState.decorations = dynamicDecorations;
-            const encodedData = encodeCardToBase64(cardState);
-            return window.location.href.split('?')[0] + '?card=' + encodedData;
+            const shortCode = encodeCardToShortLink(cardState);
+            return window.location.href.split('?')[0] + '?c=' + shortCode;
         }
 
         function shareWhatsApp() {
@@ -738,7 +777,7 @@
 
         function copyLink() {
             navigator.clipboard.writeText(getShareableLink());
-            alert('Link Berhasil Disalin! 📋 (Siap dikirim ke penerima)');
+            alert('Link Ringkas Berhasil Disalin! 📋 (Siap dikirim ke WhatsApp)');
         }
 
         function applyTextDecorationStyle(element, decoStyle) {
@@ -775,13 +814,13 @@
             setVal('input-textcolor', cardState.textColor);
             setVal('input-fontfamily', cardState.fontFamily);
             setVal('input-fontsize', cardState.fontSize);
+            setVal('input-bgstyle', cardState.bgStyle || 'gradient-rose');
+            setVal('input-bgimgurl', cardState.bgImgUrl);
             setVal('input-framestyle', cardState.frameStyle);
             setVal('input-greetingframe', cardState.greetingFrameStyle);
-            setVal('input-typespeed', cardState.typewriterSpeed);
+            setVal('input-typespeed', cardState.typewriterSpeed || 40);
             setVal('input-textdecoration', cardState.textDecoration);
             setVal('input-fotourl', cardState.fotoUrl);
-            setVal('input-gifurl', cardState.gifUrl);
-            setVal('input-videourl', cardState.videoUrl);
             setVal('input-musikurl', cardState.musikUrl);
 
             const hideNamaEl = document.getElementById('input-hidenama');
@@ -789,6 +828,25 @@
 
             updateLivePreview();
             renderDynamicDecorationsInPreview();
+        }
+
+        function runTypewriterEffect(elementId, text, speed) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.dataset.timer) {
+                clearTimeout(parseInt(el.dataset.timer));
+            }
+            el.innerText = "";
+            let i = 0;
+            function typeChar() {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                    let timer = setTimeout(typeChar, speed);
+                    el.dataset.timer = timer;
+                }
+            }
+            typeChar();
         }
 
         function updateLivePreview() {
@@ -800,9 +858,11 @@
             cardState.textColor = document.getElementById('input-textcolor').value;
             cardState.fontFamily = document.getElementById('input-fontfamily').value;
             cardState.fontSize = document.getElementById('input-fontsize').value;
+            cardState.bgStyle = document.getElementById('input-bgstyle').value;
+            cardState.bgImgUrl = document.getElementById('input-bgimgurl').value;
             cardState.frameStyle = document.getElementById('input-framestyle').value;
             cardState.greetingFrameStyle = document.getElementById('input-greetingframe').value;
-            cardState.typewriterSpeed = document.getElementById('input-typespeed').value;
+            cardState.typewriterSpeed = parseInt(document.getElementById('input-typespeed').value) || 40;
             cardState.textDecoration = document.getElementById('input-textdecoration').value;
             
             const hideNamaEl = document.getElementById('input-hidenama');
@@ -810,12 +870,34 @@
 
             document.getElementById('speed-label').innerText = cardState.typewriterSpeed + ' ms';
 
+            // Mengatur Background Full Screen
+            const bgWrapper = document.getElementById('card-bg-wrapper');
+            const customBgBox = document.getElementById('custom-bg-url-box');
+            if (cardState.bgStyle === 'custom-image') {
+                customBgBox.classList.remove('hidden');
+                bgWrapper.style.backgroundImage = cardState.bgImgUrl ? `url('${cardState.bgImgUrl}')` : 'none';
+                bgWrapper.className = "w-full h-full relative bg-cover bg-center p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28";
+            } else {
+                customBgBox.classList.add('hidden');
+                bgWrapper.style.backgroundImage = 'none';
+                if (cardState.bgStyle === 'gradient-rose') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-rose-950/50 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28";
+                } else if (cardState.bgStyle === 'gradient-dark') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-slate-900 via-slate-950 to-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28";
+                } else if (cardState.bgStyle === 'solid-black') {
+                    bgWrapper.className = "w-full h-full relative bg-black p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28";
+                } else if (cardState.bgStyle === 'gradient-purple') {
+                    bgWrapper.className = "w-full h-full relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-950 p-6 md:p-12 flex flex-col justify-between overflow-y-auto custom-scrollbar pb-28";
+                }
+            }
+
             applyGreetingBoxStyle('greeting-box-container', cardState.greetingFrameStyle);
 
             const customColor = cardState.textColor;
             const customFont = cardState.fontFamily;
             const sizeSetting = cardState.fontSize;
             const decoStyle = cardState.textDecoration;
+            const speed = cardState.typewriterSpeed;
 
             let judulSize = "text-3xl md:text-4xl";
             let namaSize = "text-2xl md:text-3xl";
@@ -836,7 +918,7 @@
                 judulEl.style.color = customColor;
                 judulEl.style.fontFamily = customFont;
                 judulEl.className = judulSize + " font-bold mb-4 typewriter-cursor";
-                judulEl.innerText = cardState.judul;
+                runTypewriterEffect('display-judul', cardState.judul, speed);
                 applyTextDecorationStyle(judulEl, decoStyle);
             }
 
@@ -848,8 +930,8 @@
                     namaEl.classList.remove('hidden');
                     namaEl.style.color = customColor;
                     namaEl.style.fontFamily = customFont;
-                    namaEl.className = namaSize + " font-semibold mb-3";
-                    namaEl.innerText = cardState.nama;
+                    namaEl.className = namaSize + " font-semibold mb-3 typewriter-cursor";
+                    runTypewriterEffect('display-nama', cardState.nama, speed);
                     applyTextDecorationStyle(namaEl, decoStyle);
                 }
             }
@@ -859,7 +941,7 @@
                 ucapanEl.style.color = cardState.greetingFrameStyle === 'polaroid-box' ? '#0f172a' : customColor;
                 ucapanEl.style.fontFamily = customFont;
                 ucapanEl.className = "italic leading-relaxed typewriter-cursor " + ucapanSize;
-                ucapanEl.innerText = cardState.ucapan;
+                runTypewriterEffect('display-ucapan', cardState.ucapan, speed);
                 applyTextDecorationStyle(ucapanEl, decoStyle);
             }
 
@@ -884,15 +966,6 @@
                 gifContainer.classList.add('hidden');
             }
 
-            const videoEl = document.getElementById('display-video');
-            const videoContainer = document.getElementById('video-container');
-            if (cardState.videoUrl && videoEl && videoContainer) {
-                videoEl.src = cardState.videoUrl;
-                videoContainer.classList.remove('hidden');
-            } else if (videoContainer) {
-                videoContainer.classList.add('hidden');
-            }
-
             document.getElementById('receiver-opening-title').innerText = cardState.openingTitle;
             const openingBtn = document.getElementById('receiver-opening-btn');
             if (openingBtn) openingBtn.innerText = cardState.openingButtonText;
@@ -901,8 +974,6 @@
 
         function updateMediaFromInput(type) {
             if (type === 'foto') cardState.fotoUrl = document.getElementById('input-fotourl').value.trim();
-            if (type === 'gif') cardState.gifUrl = document.getElementById('input-gifurl').value.trim();
-            if (type === 'video') cardState.videoUrl = document.getElementById('input-videourl').value.trim();
             if (type === 'musik') cardState.musikUrl = document.getElementById('input-musikurl').value.trim();
             updateLivePreview();
         }
@@ -916,6 +987,7 @@
                 audio.play().catch(() => {});
             }
             if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            applyCardStateToUI();
         }
 
         function showErrorScreen(title, desc) {
