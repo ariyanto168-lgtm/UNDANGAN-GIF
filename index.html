@@ -81,7 +81,7 @@
 </head>
 <body>
 
-    <div class="version-badge">v4.2 Cinematic</div>
+    <div class="version-badge">v4.5 Cinematic</div>
 
     <div id="loadingPage">Mempersiapkan Pengalaman Sinematik... ✨</div>
 
@@ -119,9 +119,9 @@
         </div>
 
         <div class="form-group">
-            <label>Upload Foto Galeri (Maks 3 foto dari HP):</label>
+            <label>Upload Foto Galeri (Maks 2 foto):</label>
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                📁 Pilih Foto dari HP (Auto-Compress Aman)
+                📁 Pilih Foto dari HP (Ultra-Compressed)
                 <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFiles(this.files)">
             </div>
             <div id="previewContainer"></div>
@@ -158,7 +158,7 @@
             <p class="greeting-msg" id="displayMessage">Pesan...</p>
         </div>
 
-        <div class="gallery-container">
+        <div class="gallery-container" id="mainGalleryContainer">
             <div class="gallery-col scroll-up" id="colLeft"></div>
             <div class="gallery-col scroll-down" id="colRight"></div>
         </div>
@@ -187,7 +187,6 @@
     </nav>
 
     <script>
-        // SCRIPT_URL Google Apps Script terbaru kamu
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUv53A4_UqoaNdM3cOC2YPD5U442tbfoH3y6hHsyhlcvRf04fLBhSOIjxDtxP5M2aM/exec';
 
         let compressedPhotoArray = [];
@@ -195,13 +194,12 @@
         let currentRecipientName = "";
         let currentTheme = "";
 
-        // Fungsi Kompresi Optimal untuk mencegah error payload besar
         function handleFiles(files) {
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.innerHTML = '';
             compressedPhotoArray = [];
 
-            const maxFiles = Math.min(files.length, 3);
+            const maxFiles = Math.min(files.length, 2);
             for (let i = 0; i < maxFiles; i++) {
                 let file = files[i];
                 let reader = new FileReader();
@@ -212,14 +210,14 @@
                     img.onload = function () {
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
-                        let maxWidth = 400; // Optimal untuk menjaga ukuran data foto tetap ringan dan aman
+                        let maxWidth = 300;
                         let scaleSize = maxWidth / img.width;
                         
                         canvas.width = maxWidth;
                         canvas.height = img.height * scaleSize;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.4); // Kompresi 40% aman dari limit server
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3);
                         compressedPhotoArray.push(compressedDataUrl);
 
                         let thumb = document.createElement('img');
@@ -272,7 +270,13 @@
         }
 
         function loadGallery(photoString) {
-            if(!photoString) return;
+            const galleryContainer = document.getElementById('mainGalleryContainer');
+            if(!photoString || photoString.trim() === "") {
+                galleryContainer.style.display = 'none'; // Sembunyikan jika foto kosong
+                return;
+            }
+            galleryContainer.style.display = 'flex';
+
             const separator = photoString.includes('|||') ? '|||' : ',';
             const photos = photoString.split(separator).map(item => item.trim()).filter(item => item.length > 0);
             
@@ -338,7 +342,7 @@
                 btn.innerText = "Buat Kartu";
                 btn.disabled = false;
             } catch (error) {
-                alert("Gagal menyimpan data! Periksa kembali koneksi atau ukuran foto Anda.");
+                alert("Gagal menyimpan data! Pastikan jumlah foto maksimal 2 dan ukuran tidak terlalu besar.");
                 btn.innerText = "Coba Lagi";
                 btn.disabled = false;
             }
@@ -359,7 +363,7 @@
                         <div class="greeting-subtitle">Untuk: ${nama}</div>
                         <p class="greeting-msg" style="font-size: ${fontsize}px; color: ${fontcolor};">${pesan}</p>
                     </div>
-                    <div class="gallery-container" style="margin-top: 20px;">
+                    <div class="gallery-container" style="margin-top: 20px; ${compressedPhotoArray.length === 0 ? 'display:none;' : ''}">
                         <div class="gallery-col scroll-up" id="previewColLeft"></div>
                         <div class="gallery-col scroll-down" id="previewColRight"></div>
                     </div>
@@ -404,7 +408,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.2\nFitur: Optimized Auto-Compress, Full-Screen Preview, WhatsApp Direct.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 4.5\nFitur: Smart Fallback Gallery, Auto Version Tag, WhatsApp Direct.\n\nPowered by Ari GPM");
             }
         }
     </script>
