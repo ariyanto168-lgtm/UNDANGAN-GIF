@@ -127,7 +127,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.33</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.35</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -167,7 +167,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.33</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.35</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -499,7 +499,7 @@
                     let quality = 0.8;
                     
                     if (targetType === 'bg') {
-                        maxWidth = 950; // Background full layar dibuat HD
+                        maxWidth = 950;
                         quality = 0.85;
                     } else if (targetType === 'foto') {
                         maxWidth = 700;
@@ -538,10 +538,10 @@
                     const bgStyleEl = document.getElementById('input-bgstyle');
                     if (bgStyleEl) bgStyleEl.value = 'custom-image';
                     const inputEl = document.getElementById('input-bgimgurl');
-                    if (inputEl) inputEl.value = '(1 Foto Background HD Terunggah)';
+                    if (inputEl) inputEl.value = '(Foto Background Terunggah)';
                 }
                 updateLivePreview();
-                alert('Gambar berhasil diunggah dengan kualitas HD yang tajam! ✨');
+                alert('Gambar latar belakang berhasil diunggah dengan kualitas HD! ✨');
             }, type);
         }
 
@@ -555,7 +555,7 @@
             const bgStyleEl = document.getElementById('input-bgstyle');
             if (bgStyleEl) bgStyleEl.value = 'custom-image';
             const bgImgEl = document.getElementById('input-bgimgurl');
-            if (bgImgEl) bgImgEl.value = cardState.fotoUrl;
+            if (bgImgEl) bgImgEl.value = '(Foto Background Terunggah)';
             updateLivePreview();
             alert('Berhasil! Foto Anda kini menjadi latar belakang full layar. 🌌✨');
         }
@@ -1007,7 +1007,7 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.33)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.35)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
             alert('Perubahan kartu berhasil disimpan! 💾');
@@ -1070,12 +1070,12 @@
             setVal('input-fontsize', cardState.fontSize);
             setVal('input-bgstyle', cardState.bgStyle || 'gradient-rose');
             setVal('input-bgeffect', cardState.bgEffect || 'none');
-            setVal('input-bgimgurl', cardState.bgImgUrl);
+            setVal('input-bgimgurl', cardState.bgImgUrl && cardState.bgImgUrl.startsWith('data:') ? '(Foto Background Terunggah)' : (cardState.bgImgUrl || ''));
             setVal('input-framestyle', cardState.frameStyle);
             setVal('input-greetingframe', cardState.greetingFrameStyle);
             setVal('input-typespeed', cardState.typewriterSpeed || 40);
             setVal('input-textdecoration', cardState.textDecoration);
-            setVal('input-fotourl', cardState.fotoUrl);
+            setVal('input-fotourl', cardState.fotoUrl && cardState.fotoUrl.startsWith('data:') ? '(1 Foto Utama HD Terunggah)' : (cardState.fotoUrl || ''));
             setVal('input-musikurl', cardState.musikUrl);
 
             const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
@@ -1143,11 +1143,20 @@
             cardState.fontSize = document.getElementById('input-fontsize').value;
             cardState.bgStyle = document.getElementById('input-bgstyle').value;
             cardState.bgEffect = document.getElementById('input-bgeffect').value;
-            cardState.bgImgUrl = document.getElementById('input-bgimgurl').value;
             cardState.frameStyle = document.getElementById('input-framestyle').value;
             cardState.greetingFrameStyle = document.getElementById('input-greetingframe').value;
             cardState.typewriterSpeed = parseInt(document.getElementById('input-typespeed').value) || 40;
             cardState.textDecoration = document.getElementById('input-textdecoration').value;
+
+            const bgInputVal = document.getElementById('input-bgimgurl').value.trim();
+            if (bgInputVal && !bgInputVal.startsWith('(') && bgInputVal.startsWith('http')) {
+                cardState.bgImgUrl = bgInputVal;
+            }
+            
+            const fotoInputVal = document.getElementById('input-fotourl').value.trim();
+            if (fotoInputVal && !fotoInputVal.startsWith('(') && fotoInputVal.startsWith('http')) {
+                cardState.fotoUrl = fotoInputVal;
+            }
             
             const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
             cardState.hideJudul = getChk('input-hidejudul');
@@ -1172,7 +1181,8 @@
                 bgWrapper.style.backgroundImage = cardState.bgImgUrl ? `url('${cardState.bgImgUrl}')` : 'none';
                 bgWrapper.style.backgroundSize = 'cover';
                 bgWrapper.style.backgroundPosition = 'center';
-                bgWrapper.className = "w-full h-full relative p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
+                // Safe background color fallback to prevent dark/black screen when image is loading or empty
+                bgWrapper.className = "w-full h-full relative bg-slate-900 p-4 md:p-8 flex flex-col justify-between overflow-hidden pb-24" + animClass;
             } else {
                 customBgBox.classList.add('hidden');
                 bgWrapper.style.backgroundImage = '';
