@@ -27,14 +27,13 @@
         .btn-buka { background: linear-gradient(135deg, #ff0055, #ff5e7e); color: white; border: none; padding: 15px 30px; border-radius: 30px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 5px 20px rgba(255, 0, 85, 0.4); letter-spacing: 1px; }
         .btn-buka:active { transform: scale(0.95); }
 
-        /* --- OPENED CARD (FULL SCREEN IMMERSIVE & TANPA KOLOM) --- */
+        /* --- OPENED CARD (FULL SCREEN IMMERSIVE) --- */
         #openedCard { 
             display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; 
             background-color: #080b12; text-align: center; z-index: 600; 
             animation: cinematicFadeIn 1.2s ease; overflow: hidden; 
         }
         
-        /* Galeri Full Screen di Latar Belakang */
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
             display: flex; gap: 8px; overflow: hidden; z-index: 1; opacity: 0.45; 
@@ -42,14 +41,12 @@
         #openedCard .gallery-col { display: flex; flex-direction: column; gap: 8px; width: 50%; height: 100%; }
         #openedCard .gallery-col img { width: 100%; height: 220px; object-fit: cover; border-radius: 0; border: none; }
 
-        /* Overlay Gradasi Gelap agar Teks Sangat Jelas Dibaca */
         #openedCard::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, rgba(8,11,18,0.5) 0%, rgba(8,11,18,0.92) 100%);
             z-index: 2; pointer-events: none;
         }
 
-        /* Kotak Ucapan Disembunyikan (Tanpa Kolom / Border / Background) */
         #openedCard .greeting-box { 
             background: transparent; backdrop-filter: none; border: none; box-shadow: none; 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
@@ -57,10 +54,25 @@
         }
         .greeting-title { color: #ffb8c6; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-weight: bold; }
         .greeting-subtitle { color: #fff; font-size: 1.2rem; margin-bottom: 15px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-        .greeting-msg { line-height: 1.6; word-break: break-word; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+        .greeting-msg { line-height: 1.6; word-break: break-word; text-shadow: 0 2px 8px rgba(0,0,0,0.8); margin-bottom: 20px; }
 
-        .scroll-up { animation: scrollUp 28s linear infinite; }
-        .scroll-down { animation: scrollDown 28s linear infinite; }
+        .btn-recipient-wa {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: #25d366; color: white; border: none; padding: 12px 24px;
+            border-radius: 30px; font-weight: bold; font-size: 0.95rem; text-decoration: none;
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); transition: transform 0.2s;
+        }
+        .btn-recipient-wa:active { transform: scale(0.95); }
+
+        /* EFEK ANIMASI PILIHAN */
+        .effect-scroll-up { animation: scrollUp 28s linear infinite; }
+        .effect-scroll-down { animation: scrollDown 28s linear infinite; }
+        .effect-slide-side { animation: slideFromSide 15s ease-in-out infinite alternate; }
+        .effect-center-fixed { transform: scale(1.05); transition: transform 0.5s ease; }
+        .effect-balloons { animation: floatBalloons 4s ease-in-out infinite alternate; }
+
+        @keyframes slideFromSide { 0% { transform: translateX(-15px); } 100% { transform: translateX(15px); } }
+        @keyframes floatBalloons { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-12px) rotate(1deg); } }
 
         /* EDITOR STYLES */
         #editorPage { display: none; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #141928; min-height: 85vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; z-index: 10; }
@@ -84,15 +96,17 @@
         .result-box { margin-top: 20px; padding: 15px; background-color: #080b12; border-radius: 8px; display: none; text-align: left; border: 1px dashed #22c55e; }
         .btn-wa-direct { background: #25d366; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 0.95rem; }
 
-        /* POPUP MODAL FULL SCREEN */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #080b12; display: none; flex-direction: column; z-index: 3000; padding: 20px; overflow-y: auto; }
-        .modal-full-content { width: 100%; max-width: 500px; margin: 0 auto; text-align: center; position: relative; padding-bottom: 40px; }
-        .modal-close-btn { position: fixed; top: 15px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 1.1rem; z-index: 3100; }
+        /* POPUP MODAL EFEK & PREVIEW */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8,11,18,0.95); display: none; flex-direction: column; z-index: 3000; padding: 20px; overflow-y: auto; align-items: center; justify-content: center; }
+        .modal-full-content { width: 100%; max-width: 450px; margin: 0 auto; text-align: center; position: relative; padding-bottom: 40px; background: rgba(20,25,40,0.9); border: 1px solid rgba(255,107,129,0.3); border-radius: 16px; padding: 30px 20px; }
+        .modal-close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 1rem; z-index: 3100; }
+        .effect-option-btn { background: linear-gradient(135deg, #1a2238, #2a3656); color: #ffb8c6; border: 1px solid rgba(255,184,198,0.3); padding: 12px 20px; border-radius: 10px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+        .effect-option-btn:hover { transform: scale(1.03); background: linear-gradient(135deg, #ff0055, #ff5e7e); color: white; }
 
         /* NAVIGATION BAR */
-        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(20, 25, 40, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; padding: 10px 15px; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-        .nav-item { background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 0.7rem; gap: 3px; transition: color 0.2s, transform 0.2s; }
-        .nav-item span { font-size: 18px; }
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 420px; background: rgba(20, 25, 40, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; padding: 10px 10px; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .nav-item { background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 0.65rem; gap: 3px; transition: color 0.2s, transform 0.2s; }
+        .nav-item span { font-size: 16px; }
         .nav-item:hover, .nav-item.active { color: #ffb8c6; transform: translateY(-2px); }
 
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -103,7 +117,7 @@
 </head>
 <body>
 
-    <div class="version-badge">v5.0 Cinematic</div>
+    <div class="version-badge" id="versionBadge">v5.2 Cinematic</div>
 
     <div id="loadingPage">Memuat data kartu... ✨</div>
 
@@ -175,15 +189,32 @@
     </div>
 
     <div id="openedCard">
-        <div class="greeting-box">
+        <div class="greeting-box" id="mainGreetingBox">
             <h2 class="greeting-title" id="displayTheme">Selamat</h2>
             <div class="greeting-subtitle" id="displayName2">Untuk: Nama</div>
             <p class="greeting-msg" id="displayMessage">Pesan...</p>
+            <!-- Tombol Kirim WA untuk Penerima -->
+            <a id="recipientWaBtn" href="#" target="_blank" class="btn-recipient-wa">
+                <span>💬</span> Bagikan ke WhatsApp
+            </a>
         </div>
 
         <div class="gallery-container" id="mainGalleryContainer">
-            <div class="gallery-col scroll-up" id="colLeft"></div>
-            <div class="gallery-col scroll-down" id="colRight"></div>
+            <div class="gallery-col effect-scroll-up" id="colLeft"></div>
+            <div class="gallery-col effect-scroll-down" id="colRight"></div>
+        </div>
+    </div>
+
+    <!-- MODAL PILIHAN EFEK ANIMASI -->
+    <div class="modal-overlay" id="effectModal">
+        <button class="modal-close-btn" onclick="closeEffectModal()">✕</button>
+        <div class="modal-full-content">
+            <h3 style="color: #ffb8c6; margin-bottom: 15px;">✨ Pilih Efek & Transisi</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">Ubah gaya gerakan latar belakang kartu sinematikmu:</p>
+            <button class="effect-option-btn" onclick="applyEffect('scroll-up')">🎞️ Gulir Sinematik Naik (Default)</button>
+            <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser dari Samping (Smooth)</button>
+            <button class="effect-option-btn" onclick="applyEffect('center-fixed')">🎯 Tengah Layar Elegan (Fixed)</button>
+            <button class="effect-option-btn" onclick="applyEffect('balloons')">🎈 Efek Balon Melayang Ceria</button>
         </div>
     </div>
 
@@ -199,7 +230,10 @@
             <span>🏠</span>Beranda
         </button>
         <button class="nav-item" onclick="navAction('edit')">
-            <span>✏️</span>Edit Kartu
+            <span>✏️</span>Edit
+        </button>
+        <button class="nav-item" onclick="navAction('effects')">
+            <span>✨</span>Efek
         </button>
         <button class="nav-item" onclick="navAction('share')">
             <span>🔗</span>Bagikan
@@ -265,6 +299,9 @@
         const cardId = urlParams.get('id');
 
         if (cardId) {
+            // Sembunyikan badge versi di halaman penerima
+            document.getElementById('versionBadge').style.display = 'none';
+
             const loadingEl = document.getElementById('loadingPage');
             loadingEl.style.display = 'block';
 
@@ -282,6 +319,11 @@
                     msgEl.innerText = data.pesan;
                     if(data.fontsize) msgEl.style.fontSize = data.fontsize + 'px';
                     if(data.fontcolor) msgEl.style.color = data.fontcolor;
+
+                    // Set URL tombol WhatsApp penerima
+                    const currentUrl = window.location.href;
+                    const recipientWaMsg = `Halo, aku baru saja melihat kartu ucapan ${data.tema} yang sangat indah ini! Kamu juga bisa membuat kartu ucapan digitalmu sendiri di sini:\n\n${currentUrl}`;
+                    document.getElementById('recipientWaBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(recipientWaMsg)}`;
 
                     loadGallery(data.foto);
                 })
@@ -316,7 +358,7 @@
             colLeft.innerHTML = '';
             colRight.innerHTML = '';
 
-            let displayPhotos = [...photos, ...photos, ...photos]; // Diperbanyak agar memenuhi efek scroll full-screen
+            let displayPhotos = [...photos, ...photos, ...photos]; 
 
             displayPhotos.forEach((url, index) => {
                 let img = document.createElement('img');
@@ -397,7 +439,7 @@
 
             let previewHtml = `
                 <div style="padding-top: 40px;">
-                    <h2 style="color: #ffb8c6; margin-bottom: 20px;">👁️ Mode Pratinjau Full-Screen</h2>
+                    <h2 style="color: #ffb8c6; margin-bottom: 20px;">👁️ Pratinjau Teks & Tema</h2>
                     <div style="text-align: center; padding: 20px;">
                         <h2 style="color: #ffb8c6; font-size: 1.8rem; margin-bottom: 5px;">Selamat ${tema}!</h2>
                         <div style="color: #fff; font-size: 1.1rem; margin-bottom: 12px; font-weight: 600;">Untuk: ${nama}</div>
@@ -414,9 +456,40 @@
             document.getElementById('customModal').style.display = 'none';
         }
 
+        function closeEffectModal() {
+            document.getElementById('effectModal').style.display = 'none';
+        }
+
+        function applyEffect(effectType) {
+            const colLeft = document.getElementById('colLeft');
+            const colRight = document.getElementById('colRight');
+            const greetingBox = document.getElementById('mainGreetingBox');
+
+            colLeft.className = "gallery-col";
+            colRight.className = "gallery-col";
+            greetingBox.style.transform = "translate(-50%, -50%) scale(1)";
+
+            if (effectType === 'scroll-up') {
+                colLeft.classList.add('effect-scroll-up');
+                colRight.classList.add('effect-scroll-down');
+            } else if (effectType === 'slide-side') {
+                colLeft.classList.add('effect-slide-side');
+                colRight.classList.add('effect-slide-side');
+            } else if (effectType === 'center-fixed') {
+                greetingBox.style.transform = "translate(-50%, -50%) scale(1.1)";
+            } else if (effectType === 'balloons') {
+                greetingBox.classList.add('effect-balloons');
+            }
+
+            closeEffectModal();
+            alert("Efek berhasil diterapkan!");
+        }
+
         function navAction(action) {
             if (action === 'home' || action === 'edit') {
                 window.location.href = window.location.href.split('?')[0];
+            } else if (action === 'effects') {
+                document.getElementById('effectModal').style.display = 'flex';
             } else if (action === 'share') {
                 if (window.location.search.includes('id=')) {
                     const currentUrl = window.location.href;
@@ -429,7 +502,7 @@
                     alert("Silakan buat dan generate kartu terlebih dahulu di menu Editor.");
                 }
             } else if (action === 'info') {
-                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.0\nFitur: Immersive Full-Screen Photo Background, Borderless Text Clean View, WhatsApp Direct.\n\nPowered by Ari GPM");
+                alert("Kartu Ucapan Digital Sinematik\nVersi: 5.2\nFitur: Clean Recipient View (No Version Badge), Recipient WhatsApp Share Button.\n\nPowered by Ari GPM");
             }
         }
     </script>
