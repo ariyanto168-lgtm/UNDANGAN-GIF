@@ -88,10 +88,12 @@
         /* EFEK BACKGROUND ANIMASI */
         .effect-zoom-slow img { animation: zoomSlow 25s ease-in-out infinite alternate; }
         .effect-slide-side img { animation: slideSideFull 20s ease-in-out infinite alternate; width: 120vw !important; }
+        .effect-scroll-up img { animation: scrollUpFull 18s linear infinite; height: 130vh !important; }
         .effect-pulse img { animation: pulseSlow 10s ease-in-out infinite alternate; }
 
         @keyframes zoomSlow { 0% { transform: scale(1); } 100% { transform: scale(1.18); } }
         @keyframes slideSideFull { 0% { transform: translateX(0); } 100% { transform: translateX(-15vw); } }
+        @keyframes scrollUpFull { 0% { transform: translateY(0); } 100% { transform: translateY(-20vh); } }
         @keyframes pulseSlow { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
         @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
@@ -155,32 +157,48 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v6.4 Custom Loading</div>
+    <div class="version-badge" id="versionBadge">v6.6 ScrollUp</div>
 
     <div id="loadingPage">Ada kejutan buatmu ✨</div>
 
     <div id="editorPage">
         <h2 class="editor-title">🎬 Studio Pembuat Kartu</h2>
         
-        <!-- BAGIAN 1: DATA & PESAN -->
+        <!-- BAGIAN 1: DATA & KONTROL TAMPIL/SEMBUNYI KOLOM TEKS -->
         <div class="settings-card">
-            <div class="settings-header">📝 Data Utama & Typewriter</div>
-            <div class="form-group">
-                <label>Nama Penerima:</label>
-                <input type="text" id="inputName" placeholder="Contoh: Audylia Salsabilla">
-            </div>
+            <div class="settings-header">📝 Data Utama & Visibilitas Kolom Teks</div>
+            
             <div class="form-group">
                 <label>Tema Acara (Atas):</label>
                 <input type="text" id="inputTheme" value="Ulang Tahun" placeholder="Contoh: Happy Birthday / Pernikahan">
-            </div>
-            <div class="form-group">
-                <label>Pesan / Doa Ucapan:</label>
-                <textarea id="inputMessage" rows="3" placeholder="Tuliskan pesan indahmu..."></textarea>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="inputTypewriter" onchange="toggleTypewriterSpeedSetting(this.checked)">
-                    <label for="inputTypewriter">✍️ Efek Mengetik Otomatis</label>
+                <div class="checkbox-group" style="margin-top: 5px;">
+                    <input type="checkbox" id="showTheme" checked>
+                    <label for="showTheme" style="font-size:0.8rem; color:#94a3b8;">Tampilkan Tema Ini di Kartu</label>
                 </div>
             </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Nama Penerima:</label>
+                <input type="text" id="inputName" placeholder="Contoh: Audylia Salsabilla">
+                <div class="checkbox-group" style="margin-top: 5px;">
+                    <input type="checkbox" id="showName" checked>
+                    <label for="showName" style="font-size:0.8rem; color:#94a3b8;">Tampilkan Nama Penerima di Kartu</label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Pesan / Doa Ucapan:</label>
+                <textarea id="inputMessage" rows="3" placeholder="Tuliskan pesan indahmu..."></textarea>
+                <div class="checkbox-group" style="margin-top: 5px;">
+                    <input type="checkbox" id="showMessage" checked>
+                    <label for="showMessage" style="font-size:0.8rem; color:#94a3b8;">Tampilkan Pesan Ucapan di Kartu</label>
+                </div>
+                <div class="checkbox-group" style="margin-top: 8px;">
+                    <input type="checkbox" id="inputTypewriter" onchange="toggleTypewriterSpeedSetting(this.checked)">
+                    <label for="inputTypewriter">✍️ Efek Mengetik Otomatis untuk Pesan</label>
+                </div>
+            </div>
+
             <!-- PENGATURAN KECEPATAN TYPEWRITER -->
             <div class="form-group" id="typewriterSpeedGroup" style="display: none; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
                 <label>Kecepatan Ketik: <span id="twSpeedVal" class="range-value">Sedang (40ms)</span></label>
@@ -188,9 +206,9 @@
             </div>
         </div>
 
-        <!-- BAGIAN 2: DESAIN TEKS -->
+        <!-- BAGIAN 2: DESAIN TEKS & SLIDER UKURAN FONT -->
         <div class="settings-card">
-            <div class="settings-header">🎨 Desain Teks & Font</div>
+            <div class="settings-header">🎨 Desain Teks & Ukuran (Slider)</div>
             <div class="form-group">
                 <label>Pilih Jenis Font (Huruf):</label>
                 <select id="inputFontFamily">
@@ -201,19 +219,21 @@
                     <option value="'Trebuchet MS', sans-serif">Rapi (Trebuchet MS)</option>
                 </select>
             </div>
+            
+            <div class="form-group">
+                <label>Ukuran Huruf Pesan: <span id="fontSizeVal" class="range-value">16px</span></label>
+                <input type="range" id="inputFontSize" min="12" max="32" step="1" value="16" oninput="updateFontSizeLabel(this.value)">
+            </div>
+
             <div class="style-row">
                 <div class="form-group">
-                    <label>Ukuran (px):</label>
-                    <input type="number" id="inputFontSize" value="16" min="12" max="30">
+                    <label>Warna Teks:</label>
+                    <input type="color" id="inputFontColor" value="#ffb8c6" style="height: 40px; padding: 3px; cursor: pointer; width: 100%;">
                 </div>
                 <div class="form-group">
-                    <label>Warna Teks:</label>
-                    <input type="color" id="inputFontColor" value="#ffb8c6" style="height: 40px; padding: 3px; cursor: pointer;">
+                    <label>Transparan <span id="opacityVal" class="range-value">100%</span></label>
+                    <input type="range" id="inputTextOpacity" min="0.2" max="1" step="0.1" value="1" oninput="document.getElementById('opacityVal').innerText = Math.round(this.value * 100) + '%'" style="margin-top: 8px;">
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Tingkat Jelas / Transparan <span id="opacityVal" class="range-value">100%</span></label>
-                <input type="range" id="inputTextOpacity" min="0.2" max="1" step="0.1" value="1" oninput="document.getElementById('opacityVal').innerText = Math.round(this.value * 100) + '%'">
             </div>
         </div>
 
@@ -326,6 +346,7 @@
         <div class="modal-full-content">
             <h3 style="color: #ffb8c6; margin-bottom: 15px;">✨ Pilih Efek Background</h3>
             <button class="effect-option-btn" onclick="applyEffect('zoom-slow')">🔍 Zoom Out Pelan Sinematik</button>
+            <button class="effect-option-btn" onclick="applyEffect('scroll-up')">⬆️ Gulir Foto ke Atas (Pan Up)</button>
             <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan Halus</button>
             <button class="effect-option-btn" onclick="applyEffect('pulse')">💖 Denyut Lembut</button>
             <button class="effect-option-btn" onclick="applyEffect('none')">🎯 Diam Saja</button>
@@ -379,6 +400,10 @@
             else if(val >= 80) labelText = "🐢 Santai / Lambat (" + val + "ms)";
             document.getElementById('twSpeedVal').innerText = labelText;
             typewriterSpeedGlobal = parseInt(val);
+        }
+
+        function updateFontSizeLabel(val) {
+            document.getElementById('fontSizeVal').innerText = val + "px";
         }
 
         function previewPhotoUrl(url) {
@@ -436,6 +461,7 @@
                     let lBtn = "✨ BUKA KARTU";
                     let lGifFull = "🎁|bounce"; 
                     let lTxt = "Ada kejutan buatmu ✨";
+                    let vis = { t: true, n: true, m: true };
 
                     if (msgText.startsWith("||OPTS:")) {
                         let parts = msgText.split("||MSG:");
@@ -445,6 +471,7 @@
                             isTypewriterGlobal = parsedOpts.tw || false;
                             if(parsedOpts.twSpeed) typewriterSpeedGlobal = parsedOpts.twSpeed;
                             if(parsedOpts.lTxt) lTxt = parsedOpts.lTxt;
+                            if(parsedOpts.vis) vis = parsedOpts.vis;
                             if (parsedOpts.fFam) fFam = parsedOpts.fFam;
                             if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
                             if (parsedOpts.wa) waMsg = parsedOpts.wa;
@@ -474,6 +501,11 @@
                     let iconEl = document.getElementById('displayLandingGif');
                     iconEl.innerText = gifArr[0];
                     iconEl.className = 'gift-icon anim-' + (gifArr[1] || 'bounce');
+
+                    // Terapkan Visibilitas Kolom Teks
+                    document.getElementById('displayTheme').style.display = vis.t ? 'block' : 'none';
+                    document.getElementById('displayName2').style.display = vis.n ? 'block' : 'none';
+                    document.getElementById('displayMessage').style.display = vis.m ? 'block' : 'none';
 
                     applyTextStylesToElements(fFam, fColor, fOpa, fSize);
                     
@@ -595,9 +627,21 @@
             document.getElementById('closeDragBtn').style.display = 'block';
             document.getElementById('recipientWaBtn').style.display = 'none';
 
-            document.getElementById('displayTheme').innerText = "Selamat " + (document.getElementById('inputTheme').value || "Acara");
-            document.getElementById('displayName2').innerText = "Untuk: " + (document.getElementById('inputName').value || "Nama");
-            document.getElementById('displayMessage').innerText = document.getElementById('inputMessage').value || "Pesan ucapan...";
+            let showT = document.getElementById('showTheme').checked;
+            let showN = document.getElementById('showName').checked;
+            let showM = document.getElementById('showMessage').checked;
+
+            let elT = document.getElementById('displayTheme');
+            let elN = document.getElementById('displayName2');
+            let elM = document.getElementById('displayMessage');
+
+            elT.style.display = showT ? 'block' : 'none';
+            elN.style.display = showN ? 'block' : 'none';
+            elM.style.display = showM ? 'block' : 'none';
+
+            elT.innerText = "Selamat " + (document.getElementById('inputTheme').value || "Acara");
+            elN.innerText = "For: " + (document.getElementById('inputName').value || "Nama");
+            elM.innerText = document.getElementById('inputMessage').value || "Pesan ucapan...";
             
             let fFam = document.getElementById('inputFontFamily').value;
             let fOpa = document.getElementById('inputTextOpacity').value;
@@ -618,9 +662,9 @@
                 galContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#94a3b8;font-size:0.9rem;">⚠️ Masukkan Link URL Foto terlebih dahulu di editor</div>';
             }
 
-            makeDraggable(document.getElementById('displayTheme'), 'tema');
-            makeDraggable(document.getElementById('displayName2'), 'nama');
-            makeDraggable(document.getElementById('displayMessage'), 'pesan');
+            makeDraggable(elT, 'tema');
+            makeDraggable(elN, 'nama');
+            makeDraggable(elM, 'pesan');
         }
 
         function closeDragPreview() {
@@ -693,6 +737,13 @@
             const typewriter = document.getElementById('inputTypewriter').checked;
             const twSpeed = typewriterSpeedGlobal;
             const loadingText = document.getElementById('inputLoadingText').value.trim() || "Ada kejutan buatmu ✨";
+            
+            const visState = {
+                t: document.getElementById('showTheme').checked,
+                n: document.getElementById('showName').checked,
+                m: document.getElementById('showMessage').checked
+            };
+
             const fontFam = document.getElementById('inputFontFamily').value;
             const fontOpa = document.getElementById('inputTextOpacity').value;
             const landingTitle = document.getElementById('inputLandingTitle').value;
@@ -700,8 +751,8 @@
             const landingGif = document.getElementById('inputLandingGif').value;
             const waMsg = document.getElementById('inputWaMsg').value;
 
-            if(!nama || !pesanRaw || !foto) { 
-                alert("Nama Penerima, Pesan, dan Link URL Foto wajib diisi!"); 
+            if(!foto) { 
+                alert("Link URL Foto wajib diisi!"); 
                 return; 
             }
 
@@ -709,6 +760,7 @@
                 tw: typewriter, 
                 twSpeed: twSpeed,
                 lTxt: loadingText,
+                vis: visState,
                 pos: posData,
                 fFam: fontFam,
                 fOpa: fontOpa,
@@ -767,7 +819,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 6.4 Custom Loading Edition\nFitur: Custom Loading Text, Top Confetti Rain, Soft Bright Photo Filter, Fullscreen Sync.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 6.6 ScrollUp Edition\nFitur: Scroll Up Background Animation, Show/Hide Text Columns, Font Size Slider, Custom Loading Text, Top Confetti Rain.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
