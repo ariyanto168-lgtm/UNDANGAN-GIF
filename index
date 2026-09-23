@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Undangan & Kartu Digital Interaktif</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Confetti JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts dengan Display Swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Sacramento&family=Cinzel:wght@500;700&family=Alex+Brush&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @keyframes musicBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        .animate-beat {
+            animation: musicBeat 2s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-float {
+            animation: floatCard 4s ease-in-out infinite;
+        }
+
+        button, a, select, input, textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .interactive-scale:active {
+            transform: scale(0.97);
+            transition: transform 0.1s ease;
+        }
+
+        .typewriter-cursor::after {
+            content: '|';
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Kustomisasi Scrollbar Dinamis & Smooth */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(244, 63, 94, 0.5);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(244, 63, 94, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 md:p-4">
+
+    <audio id="bgm" loop preload="auto"></audio>
+
+    <!-- ERROR SCREEN -->
+    <div id="error-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
+            <div class="text-5xl mb-4">⚠️</div>
+            <h1 id="error-title" class="text-2xl font-bold mb-2 text-rose-400">Kartu Tidak Ditemukan</h1>
+            <p id="error-desc" class="text-slate-400 text-sm mb-6">Maaf, link undangan atau kartu yang Anda akses tidak terdaftar di database.</p>
+            <a href="<?= webAppUrl ?>" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl text-sm transition">
+                Buat Kartu Baru
+            </a>
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="auth-screen" class="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 text-center backdrop-blur-md hidden">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl fade-in text-left">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">🔐</div>
+                <h2 class="text-xl font-bold text-rose-400">Keamanan Editor</h2>
+                <p class="text-xs text-slate-400">Masukkan Email & PIN atau Verifikasi OTP untuk masuk.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">📧 Email Asli</label>
+                    <input type="email" id="auth-email" placeholder="contoh@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🔑 PIN 6 Digit (Default: 123456)</label>
+                    <input type="password" id="auth-pin" maxlength="6" placeholder="******" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500 tracking-widest">
+                </div>
+
+                <div id="otp-group" class="hidden">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">📩 Kode OTP dari Email</label>
+                    <input type="text" id="auth-otp" maxlength="6" placeholder="Masukkan 6 digit OTP" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-rose-500 tracking-widest">
+                </div>
+
+                <div id="auth-status" class="text-xs text-center text-rose-400 font-medium h-5"></div>
+
+                <button onclick="submitLogin()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg cursor-pointer interactive-scale">
+                    Masuk Dashboard
+                </button>
+
+                <div class="flex justify-between items-center text-xs pt-2">
+                    <button onclick="requestEmailOtp()" class="text-rose-400 hover:underline cursor-pointer">Minta Kode OTP Email</button>
+                    <button onclick="openForgotPinModal()" class="text-slate-400 hover:underline cursor-pointer">Lupa PIN?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD MENU SCREEN -->
+    <div id="dashboard-menu-screen" class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden hidden fade-in my-6 p-4 md:p-8">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-xl font-bold text-rose-400 flex items-center gap-2">📋 Dashboard Kartu Saya</h2>
+                    <span id="app-version-badge" class="text-[10px] bg-slate-800 text-rose-400 px-2 py-0.5 rounded-full border border-slate-700 font-mono">v1.1.7</span>
+                    <span class="text-[10px] bg-slate-800/80 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700/80 font-sans">Master Lock Active</span>
+                </div>
+                <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-700 text-slate-300 font-medium transition cursor-pointer interactive-scale">⚙️ Akun</button>
+                <button onclick="logoutSession()" class="bg-rose-950/60 hover:bg-rose-900 text-xs px-3 py-2 rounded-xl border border-rose-800 text-rose-300 font-medium transition cursor-pointer interactive-scale">🚪 Keluar</button>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-semibold text-slate-200">Daftar Kartu Tersimpan di Database</h3>
+            <button onclick="createNewCard()" class="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs px-4 py-2.5 rounded-xl font-semibold shadow-lg transition cursor-pointer interactive-scale">
+                ✨ Buat Kartu Baru
+            </button>
+        </div>
+
+        <div id="user-cards-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1 custom-scrollbar">
+            <p class="text-center text-slate-500 text-xs py-8">Memuat daftar kartu...</p>
+        </div>
+    </div>
+
+    <!-- OPENING SCREEN -->
+    <div id="opening-screen" class="fixed inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-6 text-center backdrop-blur-md hidden">
+        <div class="max-w-md w-full bg-slate-800/80 border border-slate-700 p-8 rounded-3xl shadow-2xl fade-in animate-float">
+            <div class="text-5xl mb-4">🎁</div>
+            <h1 id="receiver-opening-title" class="text-2xl font-bold mb-2 tracking-wide text-rose-400">ADA UCAPAN UNTUKMU</h1>
+            <p id="receiver-recipient-name" class="text-slate-300 text-lg mb-6 font-medium">Seseorang</p>
+            <button onclick="openReceiverCard()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer interactive-scale">
+                <span>🎵</span> <span id="receiver-opening-btn">BUKA KARTU</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER (EDITOR DENGAN SCROLL DINAMIS) -->
+    <div id="main-container" class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden hidden fade-in my-6 max-h-[92vh] flex flex-col">
+        
+        <!-- Preview Area -->
+        <div id="card-bg-wrapper" class="relative bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-900 p-6 md:p-8 border-b border-slate-800 bg-cover bg-center overflow-y-auto max-h-[45vh] custom-scrollbar">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div id="editor-top-buttons" class="flex gap-2 flex-wrap">
+                    <button onclick="backToDashboard()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition flex items-center gap-1.5 cursor-pointer text-slate-300 font-medium interactive-scale">
+                        🏠 Menu Utama
+                    </button>
+                    <button onclick="openMediaManager()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition flex items-center gap-1.5 cursor-pointer text-rose-300 font-medium interactive-scale">
+                        📁 Media Manager
+                    </button>
+                    <button onclick="loadDummyLocalPreview()" class="bg-amber-600/40 hover:bg-amber-600/60 text-amber-300 border border-amber-500/50 text-xs px-3 py-1.5 rounded-full transition font-semibold cursor-pointer interactive-scale" title="Coba Dummy & Preview Lokal Seketika">
+                        ⚡ Dummy & Preview
+                    </button>
+                </div>
+            </div>
+
+            <div id="card-preview-box" class="text-center py-6 animate-float">
+                <div id="gif-container" class="my-2 flex justify-center hidden">
+                    <img id="display-gif" class="w-24 h-24 object-contain rounded-xl shadow-md" alt="GIF Dekorasi" loading="lazy">
+                </div>
+
+                <h2 id="display-judul" class="font-bold mb-4 text-white drop-shadow-md typewriter-cursor">Happy Birthday</h2>
+                
+                <div id="foto-preview-container" class="my-4 flex justify-center">
+                    <img id="display-foto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" class="w-36 h-36 md:w-44 md:h-44 object-cover border-4 border-rose-500/40 shadow-xl rounded-full animate-beat transition-all duration-300" alt="Foto Kartu" loading="lazy">
+                </div>
+
+                <div id="video-container" class="my-4 flex justify-center hidden">
+                    <video id="display-video" class="w-full max-h-48 rounded-2xl border border-slate-700 shadow-lg" controls playsinline preload="metadata" onerror="handleVideoError(this)"></video>
+                </div>
+
+                <p id="display-nama" class="font-semibold text-rose-300 mb-3 drop-shadow">Audylia Salsabilla</p>
+                
+                <div id="greeting-box-container" class="bg-black/25 backdrop-blur-md border border-white/20 p-5 rounded-2xl mt-4 shadow-xl transition-all duration-300">
+                    <p id="display-ucapan" class="text-slate-100 italic leading-relaxed typewriter-cursor">"Selamat ulang tahun, moga selalu beruntung."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM EDITOR SECTION (SCROLLABLE & DINAMIS) -->
+        <div id="editor-section" class="p-6 md:p-8 space-y-4 bg-slate-900 overflow-y-auto max-h-[50vh] custom-scrollbar flex-1">
+            <h3 class="text-lg font-semibold text-slate-200 border-b border-slate-800 pb-2 flex items-center justify-between">
+                <span class="flex items-center gap-2">✏️ Editor Kartu & Modular Frame</span>
+            </h3>
+
+            <!-- PENGATURAN TEKS PEMBUKA (OPENING SCREEN EDITABLE) -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <label class="block text-xs font-bold text-rose-400">🎁 Teks Layar Pembuka (Opening Screen)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Judul Pembuka</label>
+                        <input type="text" id="input-openingtitle" value="ADA UCAPAN UNTUKMU" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Teks Tombol Buka</label>
+                        <input type="text" id="input-openingbtn" value="BUKA KARTU" oninput="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULAR FRAME & REMOVE/HIDE OPTIONS -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <label class="block text-xs font-bold text-rose-400">🖼️ Pilihan Bingkai & Hapus/Sembunyikan Manual</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto (Photo Frame)</label>
+                        <select id="input-framestyle" onchange="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                            <option value="rounded-full">Lingkaran Sempurna (Circle)</option>
+                            <option value="rounded-2xl">Kotak Sudut Melengkung</option>
+                            <option value="rounded-[50%_20%_50%_20%]">Oval Unik / Telur</option>
+                            <option value="rounded-[40px_10px_40px_10px]">Geometris Modern</option>
+                            <option value="rounded-none border-8 border-white shadow-2xl">Bingkai Kotak Klasik</option>
+                            <option value="rounded-3xl border-4 border-rose-400 shadow-lg">Bingkai Rose Border</option>
+                            <option value="none">🚫 Tanpa Bingkai / Sembunyikan Foto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Kotak Ucapan (Greeting Box)</label>
+                        <select id="input-greetingframe" onchange="updateLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                            <option value="glass-blur">Glassmorphism Blur Transparan</option>
+                            <option value="solid-dark">Solid Dark Minimalis</option>
+                            <option value="neon-glow">Neon Glow Border (Bercahaya)</option>
+                            <option value="gradient-border">Gradient Border Mewah</option>
+                            <option value="polaroid-box">Paper / Polaroid Style Box</option>
+                            <option value="none">🚫 Tanpa Kotak / Sembunyikan Kotak Ucapan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GEN Z DYNAMIC DECORATIONS PANEL -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <label class="block text-xs font-bold text-rose-400">✨ Editor Dekorasi Dinamis & Gen Z</label>
+                    <select id="input-layout-mode" onchange="toggleLayoutMode()" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-lg focus:outline-none">
+                        <option value="single">Mode 1 — Single Screen</option>
+                        <option value="scroll">Mode 2 — Scroll (Multi-Section)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">🎨 Pilih Preset Gen Z</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="applyGenZPreset('genz-birthday')" class="bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🎂 Gen Z Birthday</button>
+                        <button onclick="applyGenZPreset('cute-genz')" class="bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🧸 Cute Gen Z</button>
+                        <button onclick="applyGenZPreset('neon-party')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">🔥 Neon Party</button>
+                        <button onclick="applyGenZPreset('pastel-love')" class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs py-1.5 px-2 rounded-xl font-medium interactive-scale">💖 Pastel Love</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2 border-t border-slate-800/80">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-medium text-slate-300">✏️ Teks Dekorasi Dinamis</label>
+                        <button onclick="addNewDecorationText()" class="bg-rose-600 hover:bg-rose-700 text-white text-[10px] px-2.5 py-1 rounded-lg font-semibold interactive-scale">+ Tambah Teks</button>
+                    </div>
+                    <div id="dynamic-decor-list" class="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar"></div>
+                </div>
+            </div>
+
+            <!-- PRESET T
