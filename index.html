@@ -127,7 +127,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-xl font-bold text-rose-400">📋 Dashboard Kartu Saya</h2>
-                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.31</span>
+                        <span class="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800 font-mono">v1.1.33</span>
                     </div>
                     <p id="dashboard-user-email" class="text-xs text-slate-400 mt-1">-</p>
                 </div>
@@ -167,7 +167,7 @@
             <div id="top-action-bar" class="flex justify-between items-center z-30 max-w-4xl mx-auto w-full">
                 <button onclick="backToDashboard()" class="bg-slate-900/80 hover:bg-slate-800 text-xs px-4 py-2 rounded-full border border-slate-700 text-slate-200 font-medium backdrop-blur-md interactive-scale shadow-lg">🏠 Menu Utama</button>
                 <div class="flex gap-2 items-center">
-                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.31</span>
+                    <span class="text-[10px] bg-slate-900/80 text-rose-400 px-2.5 py-1 rounded-full border border-slate-800 font-mono">v1.1.33</span>
                     <button onclick="shareWhatsApp()" class="bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">💬 WA</button>
                     <button onclick="copyLink()" class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2 rounded-full font-medium interactive-scale shadow-lg">📋 Link</button>
                 </div>
@@ -255,10 +255,19 @@
                         <option value="up">⬆️ Gerak ke Atas (Pan Up)</option>
                     </select>
                 </div>
-                <div id="custom-bg-url-box" class="hidden">
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Link Gambar Background</label>
-                    <input type="text" id="input-bgimgurl" placeholder="https://..." oninput="updateLivePreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+
+                <!-- MENU UPLOAD FOTO BACKGROUND (HD) -->
+                <div id="custom-bg-url-box" class="hidden space-y-3 bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+                    <div>
+                        <label class="block text-xs font-medium text-rose-400 mb-1">🖼️ Upload Foto Background (HD)</label>
+                        <input type="file" accept="image/*" onchange="handleFileSelect(event, 'bg')" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Atau Link URL Gambar Background</label>
+                        <input type="text" id="input-bgimgurl" placeholder="https://..." oninput="updateMediaFromInput('bg')" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-rose-500">
+                    </div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Bingkai Foto</label>
@@ -362,10 +371,10 @@
             <!-- TAB 5: MEDIA -->
             <div id="tab-content-media" class="space-y-4 editor-tab-pane hidden">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload 1 Foto Utama (Super Kompres Ringkas)</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">🖼️ Upload 1 Foto Utama (Kualitas HD)</label>
                     <input type="file" accept="image/*" onchange="handleFileSelect(event, 'foto')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer">
                     <button onclick="setPhotoAsFullScreenBg()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs py-2 rounded-xl font-medium interactive-scale border border-slate-700 cursor-pointer">🌌 Jadikan Foto Ini Background Full Layar</button>
-                    <p class="text-[10px] text-slate-500 mt-1">💡 Otomatis dikompres sangat ringkas agar link share WhatsApp aman dan tidak terpotong.</p>
+                    <p class="text-[10px] text-slate-500 mt-1">💡 Resolusi tinggi dan tajam, tidak pecah.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">🔗 Atau Link URL Foto</label>
@@ -476,7 +485,8 @@
         let activeDragItem = null;
         let isReceiverView = false;
 
-        function compressAndConvertImage(file, callback) {
+        // Fungsi Kompresi Foto HD (Tajam & Tidak Pecah)
+        function compressAndConvertImage(file, callback, targetType = 'foto') {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -484,7 +494,18 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxWidth = 180;
+                    
+                    let maxWidth = 600;
+                    let quality = 0.8;
+                    
+                    if (targetType === 'bg') {
+                        maxWidth = 950; // Background full layar dibuat HD
+                        quality = 0.85;
+                    } else if (targetType === 'foto') {
+                        maxWidth = 700;
+                        quality = 0.8;
+                    }
+
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
                         width = maxWidth;
@@ -493,7 +514,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.3);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
                     callback(compressedDataUrl);
                 };
                 img.src = e.target.result;
@@ -508,13 +529,20 @@
                 if (type === 'foto') {
                     cardState.fotoUrl = resultUrl;
                     const inputEl = document.getElementById('input-fotourl');
-                    if (inputEl) inputEl.value = '(1 Foto Utama Terunggah & Aman)';
+                    if (inputEl) inputEl.value = '(1 Foto Utama HD Terunggah)';
                 } else if (type === 'gif') {
                     cardState.gifUrl = resultUrl;
+                } else if (type === 'bg') {
+                    cardState.bgImgUrl = resultUrl;
+                    cardState.bgStyle = 'custom-image';
+                    const bgStyleEl = document.getElementById('input-bgstyle');
+                    if (bgStyleEl) bgStyleEl.value = 'custom-image';
+                    const inputEl = document.getElementById('input-bgimgurl');
+                    if (inputEl) inputEl.value = '(1 Foto Background HD Terunggah)';
                 }
                 updateLivePreview();
-                alert('Foto utama berhasil diunggah & dikompres super ringkas! ✨');
-            });
+                alert('Gambar berhasil diunggah dengan kualitas HD yang tajam! ✨');
+            }, type);
         }
 
         function setPhotoAsFullScreenBg() {
@@ -968,7 +996,7 @@
         }
 
         function saveCardData() {
-            updateLivePreview(); // Force sync data input terbaru
+            updateLivePreview();
             if (!cardState.id) cardState.id = 'card_' + Date.now();
             cardState.decorations = dynamicDecorations;
             let allCards = JSON.parse(localStorage.getItem('my_digital_cards') || '[]');
@@ -979,14 +1007,14 @@
             
             const statusEl = document.getElementById('upload-status');
             if (statusEl) {
-                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.31)';
+                statusEl.innerText = 'Kartu Berhasil Disimpan! 🎉 (v1.1.33)';
                 setTimeout(() => { statusEl.innerText = ''; }, 3000);
             }
             alert('Perubahan kartu berhasil disimpan! 💾');
         }
 
         function getShareableLink() {
-            updateLivePreview(); // Force sync data input terbaru sebelum link dibuat
+            updateLivePreview();
             if (!cardState.id) cardState.id = 'card_' + Date.now();
             cardState.decorations = dynamicDecorations;
             const shortCode = encodeCardToShortLink(cardState);
@@ -1305,6 +1333,7 @@
         function updateMediaFromInput(type) {
             if (type === 'foto') cardState.fotoUrl = document.getElementById('input-fotourl').value.trim();
             if (type === 'musik') cardState.musikUrl = document.getElementById('input-musikurl').value.trim();
+            if (type === 'bg') cardState.bgImgUrl = document.getElementById('input-bgimgurl').value.trim();
             updateLivePreview();
         }
 
