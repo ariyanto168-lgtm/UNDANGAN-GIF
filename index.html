@@ -36,19 +36,27 @@
             animation: cinematicFadeIn 1.2s ease; overflow: hidden; 
         }
         
-        /* FIX: GPU Acceleration applied to container to prevent animation freeze */
+        /* FIX TOTAL: PEMISAHAN KOTAK (WRAPPER) DAN LAPISAN ANIMASI (LAYER) AGAR GPU TIDAK MACET */
         #openedCard .gallery-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; 
-            overflow: hidden; z-index: 1; opacity: 1; background: #080b12;
-            transform-origin: center center;
+            overflow: hidden; z-index: 1; background: #080b12;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
-        /* FIX: changed width/height to 100% so it syncs perfectly with container transformations */
-        #openedCard .gallery-container img { 
-            width: 100%; height: 100%; object-fit: cover; object-position: center; border: none; display: block;
+
+        /* LAPISAN KHUSUS ANIMASI (OVERSIZED) UNTUK GPU ACCELERATION */
+        .bg-anim-layer {
+            position: absolute;
+            top: -10vh; left: -10vw; /* Lebihkan ukuran agar saat digeser tidak bolong */
+            width: 120vw; height: 120vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            will-change: transform;
+            transform: translateZ(0); /* Paksa GPU HP Merender Ini */
             filter: brightness(1.1) contrast(0.95) saturate(1.05);
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         /* BINGKAI FOTO MULTI-SHAPE & DRAG RESIZE */
@@ -57,15 +65,9 @@
             width: 260px; height: 380px; z-index: 5; touch-action: none;
             overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
             border: 4px solid rgba(255, 255, 255, 0.9); background: #000;
-            will-change: transform;
         }
-        .photo-frame-wrapper img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
-        }
-
-        .drag-mode .photo-frame-wrapper {
-            border: 2px dashed #ff0055; cursor: move;
-        }
+        .photo-frame-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .drag-mode .photo-frame-wrapper { border: 2px dashed #ff0055; cursor: move; }
         .resize-handle {
             display: none; position: absolute; right: 0; bottom: 0; width: 30px; height: 30px;
             background: #ff0055; z-index: 20; border-top-left-radius: 12px; cursor: nwse-resize;
@@ -87,11 +89,7 @@
         }
         
         .anim-slide-from-top { animation: slideDownFromTop 1.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
-
-        @keyframes slideDownFromTop {
-            0% { transform: translate(-50%, -350px); opacity: 0; }
-            100% { transform: translate(-50%, -50%); opacity: 1; }
-        }
+        @keyframes slideDownFromTop { 0% { transform: translate(-50%, -350px); opacity: 0; } 100% { transform: translate(-50%, -50%); opacity: 1; } }
 
         .greeting-title { font-size: 2.2rem; font-weight: bold; margin: 0; }
         .greeting-subtitle { font-size: 1.3rem; font-weight: 600; margin: 0; }
@@ -114,19 +112,18 @@
         .eq-2 { background: #22c55e; height: 28px; animation-delay: 0.3s; }
         .eq-3 { background: #3b82f6; height: 12px; animation-delay: 0.0s; }
         .eq-4 { background: #eab308; height: 22px; animation-delay: 0.2s; }
-        
         @keyframes eqBounce { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
         
-        /* EFEK BACKGROUND ANIMASI UNIVERSAL + GPU ACCELERATION */
-        .effect-zoom-slow { animation: zoomFastLoop 8s ease-in-out infinite alternate !important; will-change: transform; }
-        .effect-slide-side { animation: slideSideFastLoop 7s ease-in-out infinite alternate !important; width: 125vw !important; will-change: transform; }
-        .effect-scroll-up { animation: scrollUpFastLoop 6s linear infinite !important; height: 135vh !important; will-change: transform; }
-        .effect-pulse { animation: pulseFastLoop 5s ease-in-out infinite alternate !important; will-change: transform; }
+        /* KELAS ANIMASI BARU (FOKUS DI LAYER, BUKAN WRAPPER) */
+        .effect-zoom-slow { animation: zoomFastLoop 8s ease-in-out infinite alternate !important; }
+        .effect-slide-side { animation: slideSideFastLoop 7s ease-in-out infinite alternate !important; }
+        .effect-scroll-up { animation: scrollUpFastLoop 7s ease-in-out infinite alternate !important; }
+        .effect-pulse { animation: pulseFastLoop 5s ease-in-out infinite alternate !important; }
 
-        @keyframes zoomFastLoop { 0% { transform: scale(1) translateZ(0); } 100% { transform: scale(1.12) translateZ(0); } }
-        @keyframes slideSideFastLoop { 0% { transform: translateX(0) translateZ(0); } 100% { transform: translateX(-12vw) translateZ(0); } }
-        @keyframes scrollUpFastLoop { 0% { transform: translateY(0) translateZ(0); } 100% { transform: translateY(-15vh) translateZ(0); } }
-        @keyframes pulseFastLoop { 0% { transform: scale(1) translateZ(0); } 100% { transform: scale(1.06) translateZ(0); } }
+        @keyframes zoomFastLoop { 0% { transform: scale(1) translateZ(0); } 100% { transform: scale(1.1) translateZ(0); } }
+        @keyframes slideSideFastLoop { 0% { transform: translateX(3vw) translateZ(0); } 100% { transform: translateX(-3vw) translateZ(0); } }
+        @keyframes scrollUpFastLoop { 0% { transform: translateY(3vh) translateZ(0); } 100% { transform: translateY(-3vh) translateZ(0); } }
+        @keyframes pulseFastLoop { 0% { transform: scale(1) translateZ(0); } 100% { transform: scale(1.05) translateZ(0); } }
         @keyframes cinematicFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         /* ANIMASI IKON KUSTOM */
@@ -200,7 +197,7 @@
 </head>
 <body>
 
-    <div class="version-badge" id="versionBadge">v8.3 GPU Fix</div>
+    <div class="version-badge" id="versionBadge">v8.4 GPU Fix</div>
 
     <div id="loadingPage">Memuat Kartu... ✨</div>
 
@@ -367,7 +364,6 @@
         <div class="settings-card">
             <div class="settings-header">🎵 Latar Belakang & Media</div>
             
-            <!-- SAKLAR ANTI BENTROK BACKGROUND -->
             <div class="switch-wrapper" style="border-left: 4px solid #ff0055;">
                 <span class="switch-label">Gunakan Background Foto URL</span>
                 <label class="switch">
@@ -426,7 +422,9 @@
 
     <!-- AREA KARTU UTAMA -->
     <div id="openedCard">
-        <div class="gallery-container" id="mainGalleryContainer"></div>
+        <div class="gallery-container" id="mainGalleryContainer">
+            <!-- BACKGROUND LAYER ANIMASI AKAN DI-INJECT DISINI OLEH JAVASCRIPT -->
+        </div>
 
         <div class="photo-frame-wrapper" id="photoFrameContainer" style="left: 50%; top: 50%;">
             <img id="displayFramePhoto" src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop" alt="Foto Bingkai">
@@ -473,6 +471,7 @@
             <button class="effect-option-btn" onclick="applyEffect('scroll-up')">⬆️ Gulir Foto ke Atas (Pan Up)</button>
             <button class="effect-option-btn" onclick="applyEffect('slide-side')">↔️ Geser Kiri-Kanan Cepat</button>
             <button class="effect-option-btn" onclick="applyEffect('pulse')">💖 Denyut Lembut</button>
+            <button class="effect-option-btn" onclick="applyEffect('none')">🎯 Diam Saja</button>
 
             <h3 style="color: #ffb8c6; margin-top: 25px; margin-bottom: 10px; font-size: 1rem;">🎨 Pilih Warna / Tekstur</h3>
             <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 10px;">(Aktif jika saklar "Gunakan Background Warna/Tekstur" dinyalakan)</p>
@@ -600,11 +599,11 @@
                 enbLoad: document.getElementById('enableLoadingText').checked, enbAnim: document.getElementById('enableBgAnim').checked,
                 anim: selectedAnimationType, bgCustom: selectedBgColorOrTexture, pos: posData
             };
-            localStorage.setItem('card_draft_v83', JSON.stringify(draft));
+            localStorage.setItem('card_draft_v84', JSON.stringify(draft));
         }
 
         function loadDraft() {
-            let saved = localStorage.getItem('card_draft_v83');
+            let saved = localStorage.getItem('card_draft_v84');
             if(saved) {
                 try {
                     let d = JSON.parse(saved);
@@ -666,7 +665,6 @@
                             if (parsedOpts.fFam) fFam = parsedOpts.fFam; if (parsedOpts.fOpa) fOpa = parsedOpts.fOpa;
                             if (parsedOpts.wa) waMsg = parsedOpts.wa; if (parsedOpts.lTit) lTitle = parsedOpts.lTit; if (parsedOpts.lBtn) lBtn = parsedOpts.lBtn; if (parsedOpts.lGif) lGifFull = parsedOpts.lGif;
                             
-                            // Load Toggle States
                             if (parsedOpts.useBgP !== undefined) uBgP = parsedOpts.useBgP; if (parsedOpts.useBgC !== undefined) uBgC = parsedOpts.useBgC;
                             if (parsedOpts.enbLoad !== undefined) enLoad = parsedOpts.enbLoad; if (parsedOpts.enbAnim !== undefined) isAnimEnabledGlobal = parsedOpts.enbAnim;
                             if (parsedOpts.anim) selectedAnimationType = parsedOpts.anim; if (parsedOpts.bgCustom) selectedBgColorOrTexture = parsedOpts.bgCustom; if(parsedOpts.pos) posData = parsedOpts.pos;
@@ -676,7 +674,6 @@
                     }
                     finalMessageRaw = msgText;
                     
-                    // Eksekusi Saklar Teks Loading
                     if (enLoad) loadingEl.innerText = lTxt; 
                     else loadingEl.innerHTML = '<span style="font-size:2.5rem; filter: drop-shadow(0 0 10px #ffb8c6);">⏳</span>';
 
@@ -726,12 +723,10 @@
             document.getElementById('landingPage').style.display = 'none'; document.getElementById('openedCard').style.display = 'block';
             triggerDualConfettiRain();
 
-            let galContainer = document.getElementById('mainGalleryContainer');
-            galContainer.className = "gallery-container";
-            
-            // Eksekusi Saklar Efek Animasi BG
-            if (isAnimEnabledGlobal && selectedAnimationType && selectedAnimationType !== 'none') {
-                galContainer.classList.add('effect-' + selectedAnimationType);
+            // AMBIL LAPISAN ANIMASI KHUSUS YANG SUDAH DI-INJECT
+            let bgLayer = document.getElementById('bgAnimLayer');
+            if (bgLayer && isAnimEnabledGlobal && selectedAnimationType && selectedAnimationType !== 'none') {
+                bgLayer.classList.add('effect-' + selectedAnimationType);
             }
 
             let elT = document.getElementById('displayTheme'); let elN = document.getElementById('displayName2'); let elM = document.getElementById('displayMessage');
@@ -744,27 +739,32 @@
             }
         }
 
-        // RENDER BACKGROUND (FIXED IMAGE SIZING)
+        // RENDER BACKGROUND (FIXED UNTUK GPU)
         function renderCardBackground(photoUrl, bgCustom, useBgP, useBgC) {
             const galleryContainer = document.getElementById('mainGalleryContainer');
-            galleryContainer.innerHTML = ''; galleryContainer.style.backgroundImage = 'none';
+            galleryContainer.innerHTML = ''; // Bersihkan container
+            
+            // Buat lapisan div khusus untuk merender background menggunakan CSS (jauh lebih kuat untuk di-animasi GPU)
+            let bgLayer = document.createElement('div');
+            bgLayer.id = "bgAnimLayer";
+            bgLayer.className = "bg-anim-layer"; // Punya ukuran 120% layar
 
             if (useBgC) {
                 if (bgCustom === 'texture-fabric') {
-                    galleryContainer.style.backgroundColor = '#e8dfd8';
-                    galleryContainer.style.backgroundImage = `repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px), radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.08) 100%)`;
+                    bgLayer.style.backgroundColor = '#e8dfd8';
+                    bgLayer.style.backgroundImage = `repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px), radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.08) 100%)`;
                 } else if (bgCustom && bgCustom.startsWith('#')) {
-                    galleryContainer.style.backgroundColor = bgCustom;
-                } else { galleryContainer.style.backgroundColor = '#080b12'; }
+                    bgLayer.style.backgroundColor = bgCustom;
+                } else { bgLayer.style.backgroundColor = '#080b12'; }
             } else if (useBgP) {
-                galleryContainer.style.backgroundColor = '#080b12';
+                bgLayer.style.backgroundColor = '#080b12';
                 if (photoUrl && photoUrl.trim() !== "") {
-                    let img = document.createElement('img');
-                    img.src = photoUrl.trim();
-                    img.onerror = function() { this.src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop'; };
-                    galleryContainer.appendChild(img);
+                    // Gunakan background-image murni, BUKAN elemen <img src="...">
+                    bgLayer.style.backgroundImage = `url('${photoUrl.trim()}')`;
                 }
-            } else { galleryContainer.style.backgroundColor = '#080b12'; }
+            } else { bgLayer.style.backgroundColor = '#080b12'; }
+            
+            galleryContainer.appendChild(bgLayer);
         }
 
         function renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, fPos) {
@@ -803,12 +803,14 @@
             let fFam = document.getElementById('inputFontFamily').value; let fOpa = document.getElementById('inputTextOpacity').value; let fSize = document.getElementById('inputFontSize').value; let fCol = document.getElementById('inputFontColor').value;
             applyTextStylesToElements(fFam, fCol, fOpa, fSize);
 
-            let galContainer = document.getElementById('mainGalleryContainer'); galContainer.className = "gallery-container";
-            let eAnim = document.getElementById('enableBgAnim').checked;
-            if(eAnim && selectedAnimationType !== 'none') galContainer.classList.add('effect-' + selectedAnimationType);
-
             let uBgP = document.getElementById('useBgPhoto').checked; let uBgC = document.getElementById('useBgCustom').checked; let photoUrl = document.getElementById('inputPhotoUrl').value.trim();
             renderCardBackground(photoUrl, selectedBgColorOrTexture, uBgP, uBgC);
+
+            let bgLayer = document.getElementById('bgAnimLayer');
+            let eAnim = document.getElementById('enableBgAnim').checked;
+            if(bgLayer && eAnim && selectedAnimationType !== 'none') {
+                bgLayer.classList.add('effect-' + selectedAnimationType);
+            }
 
             let showFr = document.getElementById('showFrame').checked; let framePhotoUrl = document.getElementById('inputFramePhotoUrl').value.trim(); let frStyle = document.getElementById('inputFrameStyle').value;
             renderPhotoFrameOnLoad(showFr, framePhotoUrl, frStyle, posData.frame);
@@ -926,7 +928,7 @@
                 if(shareUrl) window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Buka kartu spesial ini:\n\n" + shareUrl)}`, '_blank');
                 else alert("Silakan buat kartu terlebih dahulu.");
             } 
-            else if (action === 'info') { alert("Versi: 8.3 GPU Accelerated\nFitur: GPU Translation Fix, Anti-Macet Frame + BG, Toggle Logic 100% Active.\n\nPowered by Ari GPM"); }
+            else if (action === 'info') { alert("Versi: 8.4 Ultimate GPU Fix\nFitur: Pemisahan Layer Animasi & GPU Hardware Acceleration.\n\nPowered by Ari GPM"); }
         }
     </script>
 </body>
